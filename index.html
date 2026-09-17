@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RADAR | Breakout Sessions</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="generator" content="hand-authored; build_radar.py is retired as generator, see file banner">
+<meta name="radar-version" content="1.5">
+<!-- Favicon as an inline data URI: no external file, no request, works from a stick. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%231a1b1e'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23e8b23a' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='%23e8b23a' stroke-width='5'/%3E%3Cline x1='50' y1='50' x2='74' y2='28' stroke='%23e8b23a' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<!--
+  RADAR, offline single file.
+
+  Structure:
+    1. <style>  all CSS, screen theme first, print block last
+    2. markup   masthead, timer, navigation, five screens, brief sheet, footer
+    3. <script> the generated DATA block, then state, rendering and export
+
+  Five screens hold the six fields of the paper sheet. Field 2 (Konzepte) is
+  split: the Wirkmechanismen chips sit on screen 1, the Massnahmen and Toolbox chips
+  on screen 3. The Interventionsbrief prints both together.
+
+  Nothing here reaches the network and the page writes nothing to the device.
+  Entries live in one JavaScript object for the life of the tab.
+-->
+<style>
+  :root{
+    --color-bg:            #1a1b1e;
+    --color-surface:       #24262a;
+    --color-surface-alt:   #2c2f34;
+    --color-border:        #3b3e43;
+    --color-border-strong: #4d5157;
+    --color-text:          #f2f2f2;
+    --color-text-muted:    #aab1b8;
+    --color-text-faint:    #9aa1a9;
+    --color-accent:        #e8b23a;
+    --color-accent-strong: #f0c25c;
+    --color-accent-soft:   #3a331e;
+    --color-on-accent:     #1a1b1e;
+    --color-bg-raised:     #1e2024;
+    --color-warning-bg:    #3a2814;
+    --color-warning-text:  #f0c98a;
+    --color-warning-border:#7a5a2a;
+    --color-success-bg:    #1f2f24;
+    --color-success-text:  #a9cdb3;
+    --color-success-border:#3f6349;
+    --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+                 Arial, "Noto Sans", sans-serif;
+    --radius-sm: 3px;
+    --radius-md: 6px;
+    --radius-lg: 9px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --max-width: 900px;
+  }
+
+  *, *::before, *::after{ box-sizing: border-box; }
+  html{ -webkit-text-size-adjust: 100%; }
+  body{
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, p, ul, fieldset{ margin: 0; padding: 0; }
+  ul{ list-style: none; }
+  fieldset{ border: none; }
+  button{ font-family: inherit; }
+  [hidden]{ display: none !important; }
+  a{ color: var(--color-accent-strong); }
+
+  .skip-link{
+    position: absolute; left: -999px; top: auto;
+    background: var(--color-accent); color: var(--color-on-accent);
+    padding: var(--space-2) var(--space-4);
+    z-index: 1000; border-radius: var(--radius-sm);
+  }
+  .skip-link:focus{ left: var(--space-3); top: var(--space-3); }
+
+  .sr-only{
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible,
+  textarea:focus-visible, [tabindex]:focus-visible{
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+  [tabindex="-1"]:focus{ outline: none; }
+
+  /* ========== masthead and header ========== */
+  .app-masthead{
+    background: linear-gradient(180deg, var(--color-bg-raised), var(--color-bg));
+    border-bottom: 1px solid var(--color-border);
+  }
+  .app-masthead__inner{
+    max-width: var(--max-width); margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    display: flex; flex-wrap: wrap; gap: var(--space-2);
+    justify-content: space-between; align-items: baseline;
+    font-size: 0.8rem; color: var(--color-text-faint);
+  }
+  .app-header{ border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+  .app-header__inner{
+    max-width: var(--max-width); margin: 0 auto;
+    padding: var(--space-4) var(--space-4) var(--space-3);
+  }
+  .app-header__title{ font-size: 1.6rem; letter-spacing: 0.14em; color: var(--color-accent); }
+
+  /* ========== timer ========== */
+  .timerbar{ border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+  .timerbar__inner{
+    max-width: var(--max-width); margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);
+  }
+  .timerbar__clock{
+    font-size: 1.5rem; font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+    color: var(--color-accent); min-width: 5ch;
+  }
+  .timerbar__phase{ color: var(--color-text-muted); font-size: 0.9rem; flex: 1 1 16ch; }
+  .timerbar__checkpoints{ display: flex; gap: var(--space-1); align-items: center; }
+  .cp{
+    font-size: 0.78rem; padding: 2px var(--space-2);
+    border: 1px solid var(--color-border-strong); border-radius: 999px;
+    color: var(--color-text-faint); font-variant-numeric: tabular-nums;
+  }
+  .cp.is-passed{
+    background: var(--color-accent-soft); color: var(--color-accent-strong);
+    border-color: var(--color-accent);
+  }
+  .cp__unit{ font-size: 0.78rem; color: var(--color-text-faint); }
+
+  /* ========== navigation ========== */
+  .progress-nav{ border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+  .progress-nav__inner{
+    max-width: var(--max-width); margin: 0 auto; padding: var(--space-2) var(--space-4);
+    display: flex; flex-wrap: wrap; gap: var(--space-1);
+  }
+  .progress-nav__item{
+    background: none; border: 1px solid transparent; color: var(--color-text-muted);
+    padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+    cursor: pointer; font-size: 0.85rem; text-align: left;
+  }
+  .progress-nav__item:hover{ color: var(--color-text); background: var(--color-surface-alt); }
+  .progress-nav__item.is-current{
+    color: var(--color-on-accent); background: var(--color-accent); border-color: var(--color-accent);
+  }
+  .progress-nav__num{ font-variant-numeric: tabular-nums; opacity: 0.8; margin-right: 6px; }
+
+  /* ========== steps ========== */
+  main{ max-width: var(--max-width); margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-6); }
+  .step{ display: none; }
+  .step.is-active{ display: block; }
+  .step-eyebrow{
+    color: var(--color-text-faint); font-size: 0.8rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .step-title{ font-size: 1.45rem; margin-top: var(--space-1); }
+  .step-help{ color: var(--color-text-muted); margin-top: var(--space-2); max-width: 68ch; }
+  .step-card{
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg); padding: var(--space-5); margin-top: var(--space-4);
+  }
+  .box-label{
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--color-accent); margin-bottom: var(--space-2);
+  }
+  .field{ margin-top: var(--space-4); }
+  .field__label{ display: block; font-weight: 600; margin-bottom: var(--space-1); }
+  .field__help{ color: var(--color-text-faint); font-size: 0.86rem; margin-bottom: var(--space-2); }
+  .field__input, .field__area{
+    width: 100%; background: var(--color-surface-alt); color: var(--color-text);
+    border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
+    padding: var(--space-3); font-family: inherit; font-size: 0.97rem; line-height: 1.5;
+  }
+  .field__area{ min-height: 5.5em; resize: vertical; }
+
+  /* ========== Startfall ========== */
+  .startfall-row{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+  .btn{
+    background: var(--color-surface-alt); color: var(--color-text);
+    border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3); cursor: pointer; font-size: 0.9rem;
+  }
+  .btn:hover{ border-color: var(--color-accent); color: var(--color-accent-strong); }
+  .btn--primary{
+    background: var(--color-accent); color: var(--color-on-accent);
+    border-color: var(--color-accent); font-weight: 600;
+  }
+  .btn--primary:hover{ background: var(--color-accent-strong); color: var(--color-on-accent); }
+  .btn--case{ text-align: left; }
+  .case-meta{
+    margin-top: var(--space-3); font-size: 0.84rem; color: var(--color-text-faint);
+    border-left: 2px solid var(--color-accent); padding-left: var(--space-3); line-height: 1.5;
+  }
+  .import-row{ margin-top: var(--space-4); font-size: 0.85rem; color: var(--color-text-faint); }
+  .import-row input{ color: var(--color-text-muted); font-size: 0.85rem; }
+
+  /* ========== theme grouping inside #startfallRow (Thema wählen) ==========
+     #startfallRow stays the flat flex container static_checks.py and the browser
+     suites already query ("#startfallRow button[data-case]"); a theme-group is a
+     full-width flex child, so every Startfall button is still a direct-descendant
+     query match, in the same SF1..SF5 document order as before this round. */
+  .theme-group{ flex: 1 1 100%; margin-bottom: var(--space-3); }
+  .theme-group__head{
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-2);
+    margin-bottom: var(--space-1);
+  }
+  .theme-group__nr{
+    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .theme-group__title{ font-weight: 600; font-size: 0.92rem; }
+  .theme-group__count{ font-size: 0.78rem; color: var(--color-text-faint); }
+  .theme-group__bridge{
+    font-size: 0.82rem; color: var(--color-text-muted); margin: 2px 0 var(--space-2);
+    max-width: 64ch; line-height: 1.4;
+  }
+  .theme-group__buttons{ display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .theme-group--wildcard{
+    padding-top: var(--space-3); margin-top: var(--space-1);
+    border-top: 1px dashed var(--color-border-strong);
+  }
+  .theme-group--wildcard .theme-group__nr{ color: var(--color-accent-strong); }
+
+  /* ========== theme-coach: the June bridge sentence, contextual per screen ========== */
+  .theme-coach{
+    margin-top: var(--space-3); padding: var(--space-3);
+    border: 1px solid var(--color-border); border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-sm); background: var(--color-bg-raised);
+    font-size: 0.9rem; color: var(--color-text-muted);
+  }
+  .theme-coach__label{
+    font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-accent); margin-bottom: var(--space-1); display: block;
+  }
+
+  /* ========== progress indicator ========== */
+  .progress-count{
+    font-size: 0.8rem; color: var(--color-text-faint); padding: var(--space-2) var(--space-4) 0;
+    max-width: var(--max-width); margin: 0 auto;
+  }
+
+  /* ========== chips ========== */
+  .chiprow{ margin-top: var(--space-5); }
+  .chiprow__label{
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--color-accent); margin-bottom: var(--space-1);
+  }
+  .chiprow__question{ font-weight: 600; margin-bottom: var(--space-1); }
+  .chiprow__rule{ color: var(--color-text-faint); font-size: 0.84rem; margin-bottom: var(--space-3); }
+  .chiplist{ display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .chip{
+    display: inline-flex; align-items: baseline; gap: var(--space-2);
+    border: 1px solid var(--color-border-strong); border-radius: 999px;
+    padding: var(--space-2) var(--space-4); cursor: pointer;
+    background: var(--color-surface-alt); font-size: 0.9rem; line-height: 1.35;
+  }
+  .chip input{ margin: 0; accent-color: var(--color-accent); }
+  .chip.is-on{
+    background: var(--color-accent-soft); border-color: var(--color-accent);
+    color: var(--color-accent-strong);
+  }
+  .chip.is-blocked{ opacity: 0.42; cursor: not-allowed; }
+  /* The brief joins Workshop's English name and the German short name with a middle
+     dot; the chip did not, so the same pair read as one run-on label on screen
+     and as a pair on paper. One separator, both places. */
+  .chip__de::before{ content: "\00b7\00a0"; }
+  .chip__de{ color: var(--color-text-faint); }
+  .chip.is-on .chip__de{ color: var(--color-accent-strong); }
+  .chip-single{ margin-top: var(--space-3); }
+  .chip-single .chip{ border-style: dashed; }
+
+  /* Glossary, form (a): a disclosure on each concept chip. The control sits OUTSIDE
+     the label, so the click that opens an explanation can never reach the checkbox and
+     change what the group has selected for the brief. */
+  .chip-wrap{ display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+  /* Wraps rather than pushing the page sideways on a narrow screen. */
+  .chip-line{ display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); max-width: 100%; }
+  .chip{ max-width: 100%; }
+  .chip span{ overflow-wrap: anywhere; }
+  .chip-wrap{ max-width: 100%; }
+  .startfall-own{ margin-top: var(--space-3); display: flex; flex-wrap: wrap;
+    align-items: center; gap: var(--space-2); }
+  .startfall-own .field__help{ margin: 0; }
+  .field__input--short{ max-width: 22ch; }
+  .brief__open{
+    margin-top: var(--space-2); margin-bottom: var(--space-3);
+    font-size: 0.88rem; color: var(--color-warning-text);
+  }
+  .brief__open.is-complete{ color: var(--color-success-text); }
+  .brief__note.is-open{ color: var(--color-warning-text); font-style: normal; }
+  .brief__meta{ font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: var(--space-2); }
+  .chip__info{
+    background: none; border: 1px solid var(--color-border-strong);
+    color: var(--color-text-faint); border-radius: 999px;
+    width: 1.7em; height: 1.7em; line-height: 1; padding: 0;
+    cursor: pointer; font-size: 0.85rem; font-style: italic;
+  }
+  .chip__info:hover{ color: var(--color-accent); border-color: var(--color-accent); }
+  .chip__info[aria-expanded="true"]{
+    color: var(--color-on-accent); background: var(--color-accent); border-color: var(--color-accent);
+  }
+  .chip__gloss{
+    font-size: 0.85rem; color: var(--color-text-muted); max-width: 52ch;
+    border-left: 2px solid var(--color-border-strong); padding-left: var(--space-2);
+  }
+
+  /* Glossary, form (b): the standing panel, in its own bar under the navigation so it
+     is reachable from all five screens without being a sixth screen. */
+  .lookup{ border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+  .lookup__inner{ max-width: var(--max-width); margin: 0 auto; padding: var(--space-2) var(--space-4); }
+  .lookup summary{ cursor: pointer; color: var(--color-accent); font-size: 0.88rem; }
+  .lookup__body{ padding: var(--space-3) 0 var(--space-2); }
+  .lookup__group{ margin-top: var(--space-4); }
+  .lookup__grouptitle{
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--color-accent); margin-bottom: var(--space-1);
+  }
+  .lookup__item{ margin-top: var(--space-2); max-width: 78ch; }
+  .lookup__name{ font-weight: 600; font-size: 0.92rem; }
+  .lookup__gloss{ color: var(--color-text-muted); font-size: 0.88rem; }
+
+  .hint{
+    margin-top: var(--space-3); padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-warning-border); background: var(--color-warning-bg);
+    color: var(--color-warning-text); border-radius: var(--radius-sm); font-size: 0.87rem;
+  }
+
+  /* ========== Kundenkosten ========== */
+  .kosten{
+    margin-top: var(--space-5); border-top: 1px solid var(--color-border);
+    padding-top: var(--space-4);
+  }
+  .kosten__lead{ color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: var(--space-2); }
+  .kosten__item{
+    display: flex; gap: var(--space-2); align-items: baseline;
+    margin-top: var(--space-2); font-size: 0.92rem;
+  }
+  .kosten__item input{ accent-color: var(--color-accent); }
+  .kosten__count{ margin-top: var(--space-3); font-size: 0.85rem; color: var(--color-text-faint); }
+
+  /* ========== step footer ========== */
+  .step-actions{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
+  .export-row{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
+  .export-note{ color: var(--color-text-faint); font-size: 0.84rem; margin-top: var(--space-2); max-width: 68ch; }
+
+  .action-status{
+    max-width: var(--max-width); margin: var(--space-3) auto 0; padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-success-border); background: var(--color-success-bg);
+    color: var(--color-success-text); border-radius: var(--radius-sm); font-size: 0.88rem;
+  }
+
+  /* ========== brief sheet ========== */
+  .brief-sheet{ display: none; }
+  body.show-brief .brief-sheet{
+    display: block; max-width: var(--max-width);
+    margin: 0 auto var(--space-6); padding: 0 var(--space-4);
+  }
+  .brief{
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg); padding: var(--space-5);
+  }
+  .brief__title{ font-size: 1.2rem; margin-bottom: var(--space-2); }
+  .brief__lead{
+    font-size: 1rem; line-height: 1.6; color: var(--color-text);
+    border-left: 3px solid var(--color-accent); padding-left: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .brief__box{
+    border: 1px solid var(--color-border); border-radius: var(--radius-md);
+    padding: var(--space-3); margin-top: var(--space-3);
+  }
+  /* The eyebrow labels on screen are set in capitals; the brief's field titles are
+     not. The brief is read aloud in the 60-second report and then read on paper, and
+     a line of capitals is slower to read and reads as shouting on a sheet that goes
+     to a region. Sentence case, with the letter-spacing that keeps it a label. */
+  .brief__boxtitle{
+    font-size: 0.8rem; letter-spacing: 0.06em; font-weight: 700;
+    color: var(--color-accent); margin-bottom: var(--space-2);
+  }
+  .brief__row{ margin-top: var(--space-2); }
+  .brief__rowlabel{ font-size: 0.8rem; color: var(--color-text-faint); }
+  .brief__value{ white-space: pre-wrap; }
+  .brief__value.is-empty{ color: var(--color-text-faint); }
+  .brief__note{
+    margin-top: var(--space-3); font-size: 0.82rem; color: var(--color-text-faint);
+    font-style: italic;
+  }
+  .brief__footer{
+    margin-top: var(--space-4); padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border); font-size: 0.8rem; color: var(--color-text-faint);
+  }
+  .print-attribution{ display: none; }
+
+  /* ========== page footer ========== */
+  .app-footer{ border-top: 1px solid var(--color-border); background: var(--color-bg-raised); }
+  .app-footer__inner{
+    max-width: var(--max-width); margin: 0 auto; padding: var(--space-4);
+    font-size: 0.85rem; color: var(--color-text-faint);
+  }
+  .app-footer__line{ margin-top: var(--space-2); max-width: 76ch; }
+  .app-footer__version{ font-variant-numeric: tabular-nums; }
+  .app-footer summary{ cursor: pointer; color: var(--color-text-muted); }
+  .privacy-body{ margin-top: var(--space-2); line-height: 1.5; max-width: 68ch; }
+  .privacy-body p{ margin-bottom: var(--space-2); }
+
+  @media (max-width: 620px){
+    .step-card{ padding: var(--space-4); }
+  }
+
+  /* =====================================================================
+     PRINT. Only the Interventionsbrief prints; it is the sheet that leaves
+     the room, so it prints as ink on white.
+     ===================================================================== */
+  @media print{
+    :root{
+      --color-bg:            #ffffff;
+      --color-surface:       #ffffff;
+      --color-surface-alt:   #ffffff;
+      --color-border:        #999999;
+      --color-border-strong: #666666;
+      --color-text:          #111111;
+      --color-text-muted:    #333333;
+      --color-text-faint:    #555555;
+      --color-accent:        #6b4e0c;
+      --color-accent-strong: #5c440c;
+      --color-accent-soft:   #f3ead4;
+      --color-on-accent:     #ffffff;
+    }
+    .no-print, .app-masthead, .app-header, .progress-nav, .timerbar, .skip-link,
+    .action-status, main{ display: none !important; }
+    /* The brief is the deliverable of the lab and it is meant to be one page.
+       A verbose case (long sentences in every field) was running to two, with the
+       sixth field alone on the second page, so the paddings and leadings below are
+       set to hold a full case on one A4 sheet and were measured against a rendered
+       PDF of exactly that case, not estimated. */
+    body{ background: #fff; color: #111; font-size: 10pt; padding: 9mm; }
+    .brief-sheet{ display: block !important; max-width: 100%; margin: 0; padding: 0; }
+    .brief{ border: none; padding: 0; background: #fff; }
+    .brief__title{ font-size: 13pt; margin-bottom: 3pt; }
+    .brief__lead{
+      font-size: 9.6pt; line-height: 1.35; margin-bottom: 5pt;
+      padding-left: 6pt; border-left: 2pt solid #6b4e0c;
+    }
+    .brief__box{ border: 0.75pt solid #999; padding: 4.5pt; margin-top: 3pt; break-inside: avoid; }
+    .brief__boxtitle{ font-size: 8pt; margin-bottom: 2pt; }
+    .brief__row{ margin-top: 2pt; }
+    .brief__value, .brief__rowlabel{ font-size: 8.8pt; line-height: 1.3; }
+    /* The Workshop stamp and the attribution are one foot, not two: as two ruled blocks
+       they cost enough height to push themselves onto a second sheet that carried
+       nothing else. */
+    .brief__note{ font-size: 8pt; margin-top: 3pt; }
+    /* The screen colours this line green when nothing is open and amber when something
+       is; on paper both print as ink, because the pale green was barely legible. */
+    .brief__open, .brief__open.is-complete{
+      font-size: 8.5pt; margin: 3pt 0 5pt; color: #111; font-weight: 700;
+    }
+    .brief__note.is-open{ color: #111; }
+    .brief__meta{ font-size: 8.5pt; margin-bottom: 3pt; color: #333; }
+    .brief__footer{ font-size: 7.5pt; margin-top: 4pt; padding-top: 3pt; }
+    .print-attribution{
+      display: block !important; margin-top: 2pt; padding-top: 0;
+      border-top: none; font-size: 7.5pt; color: #444; line-height: 1.35;
+    }
+    a[href]::after{ content: ""; }
+    @page{ margin: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Zum Hauptinhalt springen</a>
+
+<div class="app-masthead no-print">
+  <div class="app-masthead__inner">
+    <span>Breakout Sessions &middot; Regionalleitungen Personal Banking</span>
+    <span>Prof. Eugen Dimant, University of Pennsylvania</span>
+  </div>
+</div>
+
+<header class="app-header no-print">
+  <div class="app-header__inner">
+    <h1 class="app-header__title">RADAR</h1>
+    
+  </div>
+</header>
+
+<div class="timerbar no-print" id="timerBar">
+  <div class="timerbar__inner">
+    <span class="timerbar__clock" id="timerClock">35:00</span>
+    <span class="timerbar__phase" id="timerPhase">Noch nicht gestartet</span>
+    <span class="cp__unit">Minute</span>
+    <span class="timerbar__checkpoints" id="timerCheckpoints"></span>
+    <button type="button" class="btn" id="btnTimerStart">Start</button>
+    <button type="button" class="btn" id="btnTimerReset">Zurücksetzen</button>
+  </div>
+</div>
+
+<nav class="progress-nav no-print" id="progressNav" aria-label="Fortschritt">
+  <div class="progress-nav__inner" id="progressNavInner"></div>
+</nav>
+<p class="progress-count no-print" id="progressCount" aria-live="polite"></p>
+
+<div class="lookup no-print" id="lookupPanel">
+  <div class="lookup__inner">
+    <details id="lookupDetails">
+      <summary id="lookupSummary">Konzepte nachschlagen</summary>
+      <div class="lookup__body" id="lookupBody"></div>
+    </details>
+  </div>
+</div>
+
+<div class="sr-only" role="status" aria-live="polite" id="liveRegion"></div>
+<div class="action-status no-print" id="visualStatus" aria-hidden="true" hidden></div>
+
+<main id="main-content" class="no-print">
+
+  <!-- ============================ Screen 1 ============================ -->
+  <section class="step is-active" id="step-1" data-step="1" aria-labelledby="step-1-title">
+    <p class="step-eyebrow">Schritt 1 von 5</p>
+    <h2 class="step-title" id="step-1-title" tabindex="-1">Reibung erkennen</h2>
+    <p class="step-help">Startfall laden oder eigenen Fall eingeben. Beschreiben Sie Situation und beobachtetes Verhalten; noch keine Erklärung.</p>
+
+    <div class="step-card">
+      <h3 class="field__label">Thema wählen</h3>
+      <p class="field__help">Drei Themen aus der Vorbefragung stehen vorn, weil am meisten Antworten sie
+        nennen; dazu ein viertes mit weniger Antworten. Die Nummer auf Ihrer Startfallkarte entscheidet,
+        welchen Fall Sie öffnen; hier sehen Sie ihn nach Thema geordnet statt als Liste von fünf Nummern.</p>
+      <div class="startfall-row" id="startfallRow" role="group" aria-label="Thema und Startfall"></div>
+      <p class="startfall-own">
+        <button type="button" class="btn" id="btnOwnCase">Eigener Fall</button>
+        <span class="field__help">Ohne Startfall arbeiten, oder wenn Ihr Thema nicht in der Liste steht. Im Interventionsbrief steht dann „eigener Fall“.</span>
+      </p>
+      <p class="case-meta" id="caseMeta" hidden></p>
+      <p class="import-row">
+        <label class="field__label" for="fileImport">Bestehenden Fall aus JSON öffnen</label>
+        <!-- V1.12: a native <input type=file> shows its browser's own UI-locale button
+             text ("Choose File" in an English-locale browser), the one remaining
+             non-German control in the tool. The real file input still exists, still
+             carries id="fileImport" and its own accept/behavior unchanged, and stays
+             keyboard-reachable; it is only moved out of the visible layout (.sr-only,
+             not display:none) and out of the tab order (tabindex="-1"), with this
+             German-labelled button as its sole visible and keyboard trigger. -->
+        <button type="button" class="btn" id="btnFileImport">Datei wählen</button>
+        <span class="field__help" id="fileImportName">Keine Datei ausgewählt</span>
+        <input type="file" id="fileImport" accept="application/json,.json" class="sr-only" tabindex="-1">
+      </p>
+    </div>
+
+    <div class="step-card">
+      <p class="box-label">Feld 1</p>
+      <h3 class="field__label">Beobachtung</h3>
+      <div class="field">
+        <label class="field__label" for="f_gruppe">Gruppe</label>
+        <p class="field__help">Die Nummer Ihrer Gruppe steht auf Ihrer Startfallkarte. Sie
+          erscheint auf dem Brief und im Dateinamen, damit die Briefe zugeordnet werden
+          können.</p>
+        <select class="field__input field__input--short" id="f_gruppe" data-key="gruppe"><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_situation">Situation</label>
+        <p class="field__help">Was ist der Fall? Keine Kundennamen oder Kontonummern.</p>
+        <textarea class="field__area" id="f_situation" data-key="situation" rows="4"></textarea>
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_verhalten">Beobachtetes Verhalten</label>
+        <p class="field__help">Was passiert nach dem Gespräch tatsächlich? Nur beobachten, noch nicht erklären.</p>
+        <textarea class="field__area" id="f_verhalten" data-key="verhalten" rows="3"></textarea>
+      </div>
+
+    </div>
+
+    <div class="step-card">
+      <p class="box-label">Feld 2</p>
+      <h3 class="field__label">Konzepte</h3>
+      <p class="field__help">Welche Konzepte helfen, den Fall einzuordnen? In Schritt 3 wählen Sie den passenden Hebel.</p>
+      <div class="chiprow">
+        <p class="chiprow__label">Konzepte</p>
+        <p class="chiprow__question">Welche Konzepte helfen, den Fall einzuordnen?</p>
+        <p class="chiprow__rule">Mindestens eines, höchstens zwei. Kein Freitext.</p>
+        <div class="chiplist" id="chips-wirkmechanismen" role="group" aria-label="Konzepte"></div>
+        <p class="hint" id="hint-wirkmechanismen" hidden>Bitte wählen Sie mindestens ein Konzept.</p>
+      </div>
+    </div>
+
+    <div class="step-actions">
+      <button type="button" class="btn btn--primary" data-goto="2">Weiter zu Auslöser analysieren</button>
+    </div>
+  </section>
+
+  <!-- ============================ Screen 2 ============================ -->
+  <section class="step" id="step-2" data-step="2" aria-labelledby="step-2-title">
+    <p class="step-eyebrow">Schritt 2 von 5</p>
+    <h2 class="step-title" id="step-2-title" tabindex="-1">Auslöser analysieren</h2>
+    <p class="step-help">Zwei plausible Erklärungen. Welche Beobachtung würde sie voneinander trennen?</p>
+    <div class="theme-coach" id="themeCoach2" hidden></div>
+
+    <div class="step-card">
+      <p class="box-label">Feld 3</p>
+      <div class="field">
+        <label class="field__label" for="f_erklaerung">Erklärung A</label>
+        <p class="field__help">Was könnte das beobachtete Verhalten erklären?</p>
+        <textarea class="field__area" id="f_erklaerung" data-key="erklaerung" rows="4"></textarea>
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_gegenprobe">Erklärung B</label>
+        <p class="field__help" id="gegenprobeHelp">Eine echte Alternative, nicht dieselbe Erklärung anders formuliert.</p>
+        <textarea class="field__area" id="f_gegenprobe" data-key="gegenprobe" rows="4"></textarea>
+        <p class="hint" id="hint-gegenprobe-similar" hidden>Erklärung A und Erklärung B klingen ähnlich. Ist Erklärung B eine echte Alternative, nicht dieselbe Erklärung anders formuliert?</p>
+      </div>
+    </div>
+
+    <div class="step-actions">
+      <button type="button" class="btn" data-goto="1">Zurück</button>
+      <button type="button" class="btn btn--primary" data-goto="3">Weiter zu Design anpassen</button>
+    </div>
+  </section>
+
+  <!-- ============================ Screen 3 ============================ -->
+  <section class="step" id="step-3" data-step="3" aria-labelledby="step-3-title">
+    <p class="step-eyebrow">Schritt 3 von 5</p>
+    <h2 class="step-title" id="step-3-title" tabindex="-1">Design anpassen</h2>
+    <p class="step-help">Eine Änderung, die zur vermuteten Erklärung passt.</p>
+    <div class="theme-coach" id="themeCoach3" hidden></div>
+
+    <div class="step-card">
+      <p class="box-label">Feld 2</p>
+      <h3 class="field__label">Konzepte und Hebel</h3>
+      <p class="field__help">Ergänzen Sie die gewählten Konzepte um die Massnahme oder das Werkzeug, das zu Ihrer Diagnose passt.</p>
+
+      <div class="chiprow">
+        <p class="chiprow__label">Massnahmen</p>
+        <p class="chiprow__question">Welche Massnahme passt zu Ihrer Diagnose?</p>
+        <p class="chiprow__rule">Keine bis zwei.</p>
+        <div class="chiplist" id="chips-massnahmen" role="group" aria-label="Massnahmen"></div>
+        <div class="chip-single" id="chips-keine"></div>
+      </div>
+
+      <div class="chiprow">
+        <p class="chiprow__label">Toolbox</p>
+        <p class="chiprow__question">Welches Werkzeug passt zu Ihrer Diagnose?</p>
+        <p class="chiprow__rule">Keines oder eines.</p>
+        <div class="chiplist" id="chips-toolbox" role="group" aria-label="Toolbox"></div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <p class="box-label">Feld 4</p>
+      <div class="field">
+        <label class="field__label" for="f_aenderung">Die eine Änderung</label>
+        <p class="field__help">Was ändern Sie im Gespräch oder danach?</p>
+        <textarea class="field__area" id="f_aenderung" data-key="aenderung" rows="4"></textarea>
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_teamfrage" id="lbl_teamfrage">Frage fürs Teammeeting</label>
+        <p class="field__help">Welche Frage stellen Sie Ihrem Team im nächsten Meeting?</p>
+        <textarea class="field__area" id="f_teamfrage" data-key="teamfrage" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="step-actions">
+      <button type="button" class="btn" data-goto="2">Zurück</button>
+      <button type="button" class="btn btn--primary" data-goto="4">Weiter zu Aktion einleiten</button>
+    </div>
+  </section>
+
+  <!-- ============================ Screen 4 ============================ -->
+  <section class="step" id="step-4" data-step="4" aria-labelledby="step-4-title">
+    <p class="step-eyebrow">Schritt 4 von 5</p>
+    <h2 class="step-title" id="step-4-title" tabindex="-1">Aktion einleiten</h2>
+    <p class="step-help">Wer macht was bis wann?</p>
+
+    <div class="step-card">
+      <p class="box-label">Feld 5</p>
+      <h3 class="field__label">Umsetzung</h3>
+      <div class="field">
+        <label class="field__label" for="f_schritt">Nächster Schritt</label>
+        <p class="field__help">Der kleinste konkrete Schritt, der ohne weitere Zustimmung getan werden kann.</p>
+        <textarea class="field__area" id="f_schritt" data-key="schritt" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_verantwortlich">Verantwortlich</label>
+        <p class="field__help">Name oder Rolle.</p>
+        <input class="field__input" id="f_verantwortlich" data-key="verantwortlich" type="text">
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_datum">Datum</label>
+        <p class="field__help">Bis wann?</p>
+        <input class="field__input" id="f_datum" data-key="datum" type="text">
+      </div>
+    </div>
+
+    <p class="hint" id="hint-aktion" hidden></p>
+    <div class="step-actions">
+      <button type="button" class="btn" data-goto="3">Zurück</button>
+      <button type="button" class="btn btn--primary" data-goto="5">Weiter zu Routine verankern</button>
+    </div>
+  </section>
+
+  <!-- ============================ Screen 5 ============================ -->
+  <section class="step" id="step-5" data-step="5" aria-labelledby="step-5-title">
+    <p class="step-eyebrow">Schritt 5 von 5</p>
+    <h2 class="step-title" id="step-5-title" tabindex="-1">Routine verankern</h2>
+    <p class="step-help" id="routineHelp">Vorhersage und Signal festhalten, keine Überprüfungsroutine.</p>
+
+    <div class="step-card">
+      <p class="box-label">Feld 6</p>
+      <div class="field">
+        <label class="field__label" for="f_erwartung">Vorhersage</label>
+        <p class="field__help">Was soll sich verändern, wenn Ihre Änderung wirkt?</p>
+        <textarea class="field__area" id="f_erwartung" data-key="erwartung" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_signal">Signal</label>
+        <p class="field__help" id="signalHelp">Woran würden Sie erkennen, dass sich etwas verändert hat?</p>
+        <textarea class="field__area" id="f_signal" data-key="signal" rows="3"></textarea>
+      </div>
+      <div class="field">
+        <label class="field__label" for="f_risiko">Risiko oder Nebenwirkung</label>
+        <p class="field__help">Was könnte die Änderung kosten oder auslösen, und für wen?</p>
+        <textarea class="field__area" id="f_risiko" data-key="risiko" rows="3"></textarea>
+      </div>
+
+      <div class="kosten">
+        <h3 class="field__label">Kundenperspektive prüfen</h3>
+        <p class="kosten__lead">Fünf Punkte. Alle fünf müssen bestätigt sein, bevor der Brief hinausgeht.</p>
+        <div id="kostenList"></div>
+        <p class="kosten__count" id="kostenCount"></p>
+      </div>
+    </div>
+
+    <p class="hint" id="hint-routine" hidden></p>
+    <div class="export-row">
+      <button type="button" class="btn btn--primary" id="btnPrint">Interventionsbrief als PDF</button>
+      <button type="button" class="btn" id="btnJson">Interventionsbrief als JSON</button>
+      <button type="button" class="btn" data-goto="4">Zurück</button>
+    </div>
+    <p class="export-note">Der Druckdialog bietet "Als PDF speichern". Kopf- und Fusszeilen des
+      Browsers bitte ausschalten. Die JSON-Datei öffnet denselben Fall später wieder.</p>
+  </section>
+
+</main>
+
+<section class="brief-sheet" id="briefSheet" aria-label="Interventionsbrief">
+  <div class="brief" id="briefBody"></div>
+</section>
+
+<footer class="app-footer no-print">
+  <div class="app-footer__inner">
+    <details>
+      <summary>Datenschutzhinweis</summary>
+      <div class="privacy-body">
+        <p>Diese Datei läuft vollständig im Browser: keine Netzwerkaufrufe, keine
+        Analysewerkzeuge, kein Server, keine Übertragung von Eingaben an irgendjemanden.</p>
+        <p>Eingaben leben nur im Arbeitsspeicher dieses Tabs. Auf dem Gerät wird nichts
+        gespeichert. Beim Schliessen oder Neuladen des Tabs sind die Eingaben weg. Wer den Fall
+        behalten will, exportiert ihn als JSON und legt die Datei selbst ab.</p>
+        <p>Bitte keine Kundennamen, Kontonummern oder sonstigen vertraulichen Kundendaten
+        eingeben; das Werkzeug fragt an keiner Stelle danach.</p>
+      </div>
+    </details>
+    <p class="app-footer__line">
+      Erstellt von Prof. Eugen Dimant, University of Pennsylvania, für den Behavioral Science
+      Deep Dive mit den Regionalleitungen Personal Banking, <span id="appSessionDate"></span>.
+      Fragen: <a href="mailto:edimant@sas.upenn.edu">edimant@sas.upenn.edu</a>
+    </p>
+    <p class="app-footer__line app-footer__version">
+      Version <span id="appVersion"></span> &middot; <span id="appFooterStand"></span>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ==== RADAR-DATA-BLOCK-BEGIN (generated by build_radar.py) ==== */
+  /* Generated from 04 internal/00 data/. Do not edit index.html by hand: run
+     build_radar.py. Every Workshop label the tool prints is resolved from an id in
+     this block at render time. */
+  var DATA = {
+  "build": {
+    "version": "1.5",
+    "material_stand": "07.09.2026",
+    "session_date": "24. September 2026"
+  },
+  "concepts": [
+    {
+      "id": "value_based_framing",
+      "label_en": "Value-based Framing",
+      "german_gloss": "Wertbezogene Rahmung",
+      "row": "mechanism",
+      "order": 1,
+      "verified": true,
+      "german_short": "Wertbezogene Rahmung"
+    },
+    {
+      "id": "social_proof",
+      "label_en": "Social proof",
+      "german_gloss": "Sozialer Beweis: was andere tun",
+      "row": "mechanism",
+      "order": 2,
+      "verified": true,
+      "german_short": "Sozialer Beweis"
+    },
+    {
+      "id": "endowment_effect",
+      "label_en": "Endowment effect",
+      "german_gloss": "Besitztumseffekt",
+      "row": "mechanism",
+      "order": 3,
+      "verified": true,
+      "german_short": "Besitztumseffekt"
+    },
+    {
+      "id": "procrastination",
+      "label_en": "Procrastination",
+      "german_gloss": "Aufschieben",
+      "row": "mechanism",
+      "order": 4,
+      "verified": true,
+      "german_short": "Aufschieben"
+    },
+    {
+      "id": "friction_costs",
+      "label_en": "Friction costs",
+      "german_gloss": "Reibungskosten",
+      "row": "mechanism",
+      "order": 5,
+      "verified": true,
+      "german_short": "Reibungskosten"
+    },
+    {
+      "id": "present_bias",
+      "label_en": "Present bias",
+      "german_gloss": "Gegenwartsverzerrung",
+      "row": "mechanism",
+      "order": 6,
+      "verified": true,
+      "german_short": "Gegenwartsverzerrung"
+    },
+    {
+      "id": "lack_of_concrete_plans",
+      "label_en": "Lack of concrete plans",
+      "german_gloss": "Fehlende konkrete Pläne",
+      "row": "mechanism",
+      "order": 7,
+      "verified": true,
+      "german_short": "Fehlende konkrete Pläne"
+    },
+    {
+      "id": "peak_end_rule",
+      "label_en": "Peak-end rule",
+      "german_gloss": "Peak-End-Regel: Höhepunkt und Ende prägen die Erinnerung",
+      "row": "mechanism",
+      "order": 8,
+      "verified": true,
+      "german_short": "Peak-End-Regel"
+    },
+    {
+      "id": "personalization",
+      "label_en": "Personalization",
+      "german_gloss": "Personalisierung",
+      "row": "mechanism",
+      "order": 9,
+      "verified": true,
+      "german_short": "Personalisierung"
+    },
+    {
+      "id": "recognition",
+      "label_en": "Recognition",
+      "german_gloss": "Anerkennung",
+      "row": "mechanism",
+      "order": 10,
+      "verified": true,
+      "german_short": "Anerkennung"
+    },
+    {
+      "id": "choice_architecture",
+      "label_en": "Choice architecture",
+      "german_gloss": "Entscheidungsarchitektur",
+      "row": "intervention",
+      "order": 1,
+      "verified": true,
+      "german_short": "Entscheidungsarchitektur"
+    },
+    {
+      "id": "social_norm_messaging",
+      "label_en": "Social norm messaging",
+      "german_gloss": "Normbotschaften",
+      "row": "intervention",
+      "order": 2,
+      "verified": true,
+      "german_short": "Normbotschaften"
+    },
+    {
+      "id": "commitment_devices",
+      "label_en": "Commitment devices",
+      "german_gloss": "Selbstbindung: Verbindlichkeit schaffen",
+      "row": "intervention",
+      "order": 3,
+      "verified": true,
+      "german_short": "Selbstbindung"
+    },
+    {
+      "id": "instant_gratification",
+      "label_en": "Instant gratification",
+      "german_gloss": "Sofortige Belohnung",
+      "row": "intervention",
+      "order": 4,
+      "verified": true,
+      "german_short": "Sofortige Belohnung"
+    },
+    {
+      "id": "progress_tracking",
+      "label_en": "Progress tracking",
+      "german_gloss": "Fortschritt sichtbar machen",
+      "row": "intervention",
+      "order": 5,
+      "verified": true,
+      "german_short": "Fortschritt sichtbar machen"
+    },
+    {
+      "id": "gamification",
+      "label_en": "Gamification",
+      "german_gloss": "Spielelemente",
+      "row": "intervention",
+      "order": 6,
+      "verified": true,
+      "german_short": "Spielelemente"
+    },
+    {
+      "id": "experience_sequencing",
+      "label_en": "Experience sequencing",
+      "german_gloss": "Erlebnisabfolge gestalten",
+      "row": "intervention",
+      "order": 7,
+      "verified": true,
+      "german_short": "Erlebnisabfolge gestalten"
+    },
+    {
+      "id": "appreciation",
+      "label_en": "Appreciation",
+      "german_gloss": "Wertschätzung",
+      "row": "intervention",
+      "order": 8,
+      "verified": true,
+      "german_short": "Wertschätzung"
+    },
+    {
+      "id": "system_1_system_2",
+      "label_en": "System 1 / System 2",
+      "german_gloss": "Schnelles und langsames Denken",
+      "row": "foundation",
+      "order": 1,
+      "verified": true,
+      "german_short": "Schnelles und langsames Denken"
+    }
+  ],
+  "toolbox": [
+    {
+      "id": "tb_choice_architecture",
+      "title": "Choice Architecture: Gestalte Optionen bewusst",
+      "german_short": "Choice Architecture",
+      "linked_concept_ids": [
+        "choice_architecture"
+      ],
+      "verified": true,
+      "print_questions": [
+        "Wie viele Optionen präsentiere ich? (Daumenregel: mehr als eine, nicht mehr als drei)",
+        "Welche Option möchte ich, dass die Kundin/der Kunde wählt? Wie stelle ich diese Option besonders heraus?",
+        "Welche Option ist der \"ugly brother\"?"
+      ]
+    },
+    {
+      "id": "tb_relational_framing",
+      "title": "Relational Framing: Adressiere im partnerschaftlichen Rahmen",
+      "german_short": "Relational Framing",
+      "linked_concept_ids": [
+        "appreciation",
+        "recognition"
+      ],
+      "verified": true,
+      "print_questions": [
+        "Spreche ich kundenorientiert oder sachorientiert?",
+        "Drücke ich Wertschätzung aus und gebe der Kundin/dem Kunden positives Feedback?",
+        "Verwende ich eine empathische, persönliche Sprache, welche die Beziehung stärkt?"
+      ]
+    },
+    {
+      "id": "tb_referenzpunkte",
+      "title": "Referenzpunkte: Manage implizite Erwartungen aktiv",
+      "german_short": "Referenzpunkte",
+      "linked_concept_ids": [],
+      "verified": true,
+      "print_questions": [
+        "Welche Erwartungen für die Zukunft setze ich gerade bei den Kundinnen/den Kunden?",
+        "Wo kann ich sie bewusst übertreffen und damit positive Erlebnisse setzen?"
+      ]
+    },
+    {
+      "id": "tb_peak_end",
+      "title": "Peak End Rule: Setze bewusste Peaks und schaue für ein gutes Ende",
+      "german_short": "Peak End Rule",
+      "linked_concept_ids": [
+        "peak_end_rule"
+      ],
+      "verified": true,
+      "print_questions": [
+        "Welche zwei bis drei positiven emotionalen Peaks setze ich bewusst im Gespräch?",
+        "Wie schliesse ich das Gespräch gezielt mit einem positiven Peak ab? (nach dem Motto: Ende gut, alles gut)"
+      ]
+    },
+    {
+      "id": "tb_halo_anchoring",
+      "title": "Halo-Effekt und Anchoring: Nutze bewusste Anker in der Beratung",
+      "german_short": "Halo-Effekt und Anchoring",
+      "linked_concept_ids": [],
+      "verified": true,
+      "print_questions": [
+        "Welcher Aspekt meiner Beratung soll als Anker wirken, anhand dessen die Kundin/der Kunde die Beratung beurteilt?",
+        "Welche Produkte und/oder Leistungen stelle ich besonders ins Rampenlicht?",
+        "Welchen Rahmen setze ich gleich zu Beginn des Gesprächs?"
+      ]
+    }
+  ],
+  "startfaelle": [
+    {
+      "id": "SF1",
+      "nr": 1,
+      "kanal": "Filiale",
+      "situation": "Ein Kunde mit gewachsener Liquidität stimmt der Anlageempfehlung im Gespräch zu, will aber den Einstieg offenlassen: die Bewertungen seien hoch, eine Korrektur komme sicher. Beim nächsten Termin ist die Liquidität grösser und die Begründung dieselbe.",
+      "verhalten": "Zustimmung zum Inhalt, Aufschub des Zeitpunkts, zwei Termine ohne Einstieg.",
+      "pattern_label": "Warten auf den besseren Zeitpunkt",
+      "pattern_label_short": "Warten",
+      "concept_ids": [
+        "procrastination",
+        "present_bias",
+        "commitment_devices"
+      ],
+      "toolbox_ids": [
+        "tb_referenzpunkte"
+      ]
+    },
+    {
+      "id": "SF2",
+      "nr": 2,
+      "kanal": "Telefon / Remote",
+      "situation": "Am Telefon ist die Verlängerung der Hypothek besprochen, das Zinsumfeld erklärt, die Marge unstrittig. Der Kunde hofft weiterhin auf einen etwas tieferen Satz und will in zwei Wochen noch einmal anrufen. Der Rückruf bleibt aus.",
+      "verhalten": "Zustimmung, kein Abschluss, Warten auf einen tieferen Zins.",
+      "pattern_label": "Warten auf den besseren Zeitpunkt",
+      "pattern_label_short": "Warten",
+      "concept_ids": [
+        "procrastination",
+        "commitment_devices"
+      ],
+      "toolbox_ids": [
+        "tb_referenzpunkte"
+      ]
+    },
+    {
+      "id": "SF3",
+      "nr": 3,
+      "kanal": "Filiale",
+      "situation": "Die Optimierung der Anlagelösung ist im Detail besprochen und mündlich vereinbart, der Kunde nimmt die Unterlagen mit. Danach meldet er sich nicht mehr; beim Nachfassen ist das Thema nicht abgelehnt, sondern nach hinten gerückt.",
+      "verhalten": "Echtes Ja im Gespräch, kein festgelegter nächster Schritt, keine Umsetzung.",
+      "pattern_label": "Sagt ja, tut es dann nicht",
+      "pattern_label_short": "Sagt ja, tut es dann nicht",
+      "concept_ids": [
+        "lack_of_concrete_plans",
+        "friction_costs",
+        "commitment_devices"
+      ],
+      "toolbox_ids": []
+    },
+    {
+      "id": "SF4",
+      "nr": 4,
+      "kanal": "Filiale",
+      "situation": "Ein Kunde ist im Gespräch von der Empfehlung überzeugt und will nur noch über den Betrag nachdenken. Draussen spricht er mit seiner Partnerin oder einem Freund; Tage später sagt er ab.",
+      "verhalten": "Ja im Gespräch, Nein nach einem Gespräch ausserhalb der Bank; die Entscheidungseinheit war nicht im Raum.",
+      "pattern_label": "Jemand anderes hat das letzte Wort",
+      "pattern_label_short": "Jemand anderes hat das letzte Wort",
+      "concept_ids": [
+        "social_proof"
+      ],
+      "toolbox_ids": [
+        "tb_relational_framing"
+      ]
+    },
+    {
+      "id": "SF5",
+      "nr": 5,
+      "kanal": "Filiale",
+      "situation": "Die Empfehlung ist fachlich sauber erklärt. Am Schluss wird die Entscheidung dem Kunden überlassen; die Antwort lautet, er überlege es sich noch. Der Berater fragt nicht nach und meldet sich nicht wieder.",
+      "verhalten": "Kein Abschlusssignal erkannt, keine Frage am Schluss, kein zweiter Anlauf.",
+      "pattern_label": "Zurückhaltung auf der Beraterseite",
+      "pattern_label_short": "Beraterseite",
+      "concept_ids": [
+        "recognition",
+        "appreciation"
+      ],
+      "toolbox_ids": [
+        "tb_relational_framing"
+      ]
+    }
+  ],
+  "excluded_cases": [
+    "SF6"
+  ],
+  "themen": [
+    {
+      "code": "T-WARTEN",
+      "label": "Warten auf den besseren Zeitpunkt",
+      "label_short": "Warten",
+      "count": 4,
+      "startfall_ids": ["SF1", "SF2"],
+      "bridge": "Ein Kunde kann mehrere kursbezogene Referenzpunkte mitbringen; der Zielpfad setzt daneben einen entscheidungsrelevanten Massstab.",
+      "wildcard": false
+    },
+    {
+      "code": "T-STILLE",
+      "label": "Sagt ja, tut es dann nicht",
+      "label_short": "Sagt ja, tut es dann nicht",
+      "count": 4,
+      "startfall_ids": ["SF3"],
+      "bridge": "Wir trennen zwei Fälle nach einem Ja: offene Entscheidung und fehlender Auslöser.",
+      "wildcard": false
+    },
+    {
+      "code": "T-UMFELD",
+      "label": "Jemand anderes hat das letzte Wort",
+      "label_short": "Jemand anderes hat das letzte Wort",
+      "count": 3,
+      "startfall_ids": ["SF4"],
+      "bridge": "Wir trennen zwei Wege, über die eine nahestehende Person eine Entscheidung beeinflussen kann: Information und sozialer Nutzen.",
+      "wildcard": false
+    },
+    {
+      "code": "T-BERATER",
+      "label": "Zurückhaltung auf der Beraterseite",
+      "label_short": "Beraterseite",
+      "count": 3,
+      "startfall_ids": ["SF5"],
+      "bridge": null,
+      "wildcard": true
+    }
+  ],
+  "session": {
+    "lab_clock": [
+      [
+        "Fallauswahl",
+        5
+      ],
+      [
+        "Diagnose",
+        10
+      ],
+      [
+        "Änderung ausarbeiten",
+        15
+      ],
+      [
+        "Berichte",
+        5
+      ]
+    ],
+    "total_minutes": 35,
+    "radar_checkpoints": [
+      5,
+      15,
+      30
+    ],
+    "signal_help": "Woran würden Sie erkennen, dass sich etwas verändert hat?",
+    "team_question_label": "Frage fürs Teammeeting",
+    "groups": 5
+  }
+};
+  /* ==== RADAR-DATA-BLOCK-END ==== */
+
+  /* =================================================================
+     Label resolution. Every Workshop label this tool prints comes out of
+     DATA above, never out of a literal in this code.
+     ================================================================= */
+  var CONCEPT_BY_ID = {};
+  DATA.concepts.forEach(function (c) { CONCEPT_BY_ID[c.id] = c; });
+  var TOOLBOX_BY_ID = {};
+  DATA.toolbox.forEach(function (t) { TOOLBOX_BY_ID[t.id] = t; });
+  /* Startfall id -> theme, so a loaded case can look up its own coaching sentence.
+     Built once off DATA.themen[*].startfall_ids; nothing here retypes a case id. */
+  var THEME_BY_CASE_ID = {};
+  DATA.themen.forEach(function (th) {
+    th.startfall_ids.forEach(function (cid) { THEME_BY_CASE_ID[cid] = th; });
+  });
+
+  function conceptEn(id) { var c = CONCEPT_BY_ID[id]; return c ? c.label_en : id; }
+  /* The glossary prints german_gloss for a concept and german_short for a Toolbox
+     tool, byte-identical to the data. Nothing here writes an explanation of its own. */
+  function conceptGloss(id) { var c = CONCEPT_BY_ID[id]; return c ? c.german_gloss : ""; }
+  function conceptDe(id) { var c = CONCEPT_BY_ID[id]; return c ? c.german_short : id; }
+  function conceptLabel(id) { return conceptEn(id) + " · " + conceptDe(id); }
+  function toolboxTitle(id) { var t = TOOLBOX_BY_ID[id]; return t ? t.title : id; }
+  function toolboxShort(id) { var t = TOOLBOX_BY_ID[id]; return t ? t.german_short : id; }
+  /* The "i" disclosure on a Toolbox chip: June's own printed reflection questions for
+     that tool, verbatim out of print_questions, joined with the same middle dot the
+     rest of the tool uses for a list. toolboxShort() is not a fit here (see the
+     comment at the chip-disclosure code below): it is already the first half of the
+     chip's own label, so it never displays. This is the disclosure participants
+     actually get, real-time, when they open a Toolbox chip on screen 3. */
+  function toolboxQuestions(id) {
+    var t = TOOLBOX_BY_ID[id];
+    return (t && t.print_questions && t.print_questions.length)
+      ? t.print_questions.join(" · ") : "";
+  }
+
+  /* Unverified ids never reach a chip list. */
+  function conceptsInRow(row) {
+    return DATA.concepts.filter(function (c) { return c.verified === true && c.row === row; })
+                        .sort(function (a, b) { return a.order - b.order; });
+  }
+  /* 2026-09-08 (V1.1 third pre-ship overseer): this row offers the mechanism row AND the
+     foundation entry, which is deliberate -- it is the Workshop concept the managers use most
+     and a group must be able to record it -- but the row was LABELLED "Wirkmechanismen",
+     so it announced eleven where Workshop has ten and printed the foundation entry into the
+     Interventionsbrief under a heading it does not belong to. The set is unchanged and the
+     label names both rows now. The glossary panel is a separate surface and keeps the two
+     under their own headings, per the RADAR addendum's section 3. */
+  var ROW_WIRK = conceptsInRow("mechanism").concat(conceptsInRow("foundation"));
+  var ROW_MASS = conceptsInRow("intervention");
+  var ROW_TOOL = DATA.toolbox.filter(function (t) { return t.verified === true; });
+
+  var MIN_WIRK = 1, MAX_WIRK = 2, MAX_MASS = 2, MAX_TOOL = 1;
+
+  var KOSTEN_ITEMS = [
+    { key: "relevant",     label: "Relevant für diesen Kunden" },
+    { key: "transparent",  label: "Transparent kommuniziert" },
+    { key: "wahlfreiheit", label: "Wahlfreiheit bleibt erhalten" },
+    { key: "nein",         label: "Ein klares Nein wird respektiert" },
+    { key: "vertraulich",  label: "Keine vertraulichen Kundendaten verwendet" }
+  ];
+
+  var STEP_NAMES = ["Reibung erkennen", "Auslöser analysieren", "Design anpassen",
+                    "Aktion einleiten", "Routine verankern"];
+
+  /* Workshop's own row labels; the third is Workshop's own word. */
+  var BOX_TITLES = ["Feld 1 · Beobachtung", "Feld 2 · Konzepte und Hebel", "Feld 3 · Diagnose", "Feld 4 · Die eine Änderung und Frage fürs Teammeeting", "Feld 5 · Umsetzung", "Feld 6 · Vorhersage, Signal, Risiko"];
+  var LABEL_WIRK = "Wirkmechanismen";
+  /* The glossary section is the ten mechanisms and is headed LABEL_WIRK. The chip row and
+     the Interventionsbrief cover the mechanisms AND the foundation entry, so they use
+     their own label; one heading cannot honestly stand for both sets. */
+  var LABEL_WIRK_ROW = "Konzepte";
+  var LABEL_MASS = "Massnahmen";
+  var LABEL_TOOL = "Toolbox";
+  var NO_MASSNAHME_OPTION = "Keine passende Massnahme";
+  var NO_MASSNAHME_BRIEF = "Keine passende Massnahme";
+  var EMPTY = "[noch offen]";
+  var OWN_CASE_LABEL = "ein eigener Fall";
+  /* The footer's "Stand" line names the date the concept list and summary behind this
+     tool were finalised, not the date this file was last rebuilt. Kept as the same
+     literal the package's own gates check the shipped file against (see 04 internal/04
+     build); DATA.build.material_stand is the date, derived from session.json's
+     june_material_received field (an internal provenance field name; nothing on screen
+     names its source). */
+  var FOOTER_STAND_PREFIX = "Stand Konzepteliste: ";
+  var GROUP_LABEL = "Gruppe";
+  var GLOSS_BUTTON_LABEL = "Erklärung anzeigen";
+  /* Which chip explanations are open. Deliberately not part of STATE: browsing the
+     glossary is not part of the group's case and never reaches the brief or the export. */
+  var OPEN_GLOSS = {};
+
+  /* =================================================================
+     State. One object, in memory, for the life of the tab.
+     ================================================================= */
+  function freshState() {
+    var kosten = {};
+    KOSTEN_ITEMS.forEach(function (i) { kosten[i.key] = false; });
+    return {
+      startfall: null,
+      gruppe: "",
+      situation: "", verhalten: "",
+      wirkmechanismen: [],
+      erklaerung: "", gegenprobe: "",
+      massnahmen: [], keineMassnahme: false, toolbox: [],
+      aenderung: "", teamfrage: "",
+      schritt: "", verantwortlich: "", datum: "",
+      erwartung: "", signal: "", risiko: "",
+      kosten: kosten
+    };
+  }
+  var STATE = freshState();
+  var currentStep = 1;
+  /* What the Massnahmen row held before "Keine passende Massnahme" cleared it, so
+     unticking that option gives the group back what it had chosen. Not part of the
+     case and never exported. */
+  var MASSNAHMEN_SHADOW = [];
+  /* Which control to give focus back to after a chip row is rebuilt. */
+  var PENDING_FOCUS = null;
+
+  function $(id) { return document.getElementById(id); }
+  function txt(s) { return (s === null || s === undefined) ? "" : String(s); }
+  function trimmed(s) { return txt(s).trim(); }
+
+  var _statusTimer = null;
+  function announce(msg) { $("liveRegion").textContent = msg; }
+  function showStatus(msg, ms) {
+    var box = $("visualStatus");
+    box.textContent = msg;
+    box.hidden = false;
+    if (_statusTimer) { window.clearTimeout(_statusTimer); }
+    _statusTimer = window.setTimeout(function () { box.hidden = true; }, ms || 3200);
+    announce(msg);
+  }
+
+  /* =================================================================
+     Startfall. The button prints "Startfall N", the survey pattern's
+     short label and the channel string, both taken from the data.
+     ================================================================= */
+  /* Themen front and center: DATA.themen holds the three main patterns from the
+     pre-survey (most-named first) and, last, the fourth "Zusatzthema" (fewer
+     responses, styled apart, with a pointer to Eigener Fall for anything the
+     survey menu does not cover). Buttons stay in DATA.startfaelle order inside
+     each group (SF1..SF5 overall, unchanged), so every existing
+     "#startfallRow button[data-case]" query -- static_checks.py and all four
+     browser suites -- still finds the same buttons in the same order; only the
+     grouping and headings around them are new. */
+  function renderStartfallButtons() {
+    var row = $("startfallRow");
+    row.textContent = "";
+    DATA.themen.forEach(function (th) {
+      var cases = DATA.startfaelle.filter(function (c) {
+        return th.startfall_ids.indexOf(c.id) >= 0;
+      });
+      if (!cases.length) { return; }
+      var group = document.createElement("div");
+      group.className = "theme-group" + (th.wildcard ? " theme-group--wildcard" : "");
+      group.setAttribute("data-theme", th.code);
+
+      var head = document.createElement("div");
+      head.className = "theme-group__head";
+      var nr = document.createElement("span");
+      nr.className = "theme-group__nr";
+      nr.textContent = th.wildcard ? "Zusatzthema" : "Thema aus der Vorbefragung";
+      head.appendChild(nr);
+      var title = document.createElement("span");
+      title.className = "theme-group__title";
+      title.textContent = th.label;
+      head.appendChild(title);
+      var count = document.createElement("span");
+      count.className = "theme-group__count";
+      count.textContent = th.count + " von 11 Antworten";
+      head.appendChild(count);
+      group.appendChild(head);
+
+      if (th.wildcard) {
+        var note = document.createElement("p");
+        note.className = "theme-group__bridge";
+        note.textContent = "Weniger Antworten als die drei Themen oben, aber genug, um " +
+          "als eigenes Thema zu gelten. Passt keines der vier zu Ihrer Gruppe, nutzen " +
+          "Sie „Eigener Fall“ unten.";
+        group.appendChild(note);
+      }
+
+      var buttons = document.createElement("div");
+      buttons.className = "theme-group__buttons";
+      cases.forEach(function (c) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "btn btn--case";
+        b.setAttribute("data-case", c.id);
+        b.textContent = "Startfall " + c.nr + " · " + c.pattern_label_short + " · " + c.kanal;
+        b.addEventListener("click", function () { loadCase(c.id); });
+        buttons.appendChild(b);
+      });
+      group.appendChild(buttons);
+      row.appendChild(group);
+    });
+  }
+
+  /* Real-time coaching: once a Startfall is loaded, the theme-coach banner on
+     screens 2 and 3 shows this theme's own coaching sentence (verified text already
+     frozen in the package's theme data, never surfaced in the tool before this
+     feature). Only three of the four themes carry one; Beraterseite (the wildcard)
+     and any Eigener Fall stay silent rather than print an invented connection. */
+  function currentTheme() {
+    return STATE.startfall ? (THEME_BY_CASE_ID[STATE.startfall] || null) : null;
+  }
+  function renderThemeCoach() {
+    var th = currentTheme();
+    var text = (th && th.bridge) ? th.bridge : "";
+    ["themeCoach2", "themeCoach3"].forEach(function (id) {
+      var el = $(id);
+      if (!el) { return; }
+      if (text) {
+        el.textContent = "";
+        var label = document.createElement("span");
+        label.className = "theme-coach__label";
+        label.textContent = "Hinweis · " + th.label_short;
+        el.appendChild(label);
+        el.appendChild(document.createTextNode(text));
+        el.hidden = false;
+      } else {
+        el.hidden = true;
+        el.textContent = "";
+      }
+    });
+  }
+
+  function caseById(id) {
+    var found = null;
+    DATA.startfaelle.forEach(function (c) { if (c.id === id) { found = c; } });
+    return found;
+  }
+
+  /* Loading a Startfall fills field 1 only. No chip is preselected: the group
+     chooses the Workshop concepts itself. The card's own suggestion is printed as
+     text beside the field, so it can be overruled. */
+  /* Loading a second Startfall replaces field 1 and the Workshop selection that belonged to
+     the first one. That is a loss of the group's own work, so it is asked for rather
+     than done silently. */
+  function ownWorkAtRisk() {
+    var c = STATE.startfall ? caseById(STATE.startfall) : null;
+    var ownText = trimmed(STATE.situation) !== "" &&
+                  (!c || trimmed(STATE.situation) !== trimmed(c.situation));
+    return ownText || STATE.wirkmechanismen.length > 0 || STATE.massnahmen.length > 0 ||
+           STATE.toolbox.length > 0 || STATE.keineMassnahme === true;
+  }
+
+  function loadCase(id) {
+    var c = caseById(id);
+    if (!c) { return; }
+    if (id !== STATE.startfall && ownWorkAtRisk() &&
+        !window.confirm("Startfall " + c.nr + " laden? Feld 1 und die gewählten " +
+                        "Konzepte werden dabei ersetzt.")) {
+      return;
+    }
+    STATE.startfall = id;
+    STATE.situation = c.situation;
+    STATE.verhalten = c.verhalten;
+    /* The chips belonged to the case that is being replaced; a new case starts its own
+       diagnosis rather than inheriting one. */
+    STATE.wirkmechanismen = [];
+    STATE.massnahmen = [];
+    STATE.toolbox = [];
+    STATE.keineMassnahme = false;
+    MASSNAHMEN_SHADOW = [];
+    writeFields();
+    renderCaseMeta();
+    renderThemeCoach();
+    renderChips();
+    renderBrief();
+    showStatus("Startfall " + c.nr + " geladen. Die Konzepte wählen Sie selbst.");
+  }
+
+  /* The group may replace the Startfall with a case of its own; every printed surface
+     says so. Two ways out of the binding: this control, and simply rewriting field 1,
+     after which the loaded case is no longer what is on the screen. */
+  function detachCase(clearText) {
+    STATE.startfall = null;
+    if (clearText) {
+      STATE.situation = "";
+      STATE.verhalten = "";
+      writeFields();
+    }
+    renderCaseMeta();
+    renderThemeCoach();
+    renderBrief();
+  }
+
+  function maybeDetach() {
+    if (!STATE.startfall) { return; }
+    var c = caseById(STATE.startfall);
+    if (!c || trimmed(STATE.situation) !== trimmed(c.situation) ||
+        trimmed(STATE.verhalten) !== trimmed(c.verhalten)) {
+      detachCase(false);
+      showStatus("Eigener Fall. Im Kopfsatz heisst die Situation jetzt \u201E" +
+                 OWN_CASE_LABEL + "\u201C.");
+    }
+  }
+
+  function renderCaseMeta() {
+    var el = $("caseMeta");
+    if (!STATE.startfall) { el.hidden = true; el.textContent = ""; return; }
+    var c = caseById(STATE.startfall);
+    var parts = ["Startfall " + c.nr, "Situation: " + c.pattern_label];
+    if (c.concept_ids.length) {
+      parts.push("Mögliche Konzepte: " + c.concept_ids.map(conceptDe).join(", "));
+    }
+    if (c.toolbox_ids.length) {
+      parts.push("Mögliches Werkzeug: " + c.toolbox_ids.map(toolboxShort).join(", "));
+    }
+    parts.push("Kanal: " + c.kanal);
+    el.textContent = parts.join(" · ");
+    el.hidden = false;
+  }
+
+  /* =================================================================
+     Chips
+     ================================================================= */
+  function renderChipRow(containerId, items, selected, max, labelFn, secondFn, glossFn, onToggle) {
+    var box = $(containerId);
+    box.textContent = "";
+    items.forEach(function (item) {
+      var on = selected.indexOf(item.id) >= 0;
+      var blocked = !on && selected.length >= max;
+      var wrap = document.createElement("div");
+      wrap.className = "chip-wrap";
+      var line = document.createElement("div");
+      line.className = "chip-line";
+      var label = document.createElement("label");
+      label.className = "chip" + (on ? " is-on" : "") + (blocked ? " is-blocked" : "");
+      /* V1.12: a blocked chip looked identical to a merely-unselected one, with
+         nothing on screen or in a screen reader saying why it would not respond.
+         The cap number comes from the same `max` this row was already rendered
+         with, so the wording can never drift from the actual limit. */
+      if (blocked) {
+        label.title = "Höchstens " + max + " gleichzeitig ausgewählt. " +
+          "Erst eine Auswahl entfernen, um eine andere zu wählen.";
+      }
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = item.id;
+      input.checked = on;
+      input.disabled = blocked;
+      input.addEventListener("change", function () {
+        PENDING_FOCUS = { container: containerId, id: item.id };
+        onToggle(item.id, input.checked);
+      });
+      label.appendChild(input);
+      var main = document.createElement("span");
+      main.textContent = labelFn(item.id);
+      label.appendChild(main);
+      if (secondFn) {
+        var sec = document.createElement("span");
+        sec.className = "chip__de";
+        sec.textContent = secondFn(item.id);
+        label.appendChild(sec);
+      }
+      line.appendChild(label);
+
+      /* The disclosure is offered only where it says something the chip does not
+         already say. For most concepts german_gloss equals german_short, and a Toolbox
+         tool's german_short is the first half of its title, so those chips carry
+         no "i" at all rather than one that repeats their own words. */
+      var gloss = glossFn ? glossFn(item.id) : "";
+      var shown = label.textContent;
+      if (gloss && shown.indexOf(gloss) < 0) {
+        var key = containerId + ":" + item.id;
+        var open = OPEN_GLOSS[key] === true;
+        var info = document.createElement("button");
+        info.type = "button";
+        info.className = "chip__info";
+        info.setAttribute("data-gloss-for", item.id);
+        info.setAttribute("aria-expanded", open ? "true" : "false");
+        info.setAttribute("aria-label", GLOSS_BUTTON_LABEL);
+        info.title = GLOSS_BUTTON_LABEL;
+        info.textContent = "i";
+        var note = document.createElement("p");
+        note.className = "chip__gloss";
+        note.setAttribute("data-gloss-of", item.id);
+        note.textContent = gloss;
+        note.hidden = !open;
+        /* The button is a sibling of the label, never a child, so the browser never
+           forwards this click to the checkbox; the two guards below make that explicit
+           for anyone reading the handler on its own. */
+        info.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          OPEN_GLOSS[key] = !(OPEN_GLOSS[key] === true);
+          note.hidden = !OPEN_GLOSS[key];
+          info.setAttribute("aria-expanded", OPEN_GLOSS[key] ? "true" : "false");
+        });
+        line.appendChild(info);
+        wrap.appendChild(line);
+        wrap.appendChild(note);
+      } else {
+        wrap.appendChild(line);
+      }
+      box.appendChild(wrap);
+    });
+  }
+
+  function toggleIn(list, id, on, max) {
+    var i = list.indexOf(id);
+    if (on) {
+      if (i < 0 && list.length < max) { list.push(id); }
+    } else if (i >= 0) {
+      list.splice(i, 1);
+    }
+  }
+
+  /* A chip row is rebuilt on every toggle, which drops focus to the document body and
+     forces a keyboard user to tab in from the top for each further selection. Focus is
+     put back on the control that was just used; if the cap has disabled it, it goes to
+     the row, which is still far better than the top of the page. */
+  function restoreFocus() {
+    if (!PENDING_FOCUS) { return; }
+    var box = $(PENDING_FOCUS.container);
+    var target = box && box.querySelector('input[value="' + PENDING_FOCUS.id + '"]');
+    if (target && !target.disabled) { target.focus(); }
+    else if (box) {
+      var next = box.querySelector("input:not([disabled])");
+      if (next) { next.focus(); }
+    }
+    PENDING_FOCUS = null;
+  }
+
+  function renderChips() {
+    renderChipRow("chips-wirkmechanismen", ROW_WIRK, STATE.wirkmechanismen, MAX_WIRK,
+      conceptEn, conceptDe, conceptGloss,
+      function (id, on) {
+        toggleIn(STATE.wirkmechanismen, id, on, MAX_WIRK);
+        if (STATE.wirkmechanismen.length >= MIN_WIRK) { $("hint-wirkmechanismen").hidden = true; }
+        renderChips(); renderBrief();
+      });
+
+    /* "Keine passende Massnahme" clears and disables the Massnahmen chips: a
+       Thema-3 group must not be forced into a Massnahme. Passing max 0 is what
+       disables them, so there is one rule and not two. */
+    renderChipRow("chips-massnahmen", ROW_MASS, STATE.massnahmen,
+      STATE.keineMassnahme ? 0 : MAX_MASS,
+      conceptEn, conceptDe, conceptGloss,
+      function (id, on) {
+        toggleIn(STATE.massnahmen, id, on, MAX_MASS);
+        renderChips(); renderBrief();
+      });
+
+    /* No gloss on this one: it is the group's own option, not a Workshop concept. */
+    renderChipRow("chips-keine", [{ id: "keine" }], STATE.keineMassnahme ? ["keine"] : [], 1,
+      function () { return NO_MASSNAHME_OPTION; }, null, null,
+      function (id, on) {
+        STATE.keineMassnahme = on;
+        if (on) {
+          MASSNAHMEN_SHADOW = STATE.massnahmen.slice();
+          STATE.massnahmen = [];
+        } else {
+          STATE.massnahmen = MASSNAHMEN_SHADOW.slice();
+        }
+        PENDING_FOCUS = { container: "chips-keine", id: "keine" };
+        renderChips(); renderBrief();
+      });
+
+    renderChipRow("chips-toolbox", ROW_TOOL, STATE.toolbox, MAX_TOOL,
+      toolboxTitle, null, toolboxQuestions,
+      function (id, on) {
+        toggleIn(STATE.toolbox, id, on, MAX_TOOL);
+        renderChips(); renderBrief();
+      });
+
+    restoreFocus();
+  }
+
+  /* =================================================================
+     Glossary, form (b): the standing panel. Every entry is generated by
+     walking the embedded arrays, so it cannot drift from the JSON, and
+     the three headers are Workshop's own row labels. A foundation entry gets
+     its own heading rather than being folded into the mechanism row.
+     ================================================================= */
+  function lookupSections() {
+    var out = [
+      { title: LABEL_WIRK, items: conceptsInRow("mechanism").map(function (c) {
+          return { id: c.id, name: conceptLabel(c.id), gloss: c.german_gloss }; }) },
+      { title: LABEL_MASS, items: conceptsInRow("intervention").map(function (c) {
+          return { id: c.id, name: conceptLabel(c.id), gloss: c.german_gloss }; }) },
+      { title: LABEL_TOOL, items: ROW_TOOL.map(function (t) {
+          return { id: t.id, name: t.title, gloss: t.german_short }; }) }
+    ];
+    conceptsInRow("foundation").forEach(function (c) {
+      out.push({ title: c.label_en,
+                 items: [{ id: c.id, name: c.german_short, gloss: c.german_gloss }] });
+    });
+    return out;
+  }
+
+  function renderLookup() {
+    var body = $("lookupBody");
+    body.textContent = "";
+    lookupSections().forEach(function (section) {
+      var group = document.createElement("section");
+      group.className = "lookup__group";
+      group.setAttribute("data-lookup-group", section.title);
+      var h = document.createElement("h3");
+      h.className = "lookup__grouptitle";
+      h.textContent = section.title;
+      group.appendChild(h);
+      section.items.forEach(function (item) {
+        var row = document.createElement("div");
+        row.className = "lookup__item";
+        row.setAttribute("data-lookup-item", item.id);
+        var n = document.createElement("div");
+        n.className = "lookup__name";
+        n.textContent = item.name;
+        row.appendChild(n);
+        /* The gloss line is dropped only when the name already carries it word for
+           word, so nothing is repeated and nothing is rewritten to avoid repeating. */
+        if (item.gloss && item.name.indexOf(item.gloss) < 0) {
+          var g = document.createElement("div");
+          g.className = "lookup__gloss";
+          g.textContent = item.gloss;
+          row.appendChild(g);
+        }
+        group.appendChild(row);
+      });
+      body.appendChild(group);
+    });
+  }
+
+  /* =================================================================
+     Kundenkosten-Prüfung
+     ================================================================= */
+  function renderKosten() {
+    var box = $("kostenList");
+    box.textContent = "";
+    KOSTEN_ITEMS.forEach(function (item) {
+      var row = document.createElement("label");
+      row.className = "kosten__item";
+      var inp = document.createElement("input");
+      inp.type = "checkbox";
+      inp.setAttribute("data-kosten", item.key);
+      inp.checked = STATE.kosten[item.key] === true;
+      inp.addEventListener("change", function () {
+        STATE.kosten[item.key] = inp.checked;
+        updateKostenCount(); renderBrief();
+      });
+      row.appendChild(inp);
+      var span = document.createElement("span");
+      span.textContent = item.label;
+      row.appendChild(span);
+      box.appendChild(row);
+    });
+    updateKostenCount();
+  }
+  function kostenDone() {
+    var n = 0;
+    KOSTEN_ITEMS.forEach(function (i) { if (STATE.kosten[i.key]) { n += 1; } });
+    return n;
+  }
+  function kostenText() {
+    return kostenDone() + " von " + KOSTEN_ITEMS.length + " bestätigt";
+  }
+  function updateKostenCount() { $("kostenCount").textContent = kostenText() + "."; }
+
+  /* =================================================================
+     Fields
+     ================================================================= */
+  var FIELD_IDS = ["f_gruppe", "f_situation", "f_verhalten", "f_erklaerung", "f_gegenprobe",
+                   "f_aenderung", "f_teamfrage", "f_schritt", "f_verantwortlich",
+                   "f_datum", "f_erwartung", "f_signal", "f_risiko"];
+
+  /* Live nudge, screen 2: Erklärung A and Erklärung B are supposed to be two
+     explanations that a later observation could tell apart (spec: "Zwei plausible
+     Erklärungen"). Retyping the same explanation in different words is the single
+     most common way that requirement silently fails, and nothing else on screen
+     catches it before the group moves on. This never blocks Weiter -- it is a
+     question, not a gate -- because a tool cannot know the group's domain well
+     enough to be the judge of "different enough". */
+  function normalizeForCompare(s) {
+    return trimmed(s).toLowerCase()
+      .replace(/[.,;:!?()"'„“‚‘’]/g, "")
+      .replace(/\s+/g, " ");
+  }
+  function explanationsTooSimilar() {
+    var a = normalizeForCompare(STATE.erklaerung);
+    var b = normalizeForCompare(STATE.gegenprobe);
+    if (a.length < 8 || b.length < 8) { return false; }
+    if (a === b) { return true; }
+    var wa = a.split(" ").filter(function (w) { return w.length > 3; });
+    var wb = b.split(" ").filter(function (w) { return w.length > 3; });
+    if (!wa.length || !wb.length) { return false; }
+    var setB = {};
+    wb.forEach(function (w) { setB[w] = true; });
+    var shared = wa.filter(function (w) { return setB[w]; }).length;
+    return (shared / Math.min(wa.length, wb.length)) >= 0.6;
+  }
+  function renderGegenprobeSimilarHint() {
+    var el = $("hint-gegenprobe-similar");
+    if (el) { el.hidden = !explanationsTooSimilar(); }
+  }
+
+  function wireFields() {
+    FIELD_IDS.forEach(function (id) {
+      var el = $(id);
+      /* The group field is a <select> since the headcount was fixed. A select fires
+         "input" in current browsers and "change" everywhere, so both are bound; the
+         handler is idempotent, so a browser that fires both costs one extra render. */
+      var handler = function () {
+        var key = el.getAttribute("data-key");
+        STATE[key] = el.value;
+        if (key === "situation" || key === "verhalten") { maybeDetach(); }
+        if (key === "erklaerung" || key === "gegenprobe") { renderGegenprobeSimilarHint(); }
+        renderBrief();
+      };
+      el.addEventListener("input", handler);
+      if (el.tagName === "SELECT") { el.addEventListener("change", handler); }
+    });
+  }
+  function writeFields() {
+    FIELD_IDS.forEach(function (id) {
+      var el = $(id);
+      el.value = txt(STATE[el.getAttribute("data-key")]);
+    });
+  }
+
+  /* =================================================================
+     The report-back sentence, which is the brief's header:
+     "Problem: X. Hypothese: Z. Änderung: A. Test: D."
+     Four labels, not five: Erklärung B (Gegenprobe) stays a worksheet field, shown in
+     the full six-box brief below, but is not echoed in this compressed headline
+     (V1.8, 2026-09-09: matched against the BCG-approved deck's own "Brief in einem
+     Satz" panel, slide 26, which carries exactly these four labels).
+     No date: the group works on with RADAR, it does not commit to a review date.
+     ================================================================= */
+  function firstSentence(s, maxLen) {
+    s = trimmed(s);
+    if (!s) { return ""; }
+    var m = s.match(/^[\s\S]*?[.!?](\s|$)/);
+    var out = m ? m[0] : s;
+    out = out.replace(/\s+$/, "").replace(/[.!?]+$/, "");
+    if (maxLen && out.length > maxLen) {
+      out = out.slice(0, maxLen).replace(/\s+\S*$/, "") + " ...";
+    }
+    return out;
+  }
+  /* With a Startfall the header names the survey pattern. A group that brought its own
+     case has no pattern name, and cutting its typed situation mid-word with an ellipsis
+     read as a defect on the printed brief, so that path gets its own wording; the
+     situation itself is printed in full in box 1 directly beneath. */
+  function situationLabel() {
+    if (STATE.startfall) {
+      var c = caseById(STATE.startfall);
+      if (c) { return c.pattern_label; }
+    }
+    return trimmed(STATE.situation) ? OWN_CASE_LABEL : "";
+  }
+
+  /* The Berichtskarte prints the situation name in German quotation marks. No review
+     date is composed here: the group works on with RADAR, it does not commit to a
+     check-back date. */
+  function quoteName(s) { return "\u201E" + s + "\u201C"; }
+
+  /* Closes one clause of the header sentence with a trailing period, exactly as
+     before -- except when the clause already ends in firstSentence()'s own
+     truncation ellipsis ("... "), which must survive untouched. A blind
+     s.replace(/[.!?]+$/, "") here (the pre-V1.9 code) stripped that ellipsis's
+     three dots as if they were ordinary sentence punctuation, then the caller's
+     own period landed right where the ellipsis had been, so a long field with no
+     early sentence break printed as "...beispielsatz . Änderung:" -- the visual
+     truncation marker silently erased, on the client-facing brief header. */
+  function closeClause(s, isLast) {
+    if (/\.\.\.$/.test(s)) { return isLast ? s : s + " "; }
+    return s.replace(/[.!?]+$/, "") + (isLast ? "." : ". ");
+  }
+
+  function reportbackSentence() {
+    var xRaw = situationLabel();
+    var x = xRaw ? quoteName(xRaw) : EMPTY;
+    var z = firstSentence(STATE.erklaerung, 150) || EMPTY;
+    var a = firstSentence(STATE.aenderung, 130) || EMPTY;
+    var d = firstSentence(STATE.signal, 120) || EMPTY;
+    return "Problem: " + x + ". " +
+           "Hypothese: " + closeClause(z, false) +
+           "Änderung: " + closeClause(a, false) +
+           "Test: " + closeClause(d, true);
+  }
+
+  /* =================================================================
+     Interventionsbrief: the six fields in order, the report-back
+     sentence as header, the Workshop stamp as footer.
+     ================================================================= */
+  function briefRow(parent, label, value) {
+    var row = document.createElement("div");
+    row.className = "brief__row";
+    var l = document.createElement("div");
+    l.className = "brief__rowlabel";
+    l.textContent = label;
+    row.appendChild(l);
+    var v = document.createElement("div");
+    var t = trimmed(value);
+    v.className = "brief__value" + (t ? "" : " is-empty");
+    v.textContent = t || EMPTY;
+    row.appendChild(v);
+    parent.appendChild(row);
+  }
+  function briefBox(parent, title) {
+    var box = document.createElement("section");
+    box.className = "brief__box";
+    var h = document.createElement("h3");
+    h.className = "brief__boxtitle";
+    h.textContent = title;
+    box.appendChild(h);
+    parent.appendChild(box);
+    return box;
+  }
+
+  function renderBrief() {
+    var root = $("briefBody");
+    root.textContent = "";
+
+    var h = document.createElement("h2");
+    h.className = "brief__title";
+    h.textContent = "Interventionsbrief";
+    root.appendChild(h);
+
+    if (trimmed(STATE.gruppe)) {
+      var meta = document.createElement("p");
+      meta.className = "brief__meta";
+      meta.id = "briefGruppe";
+      meta.textContent = GROUP_LABEL + " " + trimmed(STATE.gruppe);
+      root.appendChild(meta);
+    }
+
+    var kicker = document.createElement("p");
+    kicker.className = "brief__meta";
+    kicker.textContent = "DER BRIEF IN EINEM SATZ";
+    root.appendChild(kicker);
+
+    var lead = document.createElement("p");
+    lead.className = "brief__lead";
+    lead.id = "briefLead";
+    lead.textContent = reportbackSentence();
+    root.appendChild(lead);
+
+    /* One line naming what is still open, which is what the follow-up mail tells the
+       reader of this brief to expect. The per-field markers stay as they were. */
+    var open = openBriefFields();
+    var openLine = document.createElement("p");
+    openLine.className = "brief__open" + (open.length ? "" : " is-complete");
+    openLine.id = "briefOpen";
+    openLine.textContent = open.length
+      ? "Noch offen: " + open.join(", ") + "."
+      : "Alle Felder ausgefüllt.";
+    root.appendChild(openLine);
+
+    var b1 = briefBox(root, BOX_TITLES[0]);
+    briefRow(b1, "Situation", STATE.situation);
+    briefRow(b1, "Beobachtetes Verhalten", STATE.verhalten);
+
+    var b2 = briefBox(root, BOX_TITLES[1]);
+    briefRow(b2, LABEL_WIRK_ROW, STATE.wirkmechanismen.map(conceptLabel).join("\n"));
+    briefRow(b2, LABEL_MASS, STATE.keineMassnahme
+      ? NO_MASSNAHME_BRIEF
+      : STATE.massnahmen.map(conceptLabel).join("\n"));
+    briefRow(b2, LABEL_TOOL, STATE.toolbox.map(toolboxTitle).join("\n"));
+
+    var b3 = briefBox(root, BOX_TITLES[2]);
+    briefRow(b3, "Erklärung A", STATE.erklaerung);
+    briefRow(b3, "Erklärung B", STATE.gegenprobe);
+
+    var b4 = briefBox(root, BOX_TITLES[3]);
+    briefRow(b4, "Die eine Änderung", STATE.aenderung);
+    briefRow(b4, DATA.session.team_question_label, STATE.teamfrage);
+
+    var b5 = briefBox(root, BOX_TITLES[4]);
+    briefRow(b5, "Nächster Schritt", STATE.schritt);
+    briefRow(b5, "Verantwortlich", STATE.verantwortlich);
+    briefRow(b5, "Datum", STATE.datum);
+
+    var b6 = briefBox(root, BOX_TITLES[5]);
+    briefRow(b6, "Vorhersage", STATE.erwartung);
+    briefRow(b6, "Signal", STATE.signal);
+    briefRow(b6, "Risiko oder Nebenwirkung", STATE.risiko);
+    /* The Kundenkosten-Prüfung is the tool's own safeguard, not one of the six boxes of
+       the sheet, so it prints as an advisory line at the foot of box 6 rather than as a
+       row that the worksheet has no counterpart for. */
+    var kostenNote = document.createElement("p");
+    var kostenOpen = kostenDone() < KOSTEN_ITEMS.length;
+    kostenNote.className = "brief__note" + (kostenOpen ? " is-open" : "");
+    kostenNote.id = "briefKosten";
+    kostenNote.textContent = "Kundenperspektive: " + kostenText() +
+      (kostenOpen ? ". Noch nicht vollständig." : ".");
+    b6.appendChild(kostenNote);
+
+    var foot = document.createElement("p");
+    foot.className = "brief__footer";
+    foot.id = "briefFooter";
+    foot.textContent = FOOTER_STAND_PREFIX + DATA.build.material_stand;
+    root.appendChild(foot);
+
+    var attr = document.createElement("p");
+    attr.className = "print-attribution";
+    attr.textContent = "RADAR " + DATA.build.version +
+      ", erstellt von Prof. Eugen Dimant, University of Pennsylvania. " +
+      "Fragen: edimant@sas.upenn.edu";
+    root.appendChild(attr);
+
+    renderProgressCount();
+  }
+
+  /* =================================================================
+     Export. radarExportPayload() is the single source of the JSON file
+     and is what the browser suites assert against.
+     ================================================================= */
+  function radarExportPayload() {
+    return {
+      werkzeug: "RADAR",
+      version: DATA.build.version,
+      stand_material: DATA.build.material_stand,
+      kopfsatz: reportbackSentence(),
+      gruppe: trimmed(STATE.gruppe),
+      noch_offen: openBriefFields(),
+      startfall: STATE.startfall,
+      felder: {
+        feld_1: {
+          kundensituation: STATE.situation,
+          beobachtetes_verhalten: STATE.verhalten
+        },
+        feld_2: {
+          wirkmechanismen_ids: STATE.wirkmechanismen.slice(),
+          wirkmechanismen: STATE.wirkmechanismen.map(conceptLabel),
+          massnahmen_ids: STATE.keineMassnahme ? [] : STATE.massnahmen.slice(),
+          massnahmen: STATE.keineMassnahme
+            ? [NO_MASSNAHME_BRIEF]
+            : STATE.massnahmen.map(conceptLabel),
+          keine_massnahme: STATE.keineMassnahme === true,
+          toolbox_ids: STATE.toolbox.slice(),
+          toolbox: STATE.toolbox.map(toolboxTitle)
+        },
+        feld_3: {
+          moegliche_erklaerung: STATE.erklaerung,
+          eine_andere_moegliche_erklaerung: STATE.gegenprobe
+        },
+        feld_4: {
+          beratungsaenderung: STATE.aenderung,
+          teamfrage_label: DATA.session.team_question_label,
+          teamfrage: STATE.teamfrage
+        },
+        feld_5: {
+          naechster_schritt: STATE.schritt,
+          verantwortlich: STATE.verantwortlich,
+          datum: STATE.datum
+        },
+        feld_6: {
+          erwartung: STATE.erwartung,
+          signal: STATE.signal,
+          risiko_oder_nebenwirkung: STATE.risiko,
+          kundenkosten_pruefung: JSON.parse(JSON.stringify(STATE.kosten))
+        }
+      }
+    };
+  }
+  window.radarExportPayload = radarExportPayload;
+
+  /* The runbook collects one brief per group and the follow-up mail attributes them by
+     group, so the group travels in the file name as well as on the sheet. */
+  function exportFilename(ext) {
+    var g = trimmed(STATE.gruppe).replace(/[^\wÄÖÜäöü .-]/g, "").replace(/\s+/g, "_");
+    return g ? "Interventionsbrief_" + GROUP_LABEL + "_" + g + "." + ext
+             : "Interventionsbrief." + ext;
+  }
+  window.radarExportFilename = exportFilename;
+
+  function exportJson() {
+    var missing = missingOf(REQUIRED_STEP_5).concat(missingGruppe(), missingKosten());
+    if (!showGate("hint-routine", missing)) { return; }
+    var text = JSON.stringify(radarExportPayload(), null, 2);
+    var blob = new Blob([text], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = exportFilename("json");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    showStatus("JSON-Datei erstellt. Sie liegt im Download-Ordner dieses Browsers.");
+  }
+
+  function applyPayload(p) {
+    if (!p || !p.felder) { throw new Error("kein RADAR-Fall"); }
+    var f = p.felder;
+    var s = freshState();
+    var f1 = f.feld_1 || {}, f2 = f.feld_2 || {}, f3 = f.feld_3 || {};
+    var f4 = f.feld_4 || {}, f5 = f.feld_5 || {}, f6 = f.feld_6 || {};
+    s.startfall = p.startfall || null;
+    s.gruppe = txt(p.gruppe);
+    s.situation = txt(f1.kundensituation);
+    s.verhalten = txt(f1.beobachtetes_verhalten);
+    s.wirkmechanismen = (f2.wirkmechanismen_ids || []).filter(function (id) { return CONCEPT_BY_ID[id]; });
+    s.keineMassnahme = f2.keine_massnahme === true;
+    s.massnahmen = (f2.massnahmen_ids || []).filter(function (id) { return CONCEPT_BY_ID[id]; });
+    s.toolbox = (f2.toolbox_ids || []).filter(function (id) { return TOOLBOX_BY_ID[id]; });
+    s.erklaerung = txt(f3.moegliche_erklaerung);
+    s.gegenprobe = txt(f3.eine_andere_moegliche_erklaerung);
+    s.aenderung = txt(f4.beratungsaenderung);
+    s.teamfrage = txt(f4.teamfrage);
+    s.schritt = txt(f5.naechster_schritt);
+    s.verantwortlich = txt(f5.verantwortlich);
+    s.datum = txt(f5.datum);
+    s.erwartung = txt(f6.erwartung);
+    s.signal = txt(f6.signal);
+    s.risiko = txt(f6.risiko_oder_nebenwirkung);
+    KOSTEN_ITEMS.forEach(function (i) {
+      s.kosten[i.key] = !!(f6.kundenkosten_pruefung && f6.kundenkosten_pruefung[i.key]);
+    });
+    STATE = s;
+    writeFields(); renderCaseMeta(); renderChips(); renderKosten(); renderBrief();
+  }
+  window.radarApplyPayload = applyPayload;
+
+  /* =================================================================
+     Navigation
+     ================================================================= */
+  function renderNav() {
+    var inner = $("progressNavInner");
+    inner.textContent = "";
+    STEP_NAMES.forEach(function (name, i) {
+      var n = i + 1;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "progress-nav__item" + (n === currentStep ? " is-current" : "");
+      b.setAttribute("data-navstep", String(n));
+      var num = document.createElement("span");
+      num.className = "progress-nav__num";
+      num.textContent = n;
+      b.appendChild(num);
+      b.appendChild(document.createTextNode(name));
+      b.addEventListener("click", function () { goToStep(n); });
+      inner.appendChild(b);
+    });
+  }
+
+  /* What the post-session mail promises the client's senior people: "Aktion einleiten"
+     is not complete without Schritt, Verantwortlich and Datum, "Routine verankern" is
+     not complete without Vorhersage und Signal, and the brief names in one line what is
+     still open. Both are implemented here rather than left as a claim the tool does not
+     keep. */
+  var REQUIRED_STEP_4 = [
+    { key: "schritt", label: "Nächster Schritt" },
+    { key: "verantwortlich", label: "Verantwortlich" },
+    { key: "datum", label: "Datum" }
+  ];
+  var REQUIRED_STEP_5 = [
+    { key: "erwartung", label: "Vorhersage" },
+    { key: "signal", label: "Signal" }
+  ];
+
+  function missingOf(list) {
+    return list.filter(function (f) { return trimmed(STATE[f.key]) === ""; })
+               .map(function (f) { return f.label; });
+  }
+
+  /* V1.12 (2026-09-17): the Kundenperspektive-Prüfung's own on-screen copy ("Fünf
+     Punkte. Alle fünf müssen bestätigt sein, bevor der Brief hinausgeht.") stated a
+     gate that print/export never enforced. These two, added to the same
+     missing-fields list print/export already build from REQUIRED_STEP_5, close that
+     gap. Kept as two small functions rather than folded into REQUIRED_STEP_5 itself,
+     because that list also feeds openBriefFields()/the live progress count, and
+     Gruppe/Kundenperspektive are a print-and-export precondition, not fields the
+     worksheet itself lists as open. */
+  function missingGruppe() {
+    return trimmed(STATE.gruppe) === "" ? ["Gruppe"] : [];
+  }
+  function missingKosten() {
+    return kostenDone() < KOSTEN_ITEMS.length ? ["Kundenperspektive (alle 5 Punkte)"] : [];
+  }
+
+  function showGate(hintId, missing) {
+    var el = $(hintId);
+    if (!missing.length) { el.hidden = true; return true; }
+    el.textContent = "Noch offen: " + missing.join(", ") + ". " +
+                     "Bitte ausfüllen, dann geht es weiter.";
+    el.hidden = false;
+    showStatus("Noch offen: " + missing.join(", ") + ".");
+    return false;
+  }
+
+  /* Every row the brief prints and the group is expected to fill. The two chip rows with
+     a minimum of zero are not on this list, because leaving them empty is a permitted
+     answer rather than an open field. */
+  /* Live progress line under the step nav: which step, and how many of the fields
+     openBriefFields() already tracks (the brief's own "Noch offen" list) are still
+     empty. One source for both: this never keeps its own count of "how many fields
+     exist" that could drift from what the brief actually checks. */
+  function renderProgressCount() {
+    var el = $("progressCount");
+    if (!el) { return; }
+    var open = openBriefFields().length;
+    var openText = open === 0 ? "alle Felder ausgefüllt"
+      : open + (open === 1 ? " Feld noch offen" : " Felder noch offen");
+    el.textContent = "Schritt " + currentStep + " von " + STEP_NAMES.length + " · " + openText + ".";
+  }
+
+  function openBriefFields() {
+    var open = [];
+    if (!trimmed(STATE.situation)) { open.push("Situation"); }
+    if (!trimmed(STATE.verhalten)) { open.push("Beobachtetes Verhalten"); }
+    if (!STATE.wirkmechanismen.length) { open.push(LABEL_WIRK_ROW); }
+    if (!trimmed(STATE.erklaerung)) { open.push("Erklärung A"); }
+    if (!trimmed(STATE.gegenprobe)) { open.push("Erklärung B"); }
+    if (!trimmed(STATE.aenderung)) { open.push("Die eine Änderung"); }
+    if (!trimmed(STATE.teamfrage)) { open.push(DATA.session.team_question_label); }
+    REQUIRED_STEP_4.concat(REQUIRED_STEP_5).forEach(function (f) {
+      if (!trimmed(STATE[f.key])) { open.push(f.label); }
+    });
+    if (!trimmed(STATE.risiko)) { open.push("Risiko oder Nebenwirkung"); }
+    return open;
+  }
+
+  /* The Wirkmechanismen row has a minimum of one, so screen 1 does not release
+     the group until a Workshop concept is on the sheet. The hint says why, rather
+     than the button looking inert. */
+  function goToStep(n) {
+    if (n < 1 || n > STEP_NAMES.length) { return; }
+    if (n > 1 && STATE.wirkmechanismen.length < MIN_WIRK) {
+      $("hint-wirkmechanismen").hidden = false;
+      showStatus("Bitte wählen Sie mindestens ein Konzept, dann geht es weiter.");
+      return;
+    }
+    /* This gate has to fire for every path into screen 5, not only the "Weiter" click
+       out of screen 4: the progress-nav buttons (data-navstep) call goToStep(n)
+       directly and can jump from screen 1, 2 or 3 straight to screen 5, and a gate
+       keyed to currentStep === 4 only stopped the "Weiter" path, letting a nav click
+       reach the brief -- and therefore the print/export buttons, which only re-check
+       REQUIRED_STEP_5 -- with Nächster Schritt, Verantwortlich and Datum still empty. */
+    if (n > 4 && !showGate("hint-aktion", missingOf(REQUIRED_STEP_4))) {
+      return;
+    }
+    currentStep = n;
+    Array.prototype.forEach.call(document.querySelectorAll(".step"), function (s) {
+      s.classList.toggle("is-active", s.getAttribute("data-step") === String(n));
+    });
+    document.body.classList.toggle("show-brief", n === STEP_NAMES.length);
+    renderNav();
+    renderProgressCount();
+    var title = $("step-" + n + "-title");
+    if (title) { title.focus(); }
+    window.scrollTo(0, 0);
+  }
+
+  /* =================================================================
+     Timer: the lab clock and its checkpoints, both out of the data.
+     ================================================================= */
+  var TOTAL_SECONDS = DATA.session.total_minutes * 60;
+  var remaining = TOTAL_SECONDS;
+  var ticking = null;
+  var announced = {};
+
+  function renderCheckpoints() {
+    var box = $("timerCheckpoints");
+    box.textContent = "";
+    DATA.session.radar_checkpoints.forEach(function (m) {
+      var s = document.createElement("span");
+      s.className = "cp";
+      s.setAttribute("data-cp", String(m));
+      s.textContent = String(m);
+      box.appendChild(s);
+    });
+  }
+  function elapsedMinutes() { return Math.floor((TOTAL_SECONDS - remaining) / 60); }
+  function phaseName() {
+    var acc = 0, mins = elapsedMinutes(), clock = DATA.session.lab_clock;
+    for (var i = 0; i < clock.length; i += 1) {
+      acc += clock[i][1];
+      if (mins < acc) { return clock[i][0]; }
+    }
+    return clock[clock.length - 1][0];
+  }
+  function paintTimer() {
+    var m = Math.floor(remaining / 60), s = remaining % 60;
+    $("timerClock").textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+    $("timerPhase").textContent = (remaining === TOTAL_SECONDS && !ticking)
+      ? "Noch nicht gestartet"
+      : phaseName() + (ticking ? "" : " (pausiert)");
+    var mins = elapsedMinutes();
+    Array.prototype.forEach.call($("timerCheckpoints").querySelectorAll(".cp"), function (el) {
+      var cp = parseInt(el.getAttribute("data-cp"), 10);
+      el.classList.toggle("is-passed", mins >= cp);
+      if (mins >= cp && !announced[cp]) {
+        announced[cp] = true;
+        showStatus("Minute " + cp + ": " + phaseName() + ".");
+      }
+    });
+  }
+  function toggleTimer() {
+    if (ticking) {
+      window.clearInterval(ticking); ticking = null;
+      $("btnTimerStart").textContent = "Start";
+    } else {
+      ticking = window.setInterval(function () {
+        if (remaining > 0) { remaining -= 1; }
+        paintTimer();
+      }, 1000);
+      $("btnTimerStart").textContent = "Pause";
+    }
+    paintTimer();
+  }
+  function resetTimer() {
+    if (ticking) { window.clearInterval(ticking); ticking = null; }
+    remaining = TOTAL_SECONDS;
+    announced = {};
+    $("btnTimerStart").textContent = "Start";
+    paintTimer();
+  }
+
+  /* =================================================================
+     Wiring
+     ================================================================= */
+  function init() {
+    $("appVersion").textContent = DATA.build.version;
+    $("appFooterStand").textContent = FOOTER_STAND_PREFIX + DATA.build.material_stand;
+    /* The session date used to be a second literal in the footer's static markup,
+       independent of DATA.build.session_date (which nothing read). Two copies of the
+       same date is exactly the kind of literal that drifts if only one of them is
+       updated when the session date changes; this ties the footer to the one the
+       DATA block already carries, the same way the version and the Stand line are. */
+    $("appSessionDate").textContent = DATA.build.session_date;
+    $("signalHelp").textContent = DATA.session.signal_help;
+    $("lbl_teamfrage").textContent = DATA.session.team_question_label;
+
+    renderStartfallButtons();
+    renderThemeCoach();
+    renderLookup();
+    renderChips();
+    renderKosten();
+    renderCheckpoints();
+    renderNav();
+    wireFields();
+    writeFields();
+    renderBrief();
+    resetTimer();
+
+    Array.prototype.forEach.call(document.querySelectorAll("[data-goto]"), function (b) {
+      b.addEventListener("click", function () {
+        goToStep(parseInt(b.getAttribute("data-goto"), 10));
+      });
+    });
+    $("btnTimerStart").addEventListener("click", toggleTimer);
+    $("btnTimerReset").addEventListener("click", resetTimer);
+    $("btnOwnCase").addEventListener("click", function () {
+      /* V1.12: the same data-loss risk loadCase() already guards against (replacing a
+         group's own work) exists here too and was unguarded: Eigener Fall wiped
+         Feld 1 and the chip selection unconditionally. Same ownWorkAtRisk() check,
+         same confirm() wording style as loadCase()'s own dialog. */
+      if (ownWorkAtRisk() && !window.confirm(
+          "Eigener Fall? Feld 1 und die gewählten Konzepte werden dabei geleert.")) {
+        return;
+      }
+      detachCase(true);
+      showStatus("Eigener Fall. Tragen Sie Ihre eigene Situation in Feld 1 ein.");
+      $("f_situation").focus();
+    });
+    $("btnPrint").addEventListener("click", function () {
+      if (!showGate("hint-routine", missingOf(REQUIRED_STEP_5).concat(missingGruppe(), missingKosten()))) { return; }
+      renderBrief();
+      showStatus("Druckdialog wird geöffnet. Dort können Sie auch als PDF speichern.", 1800);
+      window.setTimeout(function () { window.print(); }, 80);
+    });
+    $("btnJson").addEventListener("click", exportJson);
+    /* V1.12: the visible German-labelled trigger for the now visually-hidden
+       #fileImport (see the markup comment above it). A plain .click() forward,
+       nothing else changes about how the file input itself works. */
+    $("btnFileImport").addEventListener("click", function () { $("fileImport").click(); });
+    $("fileImport").addEventListener("change", function (ev) {
+      var file = ev.target.files && ev.target.files[0];
+      if (!file) { return; }
+      $("fileImportName").textContent = file.name;
+      /* V1.12: opening a JSON case replaces the whole in-progress STATE with no
+         guard at all, unlike every other path that can discard a group's work.
+         Same ownWorkAtRisk() check used elsewhere; declining leaves the current
+         case untouched and clears the picked file so a re-pick of the same file
+         still fires "change". */
+      if (ownWorkAtRisk() && !window.confirm(
+          "Fall aus JSON öffnen? Die aktuelle, ungespeicherte Eingabe wird dabei ersetzt.")) {
+        ev.target.value = "";
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          applyPayload(JSON.parse(String(reader.result)));
+          showStatus("Fall aus JSON geladen.");
+        } catch (e) {
+          showStatus("Diese Datei ist kein RADAR-Fall.");
+        }
+      };
+      reader.readAsText(file);
+      ev.target.value = "";
+    });
+
+    /* The tool stores nothing, by design. A group that closes the tab loses the case,
+       so the browser's own warning is armed as soon as there is something to lose.
+       Nothing is written anywhere: this only asks the question. */
+    window.addEventListener("beforeunload", function (ev) {
+      if (!caseHasContent()) { return undefined; }
+      ev.preventDefault();
+      ev.returnValue = "";
+      return "";
+    });
+
+    goToStep(1);
+  }
+
+  /* True once the group has put anything of its own into the case. */
+  function caseHasContent() {
+    var texts = ["situation", "verhalten", "erklaerung", "gegenprobe", "aenderung",
+                 "teamfrage", "schritt", "verantwortlich", "datum", "erwartung",
+                 "signal", "risiko"];
+    var typed = texts.some(function (k) { return trimmed(STATE[k]) !== ""; });
+    return typed || STATE.wirkmechanismen.length > 0 || STATE.massnahmen.length > 0 ||
+           STATE.toolbox.length > 0 || STATE.keineMassnahme === true ||
+           KOSTEN_ITEMS.some(function (i) { return STATE.kosten[i.key] === true; });
+  }
+  window.radarCaseHasContent = caseHasContent;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
