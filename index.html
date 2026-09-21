@@ -255,6 +255,14 @@
   .step.is-active{ display: block; }
   .step-title{ font-size: 1.45rem; }
   .step-help{ color: var(--color-text-muted); margin-top: var(--space-2); }
+  /* Eugen (2026-09-21, screenshot circling the onboarding paragraphs): "this text
+     should come BEFORE the 'Reibung erkennen' part... lead with that this is the
+     RADAR tool and then explain the stuff with the 2 paragraphs... and then they
+     get to 'Reibung erkennen'". #onboardingIntro/#onboardingHelp and the step-1
+     paragraph after it move ahead of the h2 title; .step-title itself keeps its
+     zero margin-top (unchanged for screens 2-5, where it is still the first
+     element), so the gap above the title now comes from here instead. */
+  .step-intro{ margin-bottom: var(--space-4); }
   .step-card{
     background: var(--color-surface); border: 1px solid var(--color-border);
     border-radius: var(--radius-lg); padding: var(--space-5); margin-top: var(--space-4);
@@ -1491,9 +1499,12 @@
 
   <!-- ============================ Screen 1 ============================ -->
   <section class="step is-active" id="step-1" data-step="1" aria-labelledby="step-1-title">
+    <div class="step-intro">
+      <p class="step-help" id="onboardingIntro">Das ist das RADAR-Tool. Der Name kommt von den fünf Schritten, durch die Sie gleich gehen: Reibung erkennen, Auslöser analysieren, Design anpassen, Aktion einleiten, Routine verankern.</p>
+      <p class="step-help" id="onboardingHelp">So läuft die Übung: In Schritt 1 wählen Sie für Ihren Fall ein bis zwei Konzepte aus der Verhaltenswissenschaft. In Schritt 2 prüfen Sie zwei mögliche Erklärungen für das beobachtete Verhalten. In Schritt 3 wählen Sie eine Massnahme (das Konzept, an dem Sie ansetzen) und ein Werkzeug aus der Toolbox, mit dem Sie diese Massnahme im Gespräch umsetzen. In Schritt 4 legen Sie fest, wer was bis wann macht. In Schritt 5 halten Sie fest, was Sie erwarten, woran Sie es erkennen und welches Risiko oder welche Nebenwirkung möglich ist.</p>
+      <p class="step-help">Wählen Sie ein Thema, es lädt einen Beispielfall, oder tragen Sie einen eigenen Fall ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
+    </div>
     <h2 class="step-title" id="step-1-title" tabindex="-1">Reibung erkennen</h2>
-    <p class="step-help" id="onboardingHelp">So läuft die Übung: In Schritt 1 wählen Sie für Ihren Fall ein bis zwei Konzepte aus der Verhaltenswissenschaft. In Schritt 2 prüfen Sie zwei mögliche Erklärungen für das beobachtete Verhalten. In Schritt 3 wählen Sie eine Massnahme (das Konzept, an dem Sie ansetzen) und ein Werkzeug aus der Toolbox, mit dem Sie diese Massnahme im Gespräch umsetzen. In Schritt 4 legen Sie fest, wer was bis wann macht. In Schritt 5 halten Sie fest, was Sie erwarten, woran Sie es erkennen und welches Risiko oder welche Nebenwirkung möglich ist.</p>
-    <p class="step-help">Wählen Sie ein Thema, es lädt einen Beispielfall, oder tragen Sie einen eigenen Fall ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
 
     <div class="step-card">
       <h3 class="box-label">Thema wählen</h3>
