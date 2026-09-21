@@ -240,7 +240,7 @@
   .step{ display: none; }
   .step.is-active{ display: block; }
   .step-title{ font-size: 1.45rem; }
-  .step-help{ color: var(--color-text-muted); margin-top: var(--space-2); max-width: 68ch; }
+  .step-help{ color: var(--color-text-muted); margin-top: var(--space-2); }
   .step-card{
     background: var(--color-surface); border: 1px solid var(--color-border);
     border-radius: var(--radius-lg); padding: var(--space-5); margin-top: var(--space-4);
@@ -716,6 +716,13 @@
     font-size: 0.86rem; color: var(--color-text-muted);
   }
   .chipgroup__head[data-chipgroup="weitere"]{ color: var(--color-text-faint); margin-top: var(--space-4); }
+  /* Eugen (2026-09-21): "was heisst 'aus ihrem thema'? ... das muss dann erklaert
+     werden kurz, nicht nur 'aus ihrem thema'". One line, same size/color as the
+     row's own field__help, so it reads as an explanation and not a second heading. */
+  .chipgroup__caption{
+    flex: 0 0 100%; margin: 0 0 var(--space-2);
+    font-size: 0.78rem; color: var(--color-text-faint);
+  }
   .chip__dual{
     font-size: 0.72rem; color: var(--color-text-faint); font-style: italic;
     /* Now a child of .chip__text rather than a third flex sibling of .chip
@@ -846,7 +853,10 @@
     font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--color-accent); margin-bottom: var(--space-1);
   }
-  .lookup__item{ margin-top: var(--space-2); max-width: 78ch; }
+  /* Same fix as .app-footer__line/.privacy-body above: .lookup (the glossary
+     panel) already bounds its own column width; this ch-cap only narrowed a
+     prose block a second time inside it. Removed. */
+  .lookup__item{ margin-top: var(--space-2); }
   .lookup__name{ font-weight: 600; font-size: 0.92rem; }
   .lookup__gloss{ color: var(--color-text-muted); font-size: 0.88rem; }
   .lookup__line{ font-size: 0.85rem; color: var(--color-text-muted); margin-top: 2px; line-height: 1.45; }
@@ -862,7 +872,9 @@
   /* ========== step footer ========== */
   .step-actions{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
   .export-row{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
-  .export-note{ color: var(--color-text-faint); font-size: 0.84rem; margin-top: var(--space-2); max-width: 100ch; }
+  /* Same rule as above: main{} already bounds this column at var(--max-width);
+     a second, narrower ch-cap here added nothing but risk. Removed. */
+  .export-note{ color: var(--color-text-faint); font-size: 0.84rem; margin-top: var(--space-2); }
   /* The loop, iteration 2 (2026-09-18): the print/mail buttons used to sit at the end
      of screen 5's fields, ABOVE the brief preview they act on, so a group that read
      the preview to the end had to scroll back up to find them (first-time participant
@@ -1113,10 +1125,17 @@
     max-width: var(--max-width); margin: 0 auto; padding: var(--space-4);
     font-size: 0.85rem; color: var(--color-text-faint);
   }
-  .app-footer__line{ margin-top: var(--space-2); max-width: 76ch; }
+  /* Eugen (2026-09-21, screenshot of this exact footer): "the line breaks at the
+     bottom are attrocious as well. ONE IMPORTANT RULE TO ALWAYS FOLLOW: use the
+     whole width, don't break sentences or paragraphs, at all." Same defect as the
+     earlier .step-help fix this round: .app-footer__inner already caps the
+     column at var(--max-width) (900px, the same width every .step-card and
+     .lookup__item -- see below -- uses), so a SECOND, narrower ch-based cap here
+     only wasted the right-hand side of that already-bounded column. Removed;
+     .app-footer__inner's own max-width is the one width rule this text needs. */
   .app-footer__version{ font-variant-numeric: tabular-nums; }
   .app-footer summary{ cursor: pointer; color: var(--color-text-muted); }
-  .privacy-body{ margin-top: var(--space-2); line-height: 1.5; max-width: 68ch; }
+  .privacy-body{ margin-top: var(--space-2); line-height: 1.5; }
   .privacy-body p{ margin-bottom: var(--space-2); }
 
   @media (max-width: 620px){
@@ -1668,6 +1687,17 @@
              panel itself shows the order (a concept lights up when armed, the right
              column fills as chips are chosen below). "Freiwillig" stays first. -->
         <p class="linkmap__hint" id="linkmapHint">Freiwillig: ein Konzept antippen, dann die passende Massnahme oder das passende Werkzeug.</p>
+        <!-- Eugen (2026-09-21, screenshot of this panel): "so etwas braucht eine
+             bessere Erklaerung ... Wie sollen die Teilnehmer das ausdiskutieren
+             und zum Ergebnis kommen? Was sollten sie beachten etc.? Man muss die
+             hier mehr an die Hand nehmen und erklaeren was hier gemacht werden
+             soll." The line above says how to operate the panel; it never said
+             what the group is actually deciding or how they know they are done.
+             This adds that, in the same short-sentence register as the rest of
+             the tool: the test to apply (can you say why in one sentence), and
+             the fallback if the answer is no (go back and look again, do not
+             force a line). -->
+        <p class="linkmap__hint">So kommen Sie zum Ergebnis: Fragen Sie sich, warum genau diese Massnahme oder dieses Werkzeug zur Erklärung passt, die Sie oben gewählt haben, nicht nur, welches Ihnen zuerst einfällt. Wenn Sie das in einem Satz begründen können, ist die Wahl getroffen. Wenn nicht, schauen Sie noch einmal auf die Konzepte in Schritt 1: manchmal passt ein anderes besser.</p>
         <div class="linkmap__body">
           <div class="linkmap__col" id="linkmapLeft"></div>
           <svg class="linkmap__svg" id="linkmapSvg" aria-hidden="true"></svg>
@@ -1868,10 +1898,23 @@
     <!-- Loop iteration 5 (2026-09-21): the banner and the mail note sit in flow under
          the sticky button row, not inside it, so the bar stays one row tall. -->
     <p class="hint" id="hint-routine" hidden></p>
-    <!-- Shown after "Per E-Mail" (an .eml file with the PDF attached, see emlBytes()):
-         what to do with the file, and the fallback if the mail client only shows it.
+    <!-- Iteration 5 (2026-09-21, Eugen: "soll nix als EML downloaden sondern
+         direkt ein Email-Fenster öffnen ... Teilnehmer sollten nichts erst
+         speichern müssen"). Shown after "Per E-Mail an Eugen Dimant": that
+         button now opens the mail app directly (mailtoHref()) and downloads
+         the PDF in the same click, so this note says what is still a manual
+         step (attaching the PDF -- a mailto: link cannot do that, no website
+         can) and points at the fallback for a machine with no mail app set up.
          Hidden again on the next change to the brief (renderBrief()). -->
-    <p class="export-note" id="mailNote" hidden>Die E-Mail-Datei aus dem Download-Ordner in Outlook öffnen: Empfänger, Text und PDF sind drin, nur noch senden. Öffnet sie sich nicht als Entwurf: das PDF aus demselben Ordner an eine Mail an edimant@sas.upenn.edu anhängen.</p>
+    <!-- The loop (2026-09-21, an independent fresh-reader pass on iteration 5):
+         this text used to be set once in markup and shown as-is by both buttons,
+         which was accurate for #btnMail but actively wrong after #btnMailFile --
+         it told the group an e-mail window had opened when the fallback opens
+         none. Each handler now sets textContent itself before showing this
+         (see MAIL_NOTE_TEXT/MAIL_FILE_NOTE_TEXT below); the markup carries only
+         the #btnMail wording as its default so the page still reads sensibly
+         before any script runs. -->
+    <p class="export-note" id="mailNote" hidden>Das PDF liegt jetzt im Download-Ordner. Im geöffneten E-Mail-Fenster einmal anhängen, dann senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die E-Mail-Datei mit PDF herunterladen.</p>
     <!-- V1.13 (2026-09-17, Eugen): "remove clutter, move things that aren't directly
          relevant to this exercise (like the JSON stuff) out of sight". The JSON export
          is a technical, facilitator/tool-sync feature (reopening a case later, here or
@@ -1887,6 +1930,14 @@
     <details class="startfall-more" id="exportMore">
       <summary>Weitere Optionen</summary>
       <div class="startfall-more__body">
+        <!-- Iteration 5 (2026-09-21): the fallback for a machine with no mail app
+             registered for mailto: (a real possibility on a locked-down laptop),
+             or for anyone who wants Outlook to open the brief as a ready draft
+             rather than attach the PDF by hand. Same emlBytes() this button always
+             produced; only its position and framing changed, now that it is the
+             second option rather than the only one. -->
+        <p class="field__help">Falls sich keine E-Mail öffnet, oder Outlook den Entwurf lieber fertig haben soll: E-Mail-Datei mit Text und PDF-Anhang.</p>
+        <button type="button" class="btn" id="btnMailFile">E-Mail-Datei mit PDF</button>
         <p class="field__help">Für die Weiterverarbeitung: den Fall später wieder öffnen, hier oder im Begleittool.</p>
         <button type="button" class="btn" id="btnJson">Interventionsbrief als JSON</button>
       </div>
@@ -3734,6 +3785,19 @@
     h1.setAttribute("data-chipgroup", "thema");
     h1.textContent = "Aus Ihrem Thema";
     box.insertBefore(h1, kids[0]);
+    /* Eugen (2026-09-21, two screenshots): "was heisst 'aus ihrem thema'? Das sind
+       ja nicht die Konzepte die wir an dem Tag explizit besprochen haben. Geht es
+       hier darum was empfohlen wird / typisch ist? Das wäre ok wenn das so wäre
+       aber das muss dann erklaert werden kurz, nicht nur 'aus ihrem thema'." It is
+       neither: these are not a recommendation and nobody in the room necessarily
+       covered them out loud -- they are the two or three concepts THIS case was
+       written around (its own concept_ids, see orderedWirk() above), the ones its
+       "Anwendung" slide addresses. One line says that plainly instead of leaving
+       the header to speak for itself. */
+    var capThema = document.createElement("p");
+    capThema.className = "chipgroup__caption";
+    capThema.textContent = "Zu Ihrem Fall vorbereitet. Sie sind nicht daran gebunden.";
+    box.insertBefore(capThema, kids[0]);
     if (kids.length > nFirst) {
       var h2 = document.createElement("p");
       h2.className = "chipgroup__head";
@@ -3745,12 +3809,22 @@
 
   /* The two rows legitimately share a few names (Choice Architecture, Peak End Rule,
      and the concepts that also exist as a named tool). Rather than rename anything,
-     each side says what the other one is, on the tile. */
+     each side says what the other one is, on the tile.
+     Eugen (2026-09-21, screenshot): "auch an anderen Stellen sehe ich solche
+     Verweise und verstehe nicht wofuer das gut sein soll ausser vllt zu
+     verwirren?" The bare cross-reference ("auch als Werkzeug unten") only makes
+     sense to someone who already knows this tool intentionally reuses a name
+     across two rows; read cold, it looks like an unexplained duplicate. "gleiche
+     Idee" is the missing word: it says up front that the second appearance is
+     the SAME thing in its other role, not a different item that happens to share
+     a name, which is the one fact the annotation exists to convey. Kept short on
+     purpose (a V1.12 round-3 fix had to rebuild .chip__text's own layout after a
+     longer version of this exact string orphaned mid-word at 320px). */
   var BOTH_ROWS_NOTE = {
-    choice_architecture: "auch als Werkzeug unten",
-    tb_choice_architecture: "auch als Massnahme oben",
-    peak_end_rule: "auch als Werkzeug in Schritt 3",
-    tb_peak_end: "auch als Konzept in Schritt 1"
+    choice_architecture: "gleiche Idee, Werkzeug unten",
+    tb_choice_architecture: "gleiche Idee, Massnahme oben",
+    peak_end_rule: "gleiche Idee, Werkzeug in Schritt 3",
+    tb_peak_end: "gleiche Idee, Konzept in Schritt 1"
   };
 
   function renderChips() {
@@ -5130,6 +5204,58 @@
     };
   }
   window.radarMailMessage = mailMessage;
+  /* Iteration 5 (2026-09-21, Eugen: "soll nix als EML downloaden sondern direkt
+     ein Email-Fenster öffnen ... Teilnehmer sollten nichts erst speichern
+     müssen"). mailto: still cannot carry an attachment -- that is a browser
+     sandboxing rule this tool cannot script around, not a gap in the
+     implementation -- so the PDF still has to land as a download and be
+     attached by hand once; what changes is that the button now opens the mail
+     app FIRST, instead of asking the group to open a downloaded file to get
+     there. The body keeps the full brief when the encoded URL stays under the
+     ~2000-character ceiling several mail clients apply to a mailto: link (the
+     reason this tool moved to .eml in the first place, see emlBytes() above);
+     past that it falls back to a short pointer at the attached PDF rather than
+     silently handing a client a truncated brief. */
+  function mailtoHref(m) {
+    var full = m.body + "\n\n(Vollständiger Text auch im angehängten PDF: " + m.pdfName + ")";
+    var short = "Der vollständige Interventionsbrief ist als PDF angehängt (" + m.pdfName +
+      "), eben in den Download-Ordner geladen. Bitte hier anhängen, dann senden.";
+    var body = window.encodeURIComponent(full).length <= 1800 ? full : short;
+    return "mailto:" + m.to + "?subject=" + window.encodeURIComponent(m.subject) +
+      "&body=" + window.encodeURIComponent(body);
+  }
+  window.radarMailtoHref = mailtoHref;
+  /* Same dance as downloadBytes() above (a throwaway <a>, clicked, removed): the
+     established pattern in this file for triggering a browser action from a
+     click handler without touching window.location, which real production
+     mailto: use avoids for the same reason this tool has to -- reassigning
+     location.href is the one path that, on some older or locked-down browsers,
+     can actually navigate the tab away, and every input in this tool lives only
+     in memory (see the footer's own Datenschutzhinweis): losing the page loses
+     the brief the group just finished writing. An <a> click with no .download
+     attribute never does that for mailto:, in this browser or the ones this
+     tool has been tested in. */
+  function openMailto(href) {
+    var a = document.createElement("a");
+    a.href = href;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  /* The loop (2026-09-21): #mailNote is shared by #btnMail and #btnMailFile, and
+     what it needs to say differs by which one fired -- #btnMail opened a mail
+     window (attaching is the one manual step left); #btnMailFile opened none (the
+     .eml it downloaded is the whole draft, PDF included). One string per button,
+     set as textContent right before the note is shown; MAIL_NOTE_TEXT also
+     matches the markup's own static #mailNote content, so the page reads
+     correctly even before either button has been clicked. */
+  var MAIL_NOTE_TEXT = "Das PDF liegt jetzt im Download-Ordner. Im geöffneten E-Mail-Fenster " +
+    "einmal anhängen, dann senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die " +
+    "E-Mail-Datei mit PDF herunterladen.";
+  var MAIL_FILE_NOTE_TEXT = "Die E-Mail-Datei aus dem Download-Ordner in Outlook öffnen: " +
+    "Empfänger, Text und PDF sind drin, nur noch senden. Öffnet sie sich nicht als Entwurf: das " +
+    "PDF aus demselben Ordner an eine Mail an edimant@sas.upenn.edu anhängen.";
   /* RFC 2047 encoded-words of at most 66 characters each (so "Subject: " plus the
      first one stays under 78), folded onto continuation lines; the subject can
      carry any character this way. */
@@ -5984,14 +6110,33 @@
     $("btnJson").addEventListener("click", exportJson);
     /* Iteration 4 (2026-09-21, Eugen: the mail "should also append the final PDF
        that the team worked on, not just the text"): a mailto: link cannot carry
-       an attachment, so the button now downloads an e-mail file (.eml) with the
-       recipient, the brief as text and the same PDF attached; opened in Outlook
-       it is a ready draft. See emlBytes(). */
+       an attachment. Iteration 5, same day (Eugen, two screenshots later: "soll
+       nix als EML downloaden sondern direkt ein Email-Fenster öffnen ...
+       Teilnehmer sollten nichts erst speichern müssen"): that constraint has
+       not changed, but which side of it this button leads with does. It now
+       downloads the PDF and opens the mail app in the same click (mailtoHref(),
+       openMailto()); #btnMailFile below, in "Weitere Optionen", keeps the old
+       .eml behaviour for a machine with no mail app registered. */
     $("btnMail").addEventListener("click", function () {
+      if (!showGate("hint-routine", missingForExport())) { return; }
+      renderBrief();
+      var m = mailMessage();
+      downloadBytes(briefPdfBytes(), "application/pdf", m.pdfName);
+      openMailto(mailtoHref(m));
+      $("mailNote").textContent = MAIL_NOTE_TEXT;
+      $("mailNote").hidden = false;
+      showStatus("E-Mail wird geöffnet, PDF im Download-Ordner (" + m.pdfName + ").", 4000);
+    });
+    /* The fallback: unchanged emlBytes() behaviour, now the second option.
+       The loop (2026-09-21): #mailNote's text now has to change with it -- the
+       #btnMail wording ("im geöffneten E-Mail-Fenster anhängen") is simply
+       false after this button, which opens no mail window at all. */
+    $("btnMailFile").addEventListener("click", function () {
       if (!showGate("hint-routine", missingForExport())) { return; }
       renderBrief();
       var pdf = briefPdfBytes();
       downloadBytes(emlBytes(pdf), "message/rfc822", exportFilename("eml"));
+      $("mailNote").textContent = MAIL_FILE_NOTE_TEXT;
       $("mailNote").hidden = false;
       showStatus("E-Mail-Datei erstellt (Download-Ordner).", 4000);
     });
