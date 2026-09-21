@@ -102,6 +102,20 @@
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
   }
+  /* Eugen (2026-09-21, screenshot of the Datenschutzhinweis footer): "pay
+     attention to orphans" -- a single word (here "irgendjemanden.") left
+     stranded alone on the last line of a reflowed paragraph. Chromium/Edge
+     and current Firefox support text-wrap:pretty, which asks the browser's
+     own line breaker to avoid exactly this; it is a no-op (not an error) on
+     browsers that do not know the property, so it is safe to set broadly as
+     a baseline. It is not load-bearing by itself -- see the U+00A0 (non-
+     breaking space) joins on the specific long paragraphs below, which is
+     the one fix that works in every browser regardless of text-wrap
+     support. A raw U+00A0 character is used directly (not the &amp;nbsp;
+     entity), so the same byte sequence appears in this markup, in every
+     JS string constant below, and in the Streamlit companion's matching
+     constants -- the two tools' own parity checks compare these verbatim. */
+  p, li{ text-wrap: pretty; }
   h1, h2, h3, p, ul, fieldset{ margin: 0; padding: 0; }
   ul{ list-style: none; }
   fieldset{ border: none; }
@@ -1132,7 +1146,13 @@
      column at var(--max-width) (900px, the same width every .step-card and
      .lookup__item -- see below -- uses), so a SECOND, narrower ch-based cap here
      only wasted the right-hand side of that already-bounded column. Removed;
-     .app-footer__inner's own max-width is the one width rule this text needs. */
+     .app-footer__inner's own max-width is the one width rule this text needs.
+     Follow-up (2026-09-21, "pay attention to orphans"): the version number used
+     to sit in its own separate <p>, which read as a short isolated line no
+     matter how wide the column was -- a width cap was never the cause of that
+     one. Folded into the line above with a middot, and joined to "Version" with
+     a U+00A0 so the two can never split across a wrap; .app-footer__version
+     now styles an inline <span>, not a <p>. */
   .app-footer__version{ font-variant-numeric: tabular-nums; }
   .app-footer summary{ cursor: pointer; color: var(--color-text-muted); }
   .privacy-body{ margin-top: var(--space-2); line-height: 1.5; }
@@ -1472,8 +1492,8 @@
   <!-- ============================ Screen 1 ============================ -->
   <section class="step is-active" id="step-1" data-step="1" aria-labelledby="step-1-title">
     <h2 class="step-title" id="step-1-title" tabindex="-1">Reibung erkennen</h2>
-    <p class="step-help" id="onboardingHelp">So läuft die Übung: In Schritt 1 wählen Sie für Ihren Fall ein bis zwei Konzepte aus der Verhaltenswissenschaft. In Schritt 2 prüfen Sie zwei mögliche Erklärungen für das beobachtete Verhalten. In Schritt 3 wählen Sie eine Massnahme (das Konzept, an dem Sie ansetzen) und ein Werkzeug aus der Toolbox, mit dem Sie diese Massnahme im Gespräch umsetzen. In Schritt 4 legen Sie fest, wer was bis wann macht. In Schritt 5 halten Sie fest, was Sie erwarten, woran Sie es erkennen und welches Risiko oder welche Nebenwirkung möglich ist.</p>
-    <p class="step-help">Wählen Sie ein Thema, es lädt einen Beispielfall, oder tragen Sie einen eigenen Fall ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
+    <p class="step-help" id="onboardingHelp">So läuft die Übung: In Schritt 1 wählen Sie für Ihren Fall ein bis zwei Konzepte aus der Verhaltenswissenschaft. In Schritt 2 prüfen Sie zwei mögliche Erklärungen für das beobachtete Verhalten. In Schritt 3 wählen Sie eine Massnahme (das Konzept, an dem Sie ansetzen) und ein Werkzeug aus der Toolbox, mit dem Sie diese Massnahme im Gespräch umsetzen. In Schritt 4 legen Sie fest, wer was bis wann macht. In Schritt 5 halten Sie fest, was Sie erwarten, woran Sie es erkennen und welches Risiko oder welche Nebenwirkung möglich ist.</p>
+    <p class="step-help">Wählen Sie ein Thema, es lädt einen Beispielfall, oder tragen Sie einen eigenen Fall ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
 
     <div class="step-card">
       <h3 class="box-label">Thema wählen</h3>
@@ -1537,7 +1557,7 @@
           <label class="field__label" for="f_verhalten">Beobachtetes Verhalten</label>
           <span class="field__counter" id="counter-f_verhalten" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Was passiert nach dem Gespräch tatsächlich? Nur beobachten, noch nicht erklären.</p>
+        <p class="field__help">Was passiert nach dem Gespräch tatsächlich? Nur beobachten, noch nicht erklären.</p>
         <textarea class="field__area" id="f_verhalten" data-key="verhalten" rows="2" maxlength="160"></textarea>
       </div>
 
@@ -1551,7 +1571,7 @@
       <h3 class="box-label">Feld 2 · Konzepte</h3>
       <div class="chiprow">
         <p class="chiprow__question">Welche Konzepte helfen, den Fall einzuordnen?</p>
-        <p class="field__help">Mindestens eines, höchstens zwei. In Schritt 3 wählen Sie die passende Massnahme.</p>
+        <p class="field__help">Mindestens eines, höchstens zwei. In Schritt 3 wählen Sie die passende Massnahme.</p>
         <div class="chiplist" id="chips-wirkmechanismen" role="group" aria-label="Konzepte"></div>
       </div>
     </div>
@@ -1563,13 +1583,13 @@
          that was refused (here, on screen 4 and under the export row), where the
          cursor already is; inserted above a button, it pushed that button down
          under the pointer. -->
-    <p class="hint" id="hint-wirkmechanismen" hidden>Noch offen: mindestens ein Konzept. Bitte wählen, dann geht es weiter.</p>
+    <p class="hint" id="hint-wirkmechanismen" hidden>Noch offen: mindestens ein Konzept. Bitte wählen, dann geht es weiter.</p>
   </section>
 
   <!-- ============================ Screen 2 ============================ -->
   <section class="step" id="step-2" data-step="2" aria-labelledby="step-2-title">
     <h2 class="step-title" id="step-2-title" tabindex="-1">Auslöser analysieren</h2>
-    <p class="step-help">Zwei plausible Erklärungen für das beobachtete Verhalten.</p>
+    <p class="step-help">Zwei plausible Erklärungen für das beobachtete Verhalten.</p>
     <div class="theme-coach" id="themeCoach2" hidden></div>
     <details class="carry" id="carry-2" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
@@ -1588,16 +1608,16 @@
           <label class="field__label" for="f_gegenprobe">Erklärung B</label>
           <span class="field__counter" id="counter-f_gegenprobe" aria-hidden="true"></span>
         </div>
-        <p class="field__help" id="gegenprobeHelp">Eine echte Alternative, nicht dieselbe Erklärung anders formuliert.</p>
+        <p class="field__help" id="gegenprobeHelp">Eine echte Alternative, nicht dieselbe Erklärung anders formuliert.</p>
         <textarea class="field__area" id="f_gegenprobe" data-key="gegenprobe" rows="2" maxlength="160"></textarea>
-        <p class="hint" id="hint-gegenprobe-similar" hidden>Erklärung A und Erklärung B klingen ähnlich. Ist Erklärung B eine echte Alternative, nicht dieselbe Erklärung anders formuliert?</p>
+        <p class="hint" id="hint-gegenprobe-similar" hidden>Erklärung A und Erklärung B klingen ähnlich. Ist Erklärung B eine echte Alternative, nicht dieselbe Erklärung anders formuliert?</p>
       </div>
       <!-- V1.13 round 3: appears once both explanations are typed. Answers the
            question the step itself asks ("welche Beobachtung würde sie trennen?"),
            which until now had nowhere to be recorded. Freiwillig, nie ein Gate. -->
       <div class="field" id="hypotheseField" hidden>
         <p class="field__label" id="hypotheseLabel">Arbeitshypothese</p>
-        <p class="field__help">Welche Beobachtung würde die beiden trennen, und welche ist danach wahrscheinlicher? Freiwillig.</p>
+        <p class="field__help">Welche Beobachtung würde die beiden trennen, und welche ist danach wahrscheinlicher? Freiwillig.</p>
         <div class="segmented" role="group" aria-labelledby="hypotheseLabel">
           <button type="button" class="segmented__btn" data-hyp="A" aria-pressed="false">Erklärung A</button>
           <button type="button" class="segmented__btn" data-hyp="B" aria-pressed="false">Erklärung B</button>
@@ -1632,7 +1652,7 @@
            input uses: a bold question as the label, the rule as the help line. -->
       <div class="chiprow">
         <p class="chiprow__question">Was ändern Sie?</p>
-        <p class="field__help">Die Massnahme: das Konzept aus der Verhaltenswissenschaft. Keine bis zwei.</p>
+        <p class="field__help">Die Massnahme: das Konzept aus der Verhaltenswissenschaft. Keine bis zwei.</p>
         <div class="chiplist" id="chips-massnahmen" role="group" aria-label="Massnahmen"></div>
         <div class="chip-single" id="chips-keine"></div>
         <!-- Round-3 adversarial pass (2026-09-17): with "Keine passende Massnahme"
@@ -1644,7 +1664,7 @@
 
       <div class="chiprow">
         <p class="chiprow__question">Womit tun Sie es im Gespräch?</p>
-        <p class="field__help">Das Werkzeug: Ihr eigenes aus der Toolbox. Keines oder eines. <span id="caseMeta" hidden></span></p>
+        <p class="field__help">Das Werkzeug: Ihr eigenes aus der Toolbox. Keines oder eines. <span id="caseMeta" hidden></span></p>
         <div class="chiplist" id="chips-toolbox" role="group" aria-label="Toolbox"></div>
       </div>
       <!-- The loop, iteration 2 (2026-09-18): the panel now FOLLOWS the two chip rows
@@ -1686,7 +1706,7 @@
              panel (three sentences on the order of events) is one sentence now; the
              panel itself shows the order (a concept lights up when armed, the right
              column fills as chips are chosen below). "Freiwillig" stays first. -->
-        <p class="linkmap__hint" id="linkmapHint">Freiwillig: ein Konzept antippen, dann die passende Massnahme oder das passende Werkzeug.</p>
+        <p class="linkmap__hint" id="linkmapHint">Freiwillig: ein Konzept antippen, dann die passende Massnahme oder das passende Werkzeug.</p>
         <!-- Eugen (2026-09-21, screenshot of this panel): "so etwas braucht eine
              bessere Erklaerung ... Wie sollen die Teilnehmer das ausdiskutieren
              und zum Ergebnis kommen? Was sollten sie beachten etc.? Man muss die
@@ -1697,7 +1717,7 @@
              the tool: the test to apply (can you say why in one sentence), and
              the fallback if the answer is no (go back and look again, do not
              force a line). -->
-        <p class="linkmap__hint">So kommen Sie zum Ergebnis: Fragen Sie sich, warum genau diese Massnahme oder dieses Werkzeug zur Erklärung passt, die Sie oben gewählt haben, nicht nur, welches Ihnen zuerst einfällt. Wenn Sie das in einem Satz begründen können, ist die Wahl getroffen. Wenn nicht, schauen Sie noch einmal auf die Konzepte in Schritt 1: manchmal passt ein anderes besser.</p>
+        <p class="linkmap__hint">So kommen Sie zum Ergebnis: Fragen Sie sich, warum genau diese Massnahme oder dieses Werkzeug zur Erklärung passt, die Sie oben gewählt haben, nicht nur, welches Ihnen zuerst einfällt. Wenn Sie das in einem Satz begründen können, ist die Wahl getroffen. Wenn nicht, schauen Sie noch einmal auf die Konzepte in Schritt 1: manchmal passt ein anderes besser.</p>
         <div class="linkmap__body">
           <div class="linkmap__col" id="linkmapLeft"></div>
           <svg class="linkmap__svg" id="linkmapSvg" aria-hidden="true"></svg>
@@ -1719,7 +1739,7 @@
           <label class="field__label" for="f_aenderung">Die eine Änderung</label>
           <span class="field__counter" id="counter-f_aenderung" aria-hidden="true"></span>
         </div>
-        <p class="field__help">In einem Satz: was Sie im Gespräch oder danach konkret anders machen.</p>
+        <p class="field__help">In einem Satz: was Sie im Gespräch oder danach konkret anders machen.</p>
         <textarea class="field__area" id="f_aenderung" data-key="aenderung" rows="2" maxlength="160"></textarea>
       </div>
       <div class="field">
@@ -1727,7 +1747,7 @@
           <label class="field__label" for="f_teamfrage" id="lbl_teamfrage">Frage fürs Teammeeting</label>
           <span class="field__counter" id="counter-f_teamfrage" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Welche Frage stellen Sie Ihrem Team im nächsten Meeting?</p>
+        <p class="field__help">Welche Frage stellen Sie Ihrem Team im nächsten Meeting?</p>
         <textarea class="field__area" id="f_teamfrage" data-key="teamfrage" rows="2" maxlength="120"></textarea>
       </div>
     </div>
@@ -1751,7 +1771,7 @@
           <label class="field__label" for="f_schritt">Nächster Schritt</label>
           <span class="field__counter" id="counter-f_schritt" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Der kleinste konkrete Schritt, den Sie ohne weitere Zustimmung selbst umsetzen können.</p>
+        <p class="field__help">Der kleinste konkrete Schritt, den Sie ohne weitere Zustimmung selbst umsetzen können.</p>
         <textarea class="field__area" id="f_schritt" data-key="schritt" rows="2" maxlength="120"></textarea>
       </div>
       <div class="field">
@@ -1794,7 +1814,7 @@
   <!-- ============================ Screen 5 ============================ -->
   <section class="step" id="step-5" data-step="5" aria-labelledby="step-5-title">
     <h2 class="step-title" id="step-5-title" tabindex="-1">Routine verankern</h2>
-    <p class="step-help" id="routineHelp">Halten Sie Vorhersage, Signal und Risiko oder Nebenwirkung fest. Eine Überprüfungsroutine brauchen Sie nicht.</p>
+    <p class="step-help" id="routineHelp">Halten Sie Vorhersage, Signal und Risiko oder Nebenwirkung fest. Eine Überprüfungsroutine brauchen Sie nicht.</p>
     <details class="carry" id="carry-5" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
@@ -1806,7 +1826,7 @@
            are the group's own estimate, they draw themselves as a comparison, and they
            travel into the Interventionsbrief. -->
       <p class="field__help">Bei wie vielen von 10 vergleichbaren Kundinnen und Kunden passiert das heute?
-        Und bei wie vielen nach Ihrer Änderung?</p>
+        Und bei wie vielen nach Ihrer Änderung?</p>
       <div class="predict" id="predict">
         <!-- V1.13: the estimate is made by clicking a row of ten, not by typing into a
              box. Ten dots is the denominator, visible, so "3 von 10" needs no reading.
@@ -1847,7 +1867,7 @@
           <label class="field__label" for="f_erwartung">Vorhersage in einem Satz</label>
           <span class="field__counter" id="counter-f_erwartung" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Was soll sich verändern, wenn Ihre Änderung wirkt?</p>
+        <p class="field__help">Was soll sich verändern, wenn Ihre Änderung wirkt?</p>
         <textarea class="field__area" id="f_erwartung" data-key="erwartung" rows="2" maxlength="120"></textarea>
       </div>
       <div class="field">
@@ -1855,7 +1875,7 @@
           <label class="field__label" for="f_signal">Signal</label>
           <span class="field__counter" id="counter-f_signal" aria-hidden="true"></span>
         </div>
-        <p class="field__help" id="signalHelp">Woran würden Sie erkennen, dass sich etwas verändert hat?</p>
+        <p class="field__help" id="signalHelp">Woran würden Sie erkennen, dass sich etwas verändert hat?</p>
         <textarea class="field__area" id="f_signal" data-key="signal" rows="2" maxlength="120"></textarea>
       </div>
       <div class="field">
@@ -1863,7 +1883,7 @@
           <label class="field__label" for="f_risiko">Risiko oder Nebenwirkung</label>
           <span class="field__counter" id="counter-f_risiko" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Was könnte die Änderung kosten oder auslösen, und für wen?</p>
+        <p class="field__help">Was könnte die Änderung kosten oder auslösen, und für wen?</p>
         <textarea class="field__area" id="f_risiko" data-key="risiko" rows="2" maxlength="120"></textarea>
       </div>
     </div>
@@ -1914,7 +1934,7 @@
          (see MAIL_NOTE_TEXT/MAIL_FILE_NOTE_TEXT below); the markup carries only
          the #btnMail wording as its default so the page still reads sensibly
          before any script runs. -->
-    <p class="export-note" id="mailNote" hidden>Das PDF liegt jetzt im Download-Ordner. Im geöffneten E-Mail-Fenster einmal anhängen, dann senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die E-Mail-Datei mit PDF herunterladen.</p>
+    <p class="export-note" id="mailNote" hidden>Das PDF liegt jetzt im Download-Ordner. Im geöffneten E-Mail-Fenster einmal anhängen, dann senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die E-Mail-Datei mit PDF herunterladen.</p>
     <!-- V1.13 (2026-09-17, Eugen): "remove clutter, move things that aren't directly
          relevant to this exercise (like the JSON stuff) out of sight". The JSON export
          is a technical, facilitator/tool-sync feature (reopening a case later, here or
@@ -1936,9 +1956,9 @@
              rather than attach the PDF by hand. Same emlBytes() this button always
              produced; only its position and framing changed, now that it is the
              second option rather than the only one. -->
-        <p class="field__help">Falls sich keine E-Mail öffnet, oder Outlook den Entwurf lieber fertig haben soll: E-Mail-Datei mit Text und PDF-Anhang.</p>
+        <p class="field__help">Falls sich keine E-Mail öffnet, oder Outlook den Entwurf lieber fertig haben soll: E-Mail-Datei mit Text und PDF-Anhang.</p>
         <button type="button" class="btn" id="btnMailFile">E-Mail-Datei mit PDF</button>
-        <p class="field__help">Für die Weiterverarbeitung: den Fall später wieder öffnen, hier oder im Begleittool.</p>
+        <p class="field__help">Für die Weiterverarbeitung: den Fall später wieder öffnen, hier oder im Begleittool.</p>
         <button type="button" class="btn" id="btnJson">Interventionsbrief als JSON</button>
       </div>
     </details>
@@ -1950,21 +1970,19 @@
       <summary>Datenschutzhinweis</summary>
       <div class="privacy-body">
         <p>Diese Datei läuft vollständig im Browser: keine Netzwerkaufrufe, keine
-        Analysewerkzeuge, kein Server, keine Übertragung von Eingaben an irgendjemanden.</p>
+        Analysewerkzeuge, kein Server, keine Übertragung von Eingaben an irgendjemanden.</p>
         <p>Eingaben leben nur im Arbeitsspeicher dieses Tabs. Auf dem Gerät wird nichts
         gespeichert. Beim Schliessen oder Neuladen des Tabs sind die Eingaben weg. Wer den Fall
-        behalten will, exportiert ihn als JSON und legt die Datei selbst ab.</p>
+        behalten will, exportiert ihn als JSON und legt die Datei selbst ab.</p>
         <p>Bitte keine Kundennamen, Kontonummern oder sonstigen vertraulichen Kundendaten
-        eingeben; das Werkzeug fragt an keiner Stelle danach.</p>
+        eingeben; das Werkzeug fragt an keiner Stelle danach.</p>
       </div>
     </details>
     <p class="app-footer__line">
       Erstellt von Prof. Eugen Dimant, University of Pennsylvania, für den Behavioral Science
       Deep Dive mit den Regionalleitungen Personal Banking, <span id="appSessionDate"></span>.
       Fragen: <a href="mailto:edimant@sas.upenn.edu">edimant@sas.upenn.edu</a>
-    </p>
-    <p class="app-footer__line app-footer__version">
-      Version <span id="appVersion"></span>
+      · Version <span id="appVersion" class="app-footer__version"></span>
     </p>
   </div>
 </footer>
@@ -2940,7 +2958,7 @@
          reading apply()'s own body. Named individually, in the tool's own
          on-screen terms, not folded back into "Konzepte". */
       showConfirmModal("„" + clickedLabel + "“ laden? Feld 1, die Konzepte, die " +
-                       "Massnahme und das Werkzeug werden dabei ersetzt.",
+                       "Massnahme und das Werkzeug werden dabei ersetzt.",
                        apply, null, "Ersetzen");
       return;
     }
@@ -3796,7 +3814,7 @@
        the header to speak for itself. */
     var capThema = document.createElement("p");
     capThema.className = "chipgroup__caption";
-    capThema.textContent = "Zu Ihrem Fall vorbereitet. Sie sind nicht daran gebunden.";
+    capThema.textContent = "Zu Ihrem Fall vorbereitet. Sie sind nicht daran gebunden.";
     box.insertBefore(capThema, kids[0]);
     if (kids.length > nFirst) {
       var h2 = document.createElement("p");
@@ -5252,10 +5270,10 @@
      correctly even before either button has been clicked. */
   var MAIL_NOTE_TEXT = "Das PDF liegt jetzt im Download-Ordner. Im geöffneten E-Mail-Fenster " +
     "einmal anhängen, dann senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die " +
-    "E-Mail-Datei mit PDF herunterladen.";
+    "E-Mail-Datei mit PDF herunterladen.";
   var MAIL_FILE_NOTE_TEXT = "Die E-Mail-Datei aus dem Download-Ordner in Outlook öffnen: " +
     "Empfänger, Text und PDF sind drin, nur noch senden. Öffnet sie sich nicht als Entwurf: das " +
-    "PDF aus demselben Ordner an eine Mail an edimant@sas.upenn.edu anhängen.";
+    "PDF aus demselben Ordner an eine Mail an edimant@sas.upenn.edu anhängen.";
   /* RFC 2047 encoded-words of at most 66 characters each (so "Subject: " plus the
      first one stays under 78), folded onto continuation lines; the subject can
      carry any character this way. */
@@ -6053,7 +6071,7 @@
            window.confirm() cannot block, so resetTimer() is handed to it and runs on
            Bestätigen only. Declining leaves the clock exactly as it was. */
         showConfirmModal(
-          "Uhr zurücksetzen? Die bisher verstrichene Zeit geht dabei verloren.",
+          "Uhr zurücksetzen? Die bisher verstrichene Zeit geht dabei verloren.",
           resetTimer, null, "Zurücksetzen");
         return;
       }
@@ -6091,7 +6109,7 @@
            Feld 1 and the Konzepte row named here. */
         showConfirmModal(
           "Eigener Fall? Feld 1, die Konzepte, die Massnahme und das Werkzeug " +
-          "werden dabei geleert.",
+          "werden dabei geleert.",
           toOwnCase, null, "Leeren");
         return;
       }
@@ -6209,7 +6227,7 @@
       }
       if (caseHasContent()) {
         showConfirmModal(
-          "Fall aus JSON öffnen? Die aktuelle, ungespeicherte Eingabe wird dabei ersetzt.",
+          "Fall aus JSON öffnen? Die aktuelle, ungespeicherte Eingabe wird dabei ersetzt.",
           openJson,
           function () { input.value = ""; $("fileImportName").textContent = ""; },
           "Ersetzen");
