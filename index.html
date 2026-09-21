@@ -6,7 +6,7 @@
 <title>RADAR | Breakout Sessions</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="generator" content="hand-authored; build_radar.py is retired as generator, see file banner">
-<meta name="radar-version" content="1.14">
+<meta name="radar-version" content="1.15">
 <!-- Favicon as an inline data URI: no external file, no request, works from a stick. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%231a1b1e'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23e8b23a' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='%23e8b23a' stroke-width='5'/%3E%3Cline x1='50' y1='50' x2='74' y2='28' stroke='%23e8b23a' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
 <!--
@@ -131,37 +131,27 @@
   }
   [tabindex="-1"]:focus{ outline: none; }
 
-  /* ========== masthead and header ========== */
-  .app-masthead{
-    background: linear-gradient(180deg, var(--color-bg-raised), var(--color-bg));
-    border-bottom: 1px solid var(--color-border);
-  }
-  .app-masthead__inner{
-    max-width: var(--max-width); margin: 0 auto;
-    padding: var(--space-3) var(--space-4);
-    display: flex; flex-wrap: wrap; gap: var(--space-2);
-    justify-content: space-between; align-items: baseline;
-    font-size: 0.8rem; color: var(--color-text-faint);
-  }
-  .app-header{ border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+  /* ========== header: wordmark and clock on one row (the loop, iteration 1) ========== */
+  .app-header{ border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
   .app-header__inner{
     max-width: var(--max-width); margin: 0 auto;
-    padding: var(--space-4) var(--space-4) var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4);
   }
-  .app-header__title{ font-size: 1.6rem; letter-spacing: 0.14em; color: var(--color-accent); }
+  .app-header__title{ font-size: 1.3rem; letter-spacing: 0.14em; color: var(--color-accent); flex: 0 0 auto; }
 
-  /* ========== timer ========== */
-  .timerbar{ border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+  /* ========== timer (lives inside the header row) ========== */
+  .timerbar{ flex: 1 1 32ch; min-width: 0; }
+  .app-header__inner .lookup{ flex: 0 0 auto; }
   .timerbar__inner{
-    max-width: var(--max-width); margin: 0 auto;
-    padding: var(--space-3) var(--space-4);
     display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);
+    justify-content: flex-end;
   }
   .timerbar__clock{
-    font-size: 1.5rem; font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+    font-size: 1.25rem; font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
     color: var(--color-accent); min-width: 5ch;
   }
-  .timerbar__phase{ color: var(--color-text-muted); font-size: 0.9rem; flex: 1 1 16ch; }
+  .timerbar__phase{ color: var(--color-text-muted); font-size: 0.88rem; flex: 0 1 auto; }
   /* V1.13: the checkpoints were three bare numbers sitting in the control row beside
      Start and Zurücksetzen, so they read as buttons that did nothing when clicked.
      They are milestones, not controls, so they are now a progress track: the fill
@@ -212,38 +202,54 @@
 
   /* ========== navigation ========== */
   .progress-nav{ border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
-  .progress-nav__inner{
-    max-width: var(--max-width); margin: 0 auto; padding: var(--space-2) var(--space-4);
-    display: flex; flex-wrap: wrap; gap: var(--space-1);
+  .progress-nav{
+    max-width: var(--max-width); margin: 0 auto; padding: var(--space-1) var(--space-4);
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: var(--space-2); border-bottom: none;
   }
+  /* The nav's own rule spans the full width even though the nav is centred: draw
+     it on a full-bleed wrapper via a box-shadow rather than a border on the boxed
+     element, so the line does not stop at the content edge. */
+  .progress-nav{ box-shadow: 0 1px 0 var(--color-border); }
+  .progress-nav__inner{
+    display: flex; flex-wrap: wrap; gap: var(--space-1); flex: 1 1 auto;
+  }
+  /* The loop, iteration 2 (2026-09-18): beside the tabs, the aside took the width the
+     fifth tab needed at 1024px and the tabs wrapped 3+2. Below 1200px both rows take
+     the full width: tabs first, count and glossary underneath. */
+  /* APEX review (2026-09-21): two rows of chrome, not three. The count and the
+     glossary sit at the right end of the tab row where they fit (1200px and up);
+     below that they take their own row, the toggle still right-aligned. */
+  .progress-nav__inner{ flex: 0 1 auto; margin-left: -10px; }  /* the first tab's text on the content edge */
+  .progress-count{ flex: 0 0 auto; margin-left: auto; }
   .progress-nav__item{
     background: none; border: 1px solid transparent; color: var(--color-text-muted);
-    padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+    padding: var(--space-2) 10px; border-radius: var(--radius-sm);
     cursor: pointer; font-size: 0.85rem; text-align: left;
   }
   .progress-nav__item:hover{ color: var(--color-text); background: var(--color-surface-alt); }
   .progress-nav__item.is-current{
     color: var(--color-on-accent); background: var(--color-accent); border-color: var(--color-accent);
   }
-  .progress-nav__num{ font-variant-numeric: tabular-nums; opacity: 0.8; margin-right: 6px; }
+  .progress-nav__num{ font-variant-numeric: tabular-nums; opacity: 0.8; margin-right: 4px; }
+  .progress-nav__item.is-unavailable{ opacity: 0.45; cursor: default; }
+  .progress-nav__item.is-unavailable:hover{ background: none; color: var(--color-text-muted); }
 
   /* ========== steps ========== */
-  main{ max-width: var(--max-width); margin: 0 auto; padding: var(--space-5) var(--space-4) var(--space-6); }
+  main{ max-width: var(--max-width); margin: 0 auto; padding: var(--space-4) var(--space-4) var(--space-6); }
   .step{ display: none; }
   .step.is-active{ display: block; }
-  .step-eyebrow{
-    color: var(--color-text-faint); font-size: 0.8rem;
-    letter-spacing: 0.12em; text-transform: uppercase;
-  }
-  .step-title{ font-size: 1.45rem; margin-top: var(--space-1); }
+  .step-title{ font-size: 1.45rem; }
   .step-help{ color: var(--color-text-muted); margin-top: var(--space-2); max-width: 68ch; }
   .step-card{
     background: var(--color-surface); border: 1px solid var(--color-border);
     border-radius: var(--radius-lg); padding: var(--space-5); margin-top: var(--space-4);
+    scroll-margin-top: 96px;
   }
   .box-label{
-    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--color-accent); margin-bottom: var(--space-2);
+    font-size: 0.78rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--color-accent); margin: 0 0 var(--space-2);
+    display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap;
   }
   .field{ margin-top: var(--space-4); }
   .field__label{ display: block; font-weight: 600; margin-bottom: var(--space-1); }
@@ -260,13 +266,22 @@
   .field__labelrow .field__label{ margin-bottom: 0; }
   .field__counter{ font-size: 0.78rem; color: var(--color-text-faint); white-space: nowrap; }
   .field__counter.is-near-limit{ color: var(--color-warning-text); font-weight: 600; }
+  /* The loop, iteration 2: at the cap the field itself says so (amber border), not
+     only the counter at the far right of the label row, which a participant typing
+     into the box does not look at. */
+  .field__area.is-at-limit, .field__input.is-at-limit{ border-color: var(--color-warning-border); }
   .field__help{ color: var(--color-text-faint); font-size: 0.86rem; margin-bottom: var(--space-2); }
   .field__input, .field__area{
     width: 100%; background: var(--color-surface-alt); color: var(--color-text);
     border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
     padding: var(--space-3); font-family: inherit; font-size: 0.97rem; line-height: 1.5;
   }
-  .field__area{ min-height: 5.5em; resize: vertical; }
+  /* The loop, iteration 2 (2026-09-18): every textarea used to open at 5.5em (about
+     three and a half lines) whatever its cap; a 100-character field then looked like
+     it wanted a paragraph, and a first-time participant (role-play) wrote one and hit
+     the cap mid-sentence. Height now follows each field's rows attribute, which is
+     set from its cap: two rows for 120 to 160 characters, five for 500. */
+  .field__area{ resize: vertical; }
   /* V1.13 round 3: the working-hypothesis toggle on screen 2. Two equal buttons, not
      a checkbox pair, because choosing B has to visibly un-choose A -- one is always
      the current answer, or neither is, never both. */
@@ -278,7 +293,7 @@
   }
   .segmented__btn:hover{ border-color: var(--color-accent); }
   .segmented__btn.is-active{
-    border-color: var(--color-accent); background: var(--color-accent); color: var(--color-on-accent);
+    border-color: var(--color-accent); background: var(--color-accent-soft); color: var(--color-accent-strong);
   }
 
   /* ========== Startfall ========== */
@@ -300,22 +315,20 @@
      the one heavy box left standing on Screen 1 once theme-coach was lightened
      elsewhere, doing the same "here is a note about your loaded case" job with
      noticeably heavier chrome for no reason tied to its content. */
-  .case-meta{
-    margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1);
-    border-left: 3px solid var(--color-accent);
-    padding: var(--space-1) var(--space-4); line-height: 1.5;
-  }
-  .case-meta__title{ font-weight: 600; font-size: 1rem; color: var(--color-accent-strong); }
-  .case-meta__line{ font-size: 0.88rem; color: var(--color-text-muted); }
+  /* The loop, iteration 2 (2026-09-18): the case's title is gone from here (the
+     chosen theme button two lines up already shows it, selected), as is the
+     "Vorschlag, keine Diagnose" tail ("das oft passt" already says suggestion). One
+     line remains, and only for a case that suggests a Werkzeug. */
   /* Pre-filled example text, until the group edits the field. */
   .field__area.is-example, .field__input.is-example{
     font-style: italic; color: var(--color-text-muted);
     border-style: dashed; background: transparent;
   }
+  /* The loop, iteration 2 (2026-09-18): on the eyebrow's own line, right-aligned,
+     instead of a second uppercase micro-label stacked under the first. */
   .example-badge{
-    display: inline-block; margin-bottom: var(--space-2);
     font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--color-accent-strong);
+    color: var(--color-accent-strong); text-align: right;
   }
   /* The card that just received the loaded text flashes once, so the click is felt. */
   @keyframes radarFlash{
@@ -326,7 +339,9 @@
   .step-card.is-flash{ animation: radarFlash 1.3s ease-out 1; }
   @media (prefers-reduced-motion: reduce){
     .step-card.is-flash{ animation: none; border-color: var(--color-accent); }
+    .bar__fill, .timertrack__fill, .dot, .chip__gloss{ transition: none; }
   }
+  ::placeholder{ color: var(--color-text-faint); opacity: 1; }  /* 5.15:1, not Chromium's 2.9:1 */
   .import-row{ margin-top: var(--space-4); font-size: 0.85rem; color: var(--color-text-faint); }
   /* Round-3 pass (2026-09-17): ".import-row input" removed -- the real file input
      inside this row has carried .sr-only (clip-rect 0,0,0,0, 1x1px) since V1.12,
@@ -350,15 +365,18 @@
     text-align: left; font-size: 0.95rem; font-weight: 600;
     padding: var(--space-3) var(--space-4); line-height: 1.35;
   }
+  /* APEX review (2026-09-21): "chosen" reads like a checked chip (soft fill, gold
+     outline, gold text); the solid gold fill now means one thing, the action. */
   .btn.is-selected{
-    background: var(--color-accent); color: var(--color-on-accent);
+    background: var(--color-accent-soft); color: var(--color-accent-strong);
     border-color: var(--color-accent);
   }
-  .btn.is-selected:hover{ background: var(--color-accent-strong); color: var(--color-on-accent); }
+  .btn.is-selected:hover{ background: var(--color-accent-soft); color: var(--color-accent-strong); }
   /* The secondary disclosure: the bonus theme and the JSON import, closed by default. */
   .quickpick{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-2); }
   .btn--quick{ font-size: 0.84rem; padding: var(--space-1) var(--space-3); }
   .startfall-more{ margin-top: var(--space-4); }
+  .export-more .startfall-more{ margin-top: var(--space-2); }
   .startfall-more summary{ cursor: pointer; color: var(--color-accent); font-size: 0.86rem; }
   .startfall-more__body{ padding-top: var(--space-3); }
 
@@ -382,7 +400,7 @@
   .linkmap__col{ display: flex; flex-direction: column; gap: var(--space-2); }
   .linkmap__node{
     display: block; width: 100%; text-align: left; cursor: pointer;
-    border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong); border-radius: 999px;
     padding: var(--space-1) var(--space-3); font-size: 0.86rem;
     background: var(--color-surface-alt); color: var(--color-text); font-family: inherit;
   }
@@ -414,17 +432,29 @@
      safety net at all covers everything above that -- including ordinary tablet
      widths (768px, the exact width an independent visual audit tested), where
      "5 Routine verankern" wraps alone onto a stranded second row with the rest
-     of that row empty. Widened to 1024px (comfortably covers tablet portrait AND
-     landscape) and changed from a 3-column grid with an empty trailing cell to a
+     of that row empty. Widened to 1024px at the time (the loop, iteration 2,
+     brought it back to 900px, see below) and changed from a 3-column grid with an empty trailing cell to a
      6-column grid where the first 3 items each span 2 columns and the last 2
      each span 3 -- 3x2=6 and 2x3=6, so both rows fill their own width exactly,
      at any width in this range, with no visible gap. Real laptop widths (the
      tool's primary expected device, generally >=1280px) are unaffected and keep
      the single-row flex layout from .progress-nav__inner above. */
-  @media (max-width: 1024px){
+  /* The loop, iteration 2 (2026-09-18): with the count and the glossary on their own
+     row below 1200px, the five tabs (about 750px) fit one row down to about 900px;
+     the 6-column grid takes over below that. */
+  @media (max-width: 900px){
     .progress-nav__inner{ display: grid; grid-template-columns: repeat(6, 1fr); }
     .progress-nav__item{ grid-column: span 2; text-align: center; }
     .progress-nav__item:nth-child(n+4){ grid-column: span 3; }
+  }
+  /* Iteration 3: on a phone the header stacked to three rows (wordmark alone on
+     one); without the track the clock, phase and buttons share the wordmark's row. */
+  @media (max-width: 620px){
+    .timertrack{ display: none; }
+    .app-header__title{ order: 0; }
+    .app-header__inner .lookup{ order: 1; margin-left: auto; }
+    .timerbar{ order: 2; flex: 1 1 100%; }
+    .timerbar__inner{ justify-content: flex-start; }
   }
   @media (max-width: 720px){
     /* Round-4 fresh-reader pass (2026-09-17/18): .linkmap__body's gap is 0 in the
@@ -496,10 +526,7 @@
     margin-top: var(--space-3); padding-bottom: var(--space-3);
     border-bottom: 1px solid var(--color-border);
   }
-  .carry__summary{
-    cursor: pointer; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--color-accent);
-  }
+  .carry__summary{ cursor: pointer; font-size: 0.88rem; color: var(--color-accent); min-height: 24px; }
   .carry__body{
     display: flex; flex-direction: column; gap: var(--space-2);
     margin-top: var(--space-3);
@@ -561,33 +588,17 @@
     color: var(--color-accent); margin-bottom: var(--space-1); display: block;
   }
 
-  /* ========== progress indicator ========== */
-  .progress-count{
-    font-size: 0.8rem; color: var(--color-text-faint); padding: var(--space-2) var(--space-4) 0;
-    max-width: var(--max-width); margin: 0 auto;
-  }
+  /* ========== progress indicator: one muted phrase in the nav row ========== */
+  .progress-count{ font-size: 0.8rem; color: var(--color-text-faint); white-space: nowrap; }
 
   /* ========== chips ========== */
   .chiprow{ margin-top: var(--space-5); }
-  .chiprow__label{
-    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--color-accent); margin-bottom: var(--space-1);
-  }
-  /* Decluttering pass (2026-09-18, round 2, "un-fucking-clutter the screens"):
-     chiprow__question and chiprow__rule used to be two separate block-level
-     paragraphs (bold question on its own line, faint rule text on the line
-     below), which made every chiprow three full lines deep -- eyebrow, question,
-     rule -- before the chip list itself even started. Screen 3 stacks two of
-     these back to back ("1. Massnahme" and "2. Werkzeug"), on top of the card's
-     own eyebrow+title+help and the linkmap's own head+hint immediately above
-     them: four repeated eyebrow/heading treatments in one card is what read as
-     cluttered, not any single one of them. Nothing here is deleted -- the
-     question and the rule are now one flowing paragraph, question still bold,
-     rule text still faint and smaller, just inline after it instead of on its
-     own line. Cuts one full line (and its margin) from every chiprow -- three of
-     them across screens 1 and 3 -- with no words removed. */
-  .chiprow__question{ font-weight: 600; margin-bottom: var(--space-3); }
-  .chiprow__rule{ display: inline; font-weight: 400; color: var(--color-text-faint); font-size: 0.84rem; }
+  /* Iteration 3 (2026-09-18): the rows carry a bold question (the label) and a
+     .field__help line, like every input; the uppercase chiprow__label and the
+     inline chiprow__rule are gone. */
+  .chiprow__question{ font-weight: 600; font-size: 1rem; margin-bottom: var(--space-1); }
+  .field__label{ font-size: 1rem; }
+  .chiprow .field__help{ margin-bottom: var(--space-3); }
   .chiplist{ display: flex; flex-wrap: wrap; gap: var(--space-2); }
   /* V1.13 (Eugen): "put the information thingies within each tile that they belong
      to, not outside of it". The "i" still has to sit OUTSIDE the <label>, because a
@@ -698,10 +709,11 @@
   .chip__de::before{ content: "\00a0\00b7\00a0"; }
   .chip__de{ color: var(--color-text-faint); }
   .chip.is-on .chip__de{ color: var(--color-accent-strong); }
+  /* APEX review (2026-09-21): sentence case, muted, not a third uppercase gold
+     line under the card eyebrow. */
   .chipgroup__head{
     flex: 0 0 100%; margin: var(--space-2) 0 0;
-    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--color-accent);
+    font-size: 0.86rem; color: var(--color-text-muted);
   }
   .chipgroup__head[data-chipgroup="weitere"]{ color: var(--color-text-faint); margin-top: var(--space-4); }
   .chip__dual{
@@ -743,7 +755,14 @@
     margin-top: var(--space-2); margin-bottom: var(--space-3);
     font-size: 0.88rem; color: var(--color-warning-text);
   }
-  .brief__open.is-complete{ color: var(--color-success-text); }
+  /* The loop, iteration 1 (2026-09-18): once every field is filled, this line said
+     "Alle Felder ausgefüllt." under a nav row that already says so, and printed
+     onto the letter. Kept in the DOM (the suites read its text, and the print/mail
+     gate compares it with the progress line), shown only while something is open. */
+  .brief__open.is-complete{ color: var(--color-success-text); display: none; }
+  /* APEX review (2026-09-21): not shown on screen at all (the chrome counts, the
+     boxes mark, the banner under the buttons names); kept in the DOM for the suites. */
+  body.show-brief .brief__open{ display: none; }
   .brief__meta{ font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: var(--space-2); }
   /* V1.13 (2026-09-17): the disclosure moved from a click-to-expand paragraph pushed
      into the page flow to a small floating popover that also opens on hover/focus
@@ -755,7 +774,7 @@
   .chip__info{
     background: none; border: 1px solid var(--color-border-strong);
     color: var(--color-text-faint); border-radius: 999px;
-    width: 1.7em; height: 1.7em; line-height: 1; padding: 0;
+    width: 24px; height: 24px; line-height: 1; padding: 0;
     cursor: pointer; font-size: 0.85rem; font-style: italic;
   }
   .chip__info:hover, .chip__info:focus-visible{
@@ -780,10 +799,48 @@
 
   /* Glossary, form (b): the standing panel, in its own bar under the navigation so it
      is reachable from all five screens without being a sixth screen. */
-  .lookup{ border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
-  .lookup__inner{ max-width: var(--max-width); margin: 0 auto; padding: var(--space-2) var(--space-4); }
-  .lookup summary{ cursor: pointer; color: var(--color-accent); font-size: 0.88rem; }
-  .lookup__body{ padding: var(--space-3) 0 var(--space-2); }
+  /* The loop, iteration 1: the glossary used to expand inline under the nav and push
+     the whole form ~2600px down (page height 2520 to 5124px). It is a reference, not a
+     step, so it now opens as a side sheet over the page: the form never moves, the
+     sheet scrolls on its own, and the same summary (or Escape, or the close button
+     at its top) closes it. */
+  .lookup summary{ cursor: pointer; color: var(--color-accent); font-size: 0.88rem; white-space: nowrap;
+    list-style: none; border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3); display: inline-block; }
+  .lookup summary::-webkit-details-marker{ display: none; }
+  .lookup summary:hover{ border-color: var(--color-accent); }
+  .lookup summary{
+    position: relative; z-index: 60; min-height: 24px; }  /* above the scrim, so it still toggles */
+  /* Explicit, not left to the UA's unslotted-content behaviour for a closed
+     <details>: Chromium still reports a computed display of "block" and a 600px
+     rect for that content, which a geometry scan reads as an overflow. */
+  #lookupDetails:not([open]) .lookup__body{ display: none; }
+  /* Iteration 3: a light scrim under the sheet, so the covered form reads as
+     "behind" rather than cut off; a click on it closes the sheet. */
+  #lookupDetails[open]::before{
+    content: ""; position: fixed; inset: 0; z-index: 59; background: rgba(0, 0, 0, 0.35);
+  }
+  .lookup__body{
+    position: fixed; top: var(--sheet-top, 0px); right: 0; bottom: 0; z-index: 60;
+    width: min(600px, 100vw); overflow-y: auto; overscroll-behavior: contain;
+    background: var(--color-bg-raised); border-left: 1px solid var(--color-border);
+    box-shadow: -12px 0 32px rgba(0,0,0,0.45);
+    padding: var(--space-4) var(--space-5) var(--space-6);
+  }
+  .lookup__head{
+    position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center;
+    margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-5)) 0;
+    top: calc(-1 * var(--space-4));  /* flush with the sheet's edge, not its padding */
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-bg-raised); border-bottom: 1px solid var(--color-border);
+  }
+  .lookup__headtitle{ font-weight: 600; }
+  .lookup__close{
+    background: var(--color-surface); border: 1px solid var(--color-border-strong);
+    color: var(--color-text); border-radius: var(--radius-sm); padding: var(--space-1) var(--space-3);
+    font-family: inherit; font-size: 0.86rem; cursor: pointer;
+  }
+  .lookup__close:hover{ border-color: var(--color-accent); }
   .lookup__group{ margin-top: var(--space-4); }
   .lookup__grouptitle{
     font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -805,7 +862,25 @@
   /* ========== step footer ========== */
   .step-actions{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
   .export-row{ display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
-  .export-note{ color: var(--color-text-faint); font-size: 0.84rem; margin-top: var(--space-2); max-width: 68ch; }
+  .export-note{ color: var(--color-text-faint); font-size: 0.84rem; margin-top: var(--space-2); max-width: 100ch; }
+  /* The loop, iteration 2 (2026-09-18): the print/mail buttons used to sit at the end
+     of screen 5's fields, ABOVE the brief preview they act on, so a group that read
+     the preview to the end had to scroll back up to find them (first-time participant
+     role-play: "four scrolls up"). They now follow the preview, on screen 5 only. */
+  .export-bar{ display: none; }
+  /* APEX review (2026-09-21): sticky at the viewport's bottom while screen 5 is
+     scrolled (the group finishing Feld 6 sees the actions at once), in its own
+     place under the preview once the page is scrolled to the end. */
+  body.show-brief .export-bar{
+    display: block; position: sticky; bottom: 0; z-index: 30;
+    background: var(--color-bg); border-top: 1px solid var(--color-border);
+  }
+  .export-bar__inner{ max-width: var(--max-width); margin: 0 auto; padding: var(--space-3) var(--space-4); }
+  .export-bar .export-row{ margin-top: 0; }
+  body.show-brief .brief-sheet{ margin-bottom: var(--space-4); }
+  .export-more{ display: none; }
+  body.show-brief .export-more{ display: block; max-width: var(--max-width); margin: 0 auto var(--space-6); padding: 0 var(--space-4); }
+  .export-more .hint{ margin-top: var(--space-3); }
 
   /* V1.13: this banner was a static block at the top of the document, so a group that
      was four screens down saw nothing when a gate refused them. Fixed to the bottom of
@@ -819,17 +894,6 @@
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
     pointer-events: none;
   }
-  /* An independent adversarial pass (2026-09-17, round 2) caught every gate
-     rejection ("please fill this in first") rendering in the same green
-     --color-success-* tones as a real confirmation ("case loaded"), right
-     next to an amber warning banner saying the same thing in a different
-     color. showStatus()'s gateHint parameter (see the script) adds this
-     class for exactly the gate-toast case, nothing else changes. */
-  .action-status--notice{
-    border-color: var(--color-warning-border); background: var(--color-warning-bg);
-    color: var(--color-warning-text);
-  }
-
   /* ========== confirm ========== */
   /* V1.13 round 5: the four actions that can throw a group's work away (a new
      Startfall, "Eigener Fall", a JSON re-open, Uhr zurücksetzen) asked with
@@ -881,9 +945,7 @@
 
   /* ========== prediction: the group's own numbers, drawn ========== */
   .predict{ margin-bottom: var(--space-4); }
-  .predict__field{ display: inline-flex; align-items: center; gap: var(--space-2); }
-  .predict__label{ font-weight: 600; font-size: 0.9rem; }
-  .predict__unit{ color: var(--color-text-faint); font-size: 0.85rem; }
+
   .field__input--num{ max-width: 6ch; text-align: center; }
   /* Round-4 fresh-reader pass (2026-09-17/18): a bare type="number" input renders
      its up/down spin buttons with the BROWSER's own light-theme chrome (white
@@ -915,7 +977,8 @@
   .dot:hover{ border-color: var(--color-accent); transform: scale(1.12); }
   .dot.is-on{ background: var(--color-data-muted); border-color: var(--color-data-muted); }
   .dot.is-goal{ background: var(--color-accent); border-color: var(--color-accent); }
-  .dots__value{ font-size: 0.86rem; color: var(--color-text-faint); font-variant-numeric: tabular-nums; }
+  .dots__value{ display: inline-flex; align-items: center; gap: var(--space-2); font-size: 0.86rem; color: var(--color-text-faint); font-variant-numeric: tabular-nums; }
+  .dots__input{ width: 3.4em; padding: var(--space-1) var(--space-2); text-align: center; font-size: 0.95rem; }
   /* The number inputs remain as the state carrier and as the keyboard path, but the
      dots are the control people use, so the boxes step back. */
   /* .predict__inputs was split across two rule blocks here and above (a
@@ -924,10 +987,8 @@
      consolidation) -- consolidated into this one block; every property from both
      is kept, and neither block had an overlapping property with the other, so this
      changes nothing about how it renders. */
-  .predict__inputs{
-    display: flex; flex-wrap: wrap; gap: var(--space-4);
-    margin-top: var(--space-3); opacity: 0.92;
-  }
+  /* .predict__inputs / .predict__inputs-hint retired (the loop, iteration 1): the
+     number boxes sit inside the dot rows now. */
   /* An independent adversarial pass (2026-09-17, round 2) read the previous
      0.75 opacity, with no label of its own, as "this control is disabled" --
      the near-universal meaning of dimmed form fields -- so the faster
@@ -935,36 +996,13 @@
      undiscovered. The caption says these are live; the opacity is raised
      enough that the fields no longer read as inactive, while staying
      visually secondary to the dots, which remain the primary control. */
-  .predict__inputs-hint{
-    color: var(--color-text-faint); font-size: 0.8rem; margin-top: var(--space-3);
-    margin-bottom: calc(-1 * var(--space-2));
-  }
-  .predict__big{
-    margin-top: var(--space-3); font-size: 2.6rem; font-weight: 700; line-height: 1;
-    color: var(--color-accent); font-variant-numeric: tabular-nums;
-  }
-  .predict__big.is-down{ color: var(--color-warning-text); }
-  .predict__chart{ margin-top: var(--space-2); }
-  /* Decluttering pass (2026-09-18): the ten dots above already show the group's
-     two numbers inline ("3 von 10" / "8 von 10" in .dots__value), so a bar chart
-     and a giant +N headline repeating the same two numbers a third and fourth
-     time added weight, not information -- this is what made Screen 5 read as
-     crowded. Neither is used by the printed brief: renderBriefPredict() below
-     builds its own, separate .briefpredict/.bar markup from predictValues()
-     directly, so hiding these two on screen changes nothing about what prints.
-     Scoped to #predictChart specifically (not the bare .bar/.bar__* classes,
-     which renderBriefPredict() reuses for the brief's own chart and must keep
-     rendering) so only the live-screen duplicate goes; #predictDelta's one
-     sentence stays as the sole, quiet "this reacts to what you entered" cue that
-     M11's regression test (regression_v29_test.py) already reads. */
-  #predictChart .bar, #predictBig{ display: none; }
-  .predict__delta{ margin-top: var(--space-1); font-size: 0.88rem; color: var(--color-accent-strong); }
   .bar{ display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-2); }
   /* 18ch, not 15ch: "Nach der Änderung" is 17 characters and wrapped onto two lines
-     beside a 600px bar (V1.14 round 3 overseer). On screen only: the print rule below
-     stays at 11ch, because widening it there was tried and cost the at-cap brief its
-     one-page headroom (stress.py's tightest-tier guard); the paper wrap is the lesser
-     defect. */
+     beside a 600px bar (V1.14 round 3 overseer). The print rule below is 17ch for the
+     same reason; measured with stress.py's at-cap case: one page, first safety-net
+     tier only. (An earlier note here claimed the wider print label cost headroom;
+     that was a misreading of the tier guard's output, corrected in the loop's
+     iteration 1.) */
   .bar__label{ flex: 0 0 18ch; font-size: 0.85rem; color: var(--color-text-muted); }
   .bar__track{
     flex: 1 1 auto; height: 14px; border-radius: 999px;
@@ -1134,7 +1172,7 @@
          separately-calibrated absolute values regardless of this token. */
       --brief-space-scale: 1;
     }
-    .no-print, .app-masthead, .app-header, .progress-nav, .timerbar, .skip-link,
+    .no-print, .app-header, .progress-nav, .timerbar, .skip-link,
     .action-status, main{ display: none !important; }
     /* The brief is the deliverable of the lab and it is meant to be one page.
        A verbose case (long sentences in every field) was running to two, with the
@@ -1186,7 +1224,7 @@
        AND a two-digit prediction, with more than one wording; measuring at anything
        less than that combined worst case is exactly the false-green mistake this note
        exists to prevent from recurring a fourth time. */
-    body{ background: #fff; color: #111; font-size: 9.6pt; padding: 2mm; }
+    body{ background: #fff; color: #111; font-size: 9.6pt; padding: 0; }
     .brief-sheet{ display: block !important; max-width: 100%; margin: 0; padding: 0; }
     /* The bars and the chain are the visual part of the deliverable, so they have to
        survive the print dialog, which drops background colours by default. */
@@ -1209,12 +1247,12 @@
        with Feld 5 and 6 alone on it. On paper both are compressed to a single line
        each: same information, a fifth of the height. */
     .chain{ display: block; margin: 1pt 0 3pt; line-height: 1.4; }
-    /* Plain inline, deliberately: inline-block would keep each key+value unit on one
-       line on paper (an overseer MINOR, V1.14 round 3: "Entscheidungs-/architektur"
-       can split), but tried and measured it costs the at-cap brief its print headroom
-       (stress.py's "does not need the tightest tier" guard failed). One-page-with-
-       margin outranks an unsplit compound on the sheet. */
-    .chain__step{ display: inline; }
+    /* inline-block: each key+value unit stays whole on paper ("Entscheidungs-/
+       architektur" used to split across lines as plain inline flow). Measured with
+       stress.py's at-cap and wide-glyph cases: still one page, first safety-net tier
+       only. (Reverted once the same day on a misread of that guard's output; the
+       guard names the tiers PRESENT, and "print-tight" alone is the mildest case.) */
+    .chain__step{ display: inline-block; }
     .chain__node{ display: inline; border: none; padding: 0; }
     .chain__node + .chain__node{ margin-left: 0; }
     .chain__key{ font-size: 6.5pt; }
@@ -1227,9 +1265,9 @@
     .briefpredict{ padding: 2.5pt 4pt; margin: 2.5pt 0; }
     .briefpredict__head{ font-size: 6.5pt; margin-bottom: 0; }
     .bar{ margin-top: 1pt; gap: 4pt; }
-    .bar__label{ flex: 0 0 11ch; font-size: 7.5pt; }
+    .bar__label{ flex: 0 0 17ch; font-size: 7.5pt; }
     .bar__track{ height: 7px; }
-    .bar__value{ flex: 0 0 7ch; font-size: 7.5pt; }
+    .bar__value{ flex: 0 0 9ch; font-size: 7.5pt; }
     .briefpredict__delta{ margin-top: 1pt; font-size: 7.5pt; }
 
     .brief{ border: none; padding: 0; background: #fff; }
@@ -1251,10 +1289,13 @@
        nothing else. */
     /* The screen colours this line green when nothing is open and amber when something
        is; on paper both print as ink, because the pale green was barely legible. */
-    .brief__open, .brief__open.is-complete{
+    .brief__open{
       font-size: 8.5pt; color: #111; font-weight: 700;
       margin: calc(3pt * var(--brief-space-scale)) 0 calc(5pt * var(--brief-space-scale));
     }
+    /* Print and mail are gated on completeness, so a printed "Alle Felder
+       ausgefüllt." was a line about the tool on a letter about a client. */
+    .brief__open.is-complete{ display: none; }
     .brief__meta{ font-size: 8.5pt; margin-bottom: calc(3pt * var(--brief-space-scale)); color: #333; }
     .brief__footer{ font-size: 7.5pt; margin-top: 4pt; padding-top: 3pt; }
     .print-attribution{
@@ -1267,7 +1308,7 @@
     .brief__footer{ margin-top: calc(2pt * var(--brief-space-scale)); }
     .brief-sheet{ break-after: avoid; page-break-after: avoid; }
     a[href]::after{ content: ""; }
-    @page{ margin: 0; }
+    @page{ margin: 6mm; }  /* APEX review: office printers cannot image the outer 4 to 5 mm */
 
     /* Round 4 (2026-09-17), Evaluator C's Dimension 6: every measurement above was
        taken against realistic German prose (the project's own earlier lesson,
@@ -1326,31 +1367,27 @@
     body.print-tightest .brief__boxtitle{ font-size: 7pt; margin-bottom: 1pt; }
     body.print-tightest .brief__lead{ font-size: 8.4pt; line-height: 1.05; margin-bottom: 2pt; }
     body.print-tightest .brief__meta{ font-size: 8pt; margin-bottom: 2pt; }
-    body.print-tightest .brief__open, body.print-tightest .brief__open.is-complete{
-      font-size: 8pt; margin: 2pt 0 3pt;
-    }
     body.print-tightest .brief__footer{ font-size: 7pt; margin-top: 2pt; padding-top: 2pt; }
   }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Zum Hauptinhalt springen</a>
+<a class="skip-link" id="skipLink" href="#main-content">Zum Hauptinhalt springen</a>
 
-<div class="app-masthead no-print">
-  <div class="app-masthead__inner">
-    <span>Breakout Sessions &middot; Regionalleitungen Personal Banking</span>
-    <span>Prof. Eugen Dimant, University of Pennsylvania</span>
-  </div>
-</div>
-
-<header class="app-header no-print">
+<!-- The loop, iteration 1 (2026-09-18, "screens can absolutely NOT be crowded"): the
+     five stacked bars above the first input (masthead, wordmark, timer, tabs, count,
+     glossary toggle) measured 293px on a 1366x768 laptop, 38% of the viewport, on every
+     screen; screens 2 and 3 opened with no input in view at all. Now two rows: the
+     wordmark shares one row with the clock (the masthead's attribution was a verbatim
+     copy of the footer), and the step tabs share the second with the open-field count
+     and the glossary toggle, whose panel opens as a side sheet instead of pushing the
+     whole form down. Every id the suites read (#timerBar, #timerClock, #timerPhase,
+     #progressNav, #progressCount, #lookupPanel, #lookupSummary, #lookupBody) is kept;
+     #lookupPanel still precedes <main> in the DOM. -->
+<header class="app-header no-print" id="appHeader">
   <div class="app-header__inner">
     <h1 class="app-header__title">RADAR</h1>
-    
-  </div>
-</header>
-
-<div class="timerbar no-print" id="timerBar">
+<div class="timerbar" id="timerBar">
   <div class="timerbar__inner">
     <span class="timerbar__clock" id="timerClock">35:00</span>
     <span class="timerbar__phase" id="timerPhase">Noch nicht gestartet</span>
@@ -1365,23 +1402,25 @@
       <span class="timertrack__fill" id="timerTrackFill"></span>
     </span>
     <button type="button" class="btn" id="btnTimerStart">Start</button>
-    <button type="button" class="btn" id="btnTimerReset">Zurücksetzen</button>
+    <button type="button" class="btn" id="btnTimerReset">Uhr zurücksetzen</button>
   </div>
 </div>
+    <!-- APEX review (2026-09-21): the glossary is a reference reachable from every
+         screen, so its toggle lives in the app bar; the tab row then carries the
+         tabs and the open-field count alone, two rows of chrome instead of three. -->
+    <div class="lookup" id="lookupPanel">
+      <details id="lookupDetails">
+        <summary id="lookupSummary">Konzepte nachschlagen</summary>
+        <div class="lookup__body" id="lookupBody" role="dialog" aria-label="Konzepte nachschlagen"></div>
+      </details>
+    </div>
+  </div>
+</header>
 
 <nav class="progress-nav no-print" id="progressNav" aria-label="Fortschritt">
   <div class="progress-nav__inner" id="progressNavInner"></div>
+  <p class="progress-count" id="progressCount" aria-live="polite"></p>
 </nav>
-<p class="progress-count no-print" id="progressCount" aria-live="polite"></p>
-
-<div class="lookup no-print" id="lookupPanel">
-  <div class="lookup__inner">
-    <details id="lookupDetails">
-      <summary id="lookupSummary">Konzepte nachschlagen</summary>
-      <div class="lookup__body" id="lookupBody"></div>
-    </details>
-  </div>
-</div>
 
 <div class="sr-only" role="status" aria-live="polite" id="liveRegion"></div>
 <div class="action-status no-print" id="visualStatus" aria-hidden="true" hidden></div>
@@ -1413,19 +1452,16 @@
 
   <!-- ============================ Screen 1 ============================ -->
   <section class="step is-active" id="step-1" data-step="1" aria-labelledby="step-1-title">
-    <p class="step-eyebrow">Schritt 1 von 5</p>
     <h2 class="step-title" id="step-1-title" tabindex="-1">Reibung erkennen</h2>
-    <p class="step-help">Laden Sie einen Startfall oder geben Sie einen eigenen ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
+    <p class="step-help">Wählen Sie ein Thema, es lädt einen Beispielfall, oder tragen Sie einen eigenen Fall ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
 
     <div class="step-card">
-      <h3 class="field__label">Thema wählen</h3>
-      <p class="field__help">Wählen Sie das Thema, das zur Situation Ihrer Gruppe passt.</p>
+      <h3 class="box-label">Thema wählen</h3>
       <div class="startfall-row" id="startfallRow" role="group" aria-label="Thema und Startfall"></div>
       <p class="startfall-own">
         <button type="button" class="btn" id="btnOwnCase">Eigener Fall</button>
-        <span class="field__help">Ohne Startfall arbeiten, oder wenn Ihr Thema nicht in der Liste steht. Im Interventionsbrief steht dann „ein eigener Fall“.</span>
+        <span class="field__help">Ohne Thema und Beispiel. Im Brief steht dann „ein eigener Fall“.</span>
       </p>
-      <p class="case-meta" id="caseMeta" hidden></p>
       <!-- V1.13 (2026-09-17, Eugen): "put all these complicated additional options
            somewhere rather hidden, not front and center". The wildcard/bonus theme
            (Beraterseite) and the JSON-file-import control are both genuinely
@@ -1439,6 +1475,7 @@
       <details class="startfall-more" id="startfallMore">
         <summary>Weitere Optionen</summary>
         <div class="startfall-more__body">
+          <p class="field__help">Zusatzthema, falls Zeit bleibt.</p>
           <div class="startfall-row" id="startfallRowMore" role="group" aria-label="Zusatzthema"></div>
           <p class="import-row">
             <label class="field__label" for="fileImport">Bestehenden Fall aus JSON öffnen</label>
@@ -1450,7 +1487,7 @@
                  not display:none) and out of the tab order (tabindex="-1"), with this
                  German-labelled button as its sole visible and keyboard trigger. -->
             <button type="button" class="btn" id="btnFileImport">Datei wählen</button>
-            <span class="field__help" id="fileImportName">Keine Datei ausgewählt</span>
+            <span class="field__help" id="fileImportName"></span>
             <input type="file" id="fileImport" accept="application/json,.json" class="sr-only" tabindex="-1">
           </p>
         </div>
@@ -1458,16 +1495,13 @@
     </div>
 
     <div class="step-card">
-      <p class="box-label">Feld 1</p>
-      <h3 class="field__label">Beobachtung</h3>
-      <span class="example-badge" id="feld1Example" hidden>Beispieltext · mit Ihrem eigenen Fall überschreiben</span>
+      <h3 class="box-label">Feld 1 · Beobachtung <span class="example-badge" id="feld1Example" hidden>Beispieltext, mit Ihrem Fall ersetzen</span></h3>
       <div class="field">
         <div class="field__labelrow">
           <label class="field__label" for="f_gruppe">Wer arbeitet an diesem Fall?</label>
           <span class="field__counter" id="counter-f_gruppe" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Die Vornamen Ihrer Gruppe, durch Komma getrennt. Die Namen stehen
-          auf dem Brief und im Dateinamen, damit die Briefe zugeordnet werden können.</p>
+        <p class="field__help">Sie stehen auf dem Brief.</p>
         <input class="field__input" id="f_gruppe" data-key="gruppe" type="text" placeholder="z. B. Anna, Marco, Sven" maxlength="65">
       </div>
       <div class="field">
@@ -1476,7 +1510,7 @@
           <span class="field__counter" id="counter-f_situation" aria-hidden="true"></span>
         </div>
         <p class="field__help">Was ist der Fall? Keine Kundennamen oder Kontonummern.</p>
-        <textarea class="field__area" id="f_situation" data-key="situation" rows="4" maxlength="350"></textarea>
+        <textarea class="field__area" id="f_situation" data-key="situation" rows="5" maxlength="500"></textarea>
       </div>
       <div class="field">
         <div class="field__labelrow">
@@ -1484,48 +1518,50 @@
           <span class="field__counter" id="counter-f_verhalten" aria-hidden="true"></span>
         </div>
         <p class="field__help">Was passiert nach dem Gespräch tatsächlich? Nur beobachten, noch nicht erklären.</p>
-        <textarea class="field__area" id="f_verhalten" data-key="verhalten" rows="3" maxlength="125"></textarea>
+        <textarea class="field__area" id="f_verhalten" data-key="verhalten" rows="2" maxlength="160"></textarea>
       </div>
 
     </div>
 
     <div class="step-card">
-      <p class="box-label">Feld 2 · Teil 1 von 2</p>
-      <!-- V1.13 round 2 (council): this used to repeat itself -- an <h3>Konzepte</h3>
-           and its help line here, then the chiprow's own chiprow__label/question
-           saying the identical two things again immediately below. Screen 3's two
-           chiprows (Massnahme, Werkzeug) never had the outer pair, so this now
-           matches that pattern instead of being the odd one out. -->
+      <!-- The loop, iteration 2 (2026-09-18): every card now opens with one eyebrow,
+           "Feld N · <the box's name on the brief>", and nothing else; this one used
+           to add a chiprow label "Konzepte" directly under an eyebrow ending in
+           "Konzepte". -->
+      <h3 class="box-label">Feld 2 · Konzepte</h3>
       <div class="chiprow">
-        <p class="chiprow__label">Konzepte</p>
-        <p class="chiprow__question">Welche Konzepte helfen, den Fall einzuordnen? <span class="chiprow__rule">Mindestens eines, höchstens zwei. Kein Freitext. In Schritt 3 wählen Sie die passende Massnahme.</span></p>
+        <p class="chiprow__question">Welche Konzepte helfen, den Fall einzuordnen?</p>
+        <p class="field__help">Mindestens eines, höchstens zwei. In Schritt 3 wählen Sie die passende Massnahme.</p>
         <div class="chiplist" id="chips-wirkmechanismen" role="group" aria-label="Konzepte"></div>
-        <p class="hint" id="hint-wirkmechanismen" hidden>Bitte wählen Sie mindestens ein Konzept.</p>
       </div>
     </div>
 
     <div class="step-actions">
       <button type="button" class="btn btn--primary" data-goto="2">Weiter: Auslöser analysieren</button>
     </div>
+    <!-- The loop, iteration 2 (2026-09-18): every gate banner sits UNDER the button
+         that was refused (here, on screen 4 and under the export row), where the
+         cursor already is; inserted above a button, it pushed that button down
+         under the pointer. -->
+    <p class="hint" id="hint-wirkmechanismen" hidden>Noch offen: mindestens ein Konzept. Bitte wählen, dann geht es weiter.</p>
   </section>
 
   <!-- ============================ Screen 2 ============================ -->
   <section class="step" id="step-2" data-step="2" aria-labelledby="step-2-title">
-    <p class="step-eyebrow">Schritt 2 von 5</p>
     <h2 class="step-title" id="step-2-title" tabindex="-1">Auslöser analysieren</h2>
-    <p class="step-help">Zwei plausible Erklärungen. Welche Beobachtung würde sie voneinander trennen?</p>
+    <p class="step-help">Zwei plausible Erklärungen für das beobachtete Verhalten.</p>
     <div class="theme-coach" id="themeCoach2" hidden></div>
     <details class="carry" id="carry-2" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
-      <p class="box-label">Feld 3</p>
+      <h3 class="box-label">Feld 3 · Diagnose</h3>
       <div class="field">
         <div class="field__labelrow">
           <label class="field__label" for="f_erklaerung">Erklärung A</label>
           <span class="field__counter" id="counter-f_erklaerung" aria-hidden="true"></span>
         </div>
         <p class="field__help">Was könnte das beobachtete Verhalten erklären?</p>
-        <textarea class="field__area" id="f_erklaerung" data-key="erklaerung" rows="4" maxlength="100"></textarea>
+        <textarea class="field__area" id="f_erklaerung" data-key="erklaerung" rows="2" maxlength="160"></textarea>
       </div>
       <div class="field">
         <div class="field__labelrow">
@@ -1533,7 +1569,7 @@
           <span class="field__counter" id="counter-f_gegenprobe" aria-hidden="true"></span>
         </div>
         <p class="field__help" id="gegenprobeHelp">Eine echte Alternative, nicht dieselbe Erklärung anders formuliert.</p>
-        <textarea class="field__area" id="f_gegenprobe" data-key="gegenprobe" rows="4" maxlength="100"></textarea>
+        <textarea class="field__area" id="f_gegenprobe" data-key="gegenprobe" rows="2" maxlength="160"></textarea>
         <p class="hint" id="hint-gegenprobe-similar" hidden>Erklärung A und Erklärung B klingen ähnlich. Ist Erklärung B eine echte Alternative, nicht dieselbe Erklärung anders formuliert?</p>
       </div>
       <!-- V1.13 round 3: appears once both explanations are typed. Answers the
@@ -1541,7 +1577,7 @@
            which until now had nowhere to be recorded. Freiwillig, nie ein Gate. -->
       <div class="field" id="hypotheseField" hidden>
         <p class="field__label" id="hypotheseLabel">Arbeitshypothese</p>
-        <p class="field__help">Nach der trennenden Beobachtung: welche der beiden ist wahrscheinlicher? Freiwillig, ohne Einfluss auf „Weiter“.</p>
+        <p class="field__help">Welche Beobachtung würde die beiden trennen, und welche ist danach wahrscheinlicher? Freiwillig.</p>
         <div class="segmented" role="group" aria-labelledby="hypotheseLabel">
           <button type="button" class="segmented__btn" data-hyp="A" aria-pressed="false">Erklärung A</button>
           <button type="button" class="segmented__btn" data-hyp="B" aria-pressed="false">Erklärung B</button>
@@ -1557,17 +1593,44 @@
 
   <!-- ============================ Screen 3 ============================ -->
   <section class="step" id="step-3" data-step="3" aria-labelledby="step-3-title">
-    <p class="step-eyebrow">Schritt 3 von 5</p>
     <h2 class="step-title" id="step-3-title" tabindex="-1">Design anpassen</h2>
     <p class="step-help">Eine Änderung, die zur vermuteten Erklärung passt.</p>
-    <div class="theme-coach" id="themeCoach3" hidden></div>
     <details class="carry" id="carry-3" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
-      <p class="box-label">Feld 2 · Teil 2 von 2, Fortsetzung aus Schritt 1</p>
-      <h3 class="field__label">Konzepte und Massnahmen</h3>
-      <p class="field__help">Zwei verschiedene Fragen: <strong>was</strong> Sie ändern, und <strong>womit</strong> Sie es im Gespräch tun.</p>
+      <h3 class="box-label">Feld 2 · Massnahme und Werkzeug</h3>
 
+      <!-- V1.13 (Eugen): "how would they know the difference between Massnahmen and
+           Toolbox if some of the choices are the same?" Choice Architecture and Peak
+           End Rule genuinely appear in both, because one row is the behavioural lever
+           and the other is the bank's own named instrument for applying it. Nothing on
+           screen said that, so both rows now name what they are, and a tile whose name
+           appears in both rows says so on the tile itself. -->
+      <!-- Iteration 3 (2026-09-18): the "1. Massnahme" / "2. Werkzeug" micro-labels
+           sat in the card eyebrow's own style directly under it (three uppercase
+           gold lines within 120px). The rows now use the field idiom every other
+           input uses: a bold question as the label, the rule as the help line. -->
+      <div class="chiprow">
+        <p class="chiprow__question">Was ändern Sie?</p>
+        <p class="field__help">Die Massnahme: das Konzept aus der Verhaltenswissenschaft. Keine bis zwei.</p>
+        <div class="chiplist" id="chips-massnahmen" role="group" aria-label="Massnahmen"></div>
+        <div class="chip-single" id="chips-keine"></div>
+        <!-- Round-3 adversarial pass (2026-09-17): with "Keine passende Massnahme"
+             ticked, every Massnahme chip above renders blocked with the row's
+             generic cap title ("Hochstens 0 gleichzeitig") -- a hover-only message
+             that is also nonsensical at a cap of zero. This is the same fact,
+             stated plainly and visibly, toggled from renderChips(). -->
+      </div>
+
+      <div class="chiprow">
+        <p class="chiprow__question">Womit tun Sie es im Gespräch?</p>
+        <p class="field__help">Das Werkzeug: Ihr eigenes aus der Toolbox. Keines oder eines. <span id="caseMeta" hidden></span></p>
+        <div class="chiplist" id="chips-toolbox" role="group" aria-label="Toolbox"></div>
+      </div>
+      <!-- The loop, iteration 2 (2026-09-18): the panel now FOLLOWS the two chip rows
+           it pairs (it used to open the card with an empty right column and a
+           "noch nichts gewählt" placeholder before anything below it was chosen),
+           and it shows only once both sides have something to pair. -->
       <!-- V1.13: the screens were disjointed, so this one shows the link it is asking
            the group to make. Left: the concepts they picked in step 1. Right: what they
            pick here. Round 2 (council): a solid line now draws only where the group
@@ -1599,51 +1662,34 @@
              problem and did not re-check this one. Rewritten again, this time
              keeping both: the actual order of events, and no positional
              words at all, so it stays true stacked or side by side. -->
-        <p class="linkmap__hint">Freiwillig, für die Übersicht im Brief. Erst unten eine Massnahme oder ein Werkzeug wählen: sie erscheint dann hier. Danach der Reihe nach antippen: zuerst das passende Konzept, dann die Massnahme oder das Werkzeug.</p>
+        <!-- The loop, iteration 1 (2026-09-18): the 52-word instruction above this
+             panel (three sentences on the order of events) is one sentence now; the
+             panel itself shows the order (a concept lights up when armed, the right
+             column fills as chips are chosen below). "Freiwillig" stays first. -->
+        <p class="linkmap__hint" id="linkmapHint">Freiwillig: ein Konzept antippen, dann die passende Massnahme oder das passende Werkzeug.</p>
         <div class="linkmap__body">
           <div class="linkmap__col" id="linkmapLeft"></div>
           <svg class="linkmap__svg" id="linkmapSvg" aria-hidden="true"></svg>
           <div class="linkmap__col" id="linkmapRight"></div>
         </div>
-        <p class="linkmap__legend"><span class="linkmap__key linkmap__key--solid"></span>von Ihnen verknüpft
-          <span class="linkmap__key linkmap__key--dotted"></span>im Material so angelegt, noch nicht bestätigt</p>
+        <!-- Each legend key shows only while a line of its kind is actually drawn
+             (renderLinkmap() toggles them): a first-time participant read the dotted
+             key as an instruction for a state that never appeared. -->
+        <p class="linkmap__legend" id="linkmapLegend" hidden><span id="legendSolid" hidden><span class="linkmap__key linkmap__key--solid"></span>von Ihnen verknüpft</span>
+          <span id="legendSuggested" hidden><span class="linkmap__key linkmap__key--dotted"></span>im Material so angelegt, noch nicht bestätigt</span></p>
       </div>
 
-      <!-- V1.13 (Eugen): "how would they know the difference between Massnahmen and
-           Toolbox if some of the choices are the same?" Choice Architecture and Peak
-           End Rule genuinely appear in both, because one row is the behavioural lever
-           and the other is the bank's own named instrument for applying it. Nothing on
-           screen said that, so both rows now name what they are, and a tile whose name
-           appears in both rows says so on the tile itself. -->
-      <div class="chiprow">
-        <p class="chiprow__label">1. Massnahme</p>
-        <p class="chiprow__question">Was ändern Sie? <span class="chiprow__rule">Das Konzept aus der Verhaltenswissenschaft. Keine bis zwei Massnahmen.</span></p>
-        <div class="chiplist" id="chips-massnahmen" role="group" aria-label="Massnahmen"></div>
-        <div class="chip-single" id="chips-keine"></div>
-        <!-- Round-3 adversarial pass (2026-09-17): with "Keine passende Massnahme"
-             ticked, every Massnahme chip above renders blocked with the row's
-             generic cap title ("Hochstens 0 gleichzeitig") -- a hover-only message
-             that is also nonsensical at a cap of zero. This is the same fact,
-             stated plainly and visibly, toggled from renderChips(). -->
-        <p class="field__help" id="massnahmenLockHint" hidden>„Keine passende Massnahme“ ist gewählt. Zum Wählen einer Massnahme dort das Häkchen wieder entfernen.</p>
-      </div>
-
-      <div class="chiprow">
-        <p class="chiprow__label">2. Werkzeug</p>
-        <p class="chiprow__question">Womit tun Sie es im Gespräch? <span class="chiprow__rule">Ihr eigenes Werkzeug aus der Toolbox. Keines oder eines.</span></p>
-        <div class="chiplist" id="chips-toolbox" role="group" aria-label="Toolbox"></div>
-      </div>
     </div>
 
     <div class="step-card">
-      <p class="box-label">Feld 4</p>
+      <h3 class="box-label">Feld 4</h3>
       <div class="field">
         <div class="field__labelrow">
           <label class="field__label" for="f_aenderung">Die eine Änderung</label>
           <span class="field__counter" id="counter-f_aenderung" aria-hidden="true"></span>
         </div>
         <p class="field__help">In einem Satz: was Sie im Gespräch oder danach konkret anders machen.</p>
-        <textarea class="field__area" id="f_aenderung" data-key="aenderung" rows="4" maxlength="100"></textarea>
+        <textarea class="field__area" id="f_aenderung" data-key="aenderung" rows="2" maxlength="160"></textarea>
       </div>
       <div class="field">
         <div class="field__labelrow">
@@ -1651,7 +1697,7 @@
           <span class="field__counter" id="counter-f_teamfrage" aria-hidden="true"></span>
         </div>
         <p class="field__help">Welche Frage stellen Sie Ihrem Team im nächsten Meeting?</p>
-        <textarea class="field__area" id="f_teamfrage" data-key="teamfrage" rows="2" maxlength="80"></textarea>
+        <textarea class="field__area" id="f_teamfrage" data-key="teamfrage" rows="2" maxlength="120"></textarea>
       </div>
     </div>
 
@@ -1663,21 +1709,19 @@
 
   <!-- ============================ Screen 4 ============================ -->
   <section class="step" id="step-4" data-step="4" aria-labelledby="step-4-title">
-    <p class="step-eyebrow">Schritt 4 von 5</p>
     <h2 class="step-title" id="step-4-title" tabindex="-1">Aktion einleiten</h2>
     <p class="step-help">Wer macht was bis wann?</p>
     <details class="carry" id="carry-4" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
-      <p class="box-label">Feld 5</p>
-      <h3 class="field__label">Umsetzung</h3>
+      <h3 class="box-label">Feld 5 · Umsetzung</h3>
       <div class="field">
         <div class="field__labelrow">
           <label class="field__label" for="f_schritt">Nächster Schritt</label>
           <span class="field__counter" id="counter-f_schritt" aria-hidden="true"></span>
         </div>
         <p class="field__help">Der kleinste konkrete Schritt, den Sie ohne weitere Zustimmung selbst umsetzen können.</p>
-        <textarea class="field__area" id="f_schritt" data-key="schritt" rows="3" maxlength="70"></textarea>
+        <textarea class="field__area" id="f_schritt" data-key="schritt" rows="2" maxlength="120"></textarea>
       </div>
       <div class="field">
         <div class="field__labelrow">
@@ -1697,7 +1741,7 @@
           <label class="field__label" for="f_datum">Datum</label>
           <span class="field__counter" id="counter-f_datum" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Bis wann? Wählen Sie einen Vorschlag oder schreiben Sie ein eigenes Datum.</p>
+        <p class="field__help">Bis wann?</p>
         <!-- V1.13 (Eugen): an empty free-text date field made every group invent a
              format. The three buttons write a concrete horizon into the field and can
              be overwritten immediately; they set no state of their own. -->
@@ -1706,11 +1750,10 @@
           <button type="button" class="btn btn--quick" data-datum-months="6">In 6 Monaten</button>
           <button type="button" class="btn btn--quick" data-datum-months="12">In 12 Monaten</button>
         </div>
-        <input class="field__input" id="f_datum" data-key="datum" type="text" maxlength="40">
+        <input class="field__input" id="f_datum" data-key="datum" type="text" maxlength="60">
       </div>
     </div>
 
-    <p class="hint" id="hint-aktion" hidden></p>
     <div class="step-actions">
       <button type="button" class="btn" data-goto="3">Zurück</button>
       <button type="button" class="btn btn--primary" data-goto="5">Weiter: Routine verankern</button>
@@ -1719,14 +1762,12 @@
 
   <!-- ============================ Screen 5 ============================ -->
   <section class="step" id="step-5" data-step="5" aria-labelledby="step-5-title">
-    <p class="step-eyebrow">Schritt 5 von 5</p>
     <h2 class="step-title" id="step-5-title" tabindex="-1">Routine verankern</h2>
     <p class="step-help" id="routineHelp">Halten Sie Vorhersage, Signal und Risiko oder Nebenwirkung fest. Eine Überprüfungsroutine brauchen Sie nicht.</p>
     <details class="carry" id="carry-5" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
-      <p class="box-label">Feld 6</p>
-      <h3 class="field__label">Vorhersage</h3>
+      <h3 class="box-label">Feld 6</h3>
       <!-- V1.13 (Eugen): "someone could have just done it in Word", and "there should
            at least be a way to indicate some amounts or % that can then be translated
            into a nice bar chart". A prediction nobody quantified cannot be checked
@@ -1740,44 +1781,24 @@
              box. Ten dots is the denominator, visible, so "3 von 10" needs no reading.
              The number inputs stay underneath as the state carrier, so the clamp, the
              JSON export and the printed sheet keep working through one code path. -->
+        <!-- The loop, iteration 1 (2026-09-18): the same value used to be entered two
+             ways side by side (the dot row, then an "Oder Zahl eingeben" row with a
+             number box) and shown three times ("3 von 10" beside the dots, "3 von 10"
+             beside the box, "von 3 auf 6" in the sentence). One control per row now:
+             the dots, and the number box as the row's own trailing value, typed or
+             clicked, one source of truth (#f_heute / #f_ziel unchanged for the
+             clamp, the export and the printed sheet). -->
         <div class="dots" id="dotsHeute" role="group" aria-label="Heute, von 10">
           <span class="dots__label">Heute</span>
           <span class="dots__row" data-dots-for="heute"></span>
-          <span class="dots__value" id="dotsHeuteValue">noch offen</span>
+          <span class="dots__value" id="dotsHeuteValue"><input class="field__input field__input--num dots__input" id="f_heute" data-key="heute"
+                   type="number" min="0" max="10" step="1" inputmode="numeric" aria-label="Heute, Zahl von 10"><span class="dots__unit">von 10</span></span>
         </div>
         <div class="dots" id="dotsZiel" role="group" aria-label="Nach der Änderung, von 10">
           <span class="dots__label">Nach der Änderung</span>
           <span class="dots__row" data-dots-for="ziel"></span>
-          <span class="dots__value" id="dotsZielValue">noch offen</span>
-        </div>
-        <p class="predict__inputs-hint">Oder Zahl eingeben:</p>
-        <div class="predict__inputs">
-          <label class="predict__field">
-            <span class="predict__label">Heute</span>
-            <input class="field__input field__input--num" id="f_heute" data-key="heute"
-                   type="number" min="0" max="10" step="1" inputmode="numeric">
-            <span class="predict__unit">von 10</span>
-          </label>
-          <label class="predict__field">
-            <span class="predict__label">Nach der Änderung</span>
-            <input class="field__input field__input--num" id="f_ziel" data-key="ziel"
-                   type="number" min="0" max="10" step="1" inputmode="numeric">
-            <span class="predict__unit">von 10</span>
-          </label>
-        </div>
-        <div class="predict__chart" id="predictChart" hidden>
-          <div class="bar">
-            <span class="bar__label">Heute</span>
-            <span class="bar__track"><span class="bar__fill bar__fill--now" id="barNow"></span></span>
-            <span class="bar__value" id="barNowValue"></span>
-          </div>
-          <div class="bar">
-            <span class="bar__label">Nach der Änderung</span>
-            <span class="bar__track"><span class="bar__fill bar__fill--goal" id="barGoal"></span></span>
-            <span class="bar__value" id="barGoalValue"></span>
-          </div>
-          <p class="predict__big" id="predictBig" hidden></p>
-          <p class="predict__delta" id="predictDelta"></p>
+          <span class="dots__value" id="dotsZielValue"><input class="field__input field__input--num dots__input" id="f_ziel" data-key="ziel"
+                   type="number" min="0" max="10" step="1" inputmode="numeric" aria-label="Nach der Änderung, Zahl von 10"><span class="dots__unit">von 10</span></span>
         </div>
       </div>
       <!-- Erwartung/Signal/Risiko were capped at 55 through V1.13; an adversarial
@@ -1792,11 +1813,11 @@
            new, larger 100%-of-cap total before this shipped. -->
       <div class="field">
         <div class="field__labelrow">
-          <label class="field__label" for="f_erwartung">In einem Satz</label>
+          <label class="field__label" for="f_erwartung">Vorhersage in einem Satz</label>
           <span class="field__counter" id="counter-f_erwartung" aria-hidden="true"></span>
         </div>
         <p class="field__help">Was soll sich verändern, wenn Ihre Änderung wirkt?</p>
-        <textarea class="field__area" id="f_erwartung" data-key="erwartung" rows="2" maxlength="70"></textarea>
+        <textarea class="field__area" id="f_erwartung" data-key="erwartung" rows="2" maxlength="120"></textarea>
       </div>
       <div class="field">
         <div class="field__labelrow">
@@ -1804,7 +1825,7 @@
           <span class="field__counter" id="counter-f_signal" aria-hidden="true"></span>
         </div>
         <p class="field__help" id="signalHelp">Woran würden Sie erkennen, dass sich etwas verändert hat?</p>
-        <textarea class="field__area" id="f_signal" data-key="signal" rows="2" maxlength="70"></textarea>
+        <textarea class="field__area" id="f_signal" data-key="signal" rows="2" maxlength="120"></textarea>
       </div>
       <div class="field">
         <div class="field__labelrow">
@@ -1812,11 +1833,21 @@
           <span class="field__counter" id="counter-f_risiko" aria-hidden="true"></span>
         </div>
         <p class="field__help">Was könnte die Änderung kosten oder auslösen, und für wen?</p>
-        <textarea class="field__area" id="f_risiko" data-key="risiko" rows="2" maxlength="70"></textarea>
+        <textarea class="field__area" id="f_risiko" data-key="risiko" rows="2" maxlength="120"></textarea>
       </div>
     </div>
 
-    <p class="hint" id="hint-routine" hidden></p>
+  </section>
+
+</main>
+
+<section class="brief-sheet" id="briefSheet" aria-label="Interventionsbrief">
+  <div class="brief" id="briefBody"></div>
+</section>
+
+<!-- The loop, iteration 2 (2026-09-18): the print/mail actions follow the brief
+     preview they act on (see .export-bar). Shown on screen 5 only, never printed. -->
+<div class="export-bar no-print" id="exportBar"><div class="export-bar__inner">
     <!-- Round-4 fresh-reader pass (2026-09-17/18): Zurück sits FIRST here, matching
          every other screen's .step-actions row (screens 2-4 all put it before the
          forward/primary action) -- it used to be listed last, after both export
@@ -1826,18 +1857,20 @@
          Interventionsbrief als PDF, regardless of its position in the row. -->
     <div class="export-row">
       <button type="button" class="btn" data-goto="4">Zurück</button>
-      <button type="button" class="btn btn--primary" id="btnPrint">Interventionsbrief als PDF</button>
-      <button type="button" class="btn" id="btnMail">Per E-Mail an Eugen Dimant</button>
+      <button type="button" class="btn" id="btnPrint">Interventionsbrief als PDF</button>
+      <!-- APEX review (2026-09-21): the mail is the room's deliverable (it carries the
+           same PDF), so it is the primary action; the PDF alone is the secondary. -->
+      <button type="button" class="btn btn--primary" id="btnMail">Per E-Mail an Eugen Dimant</button>
     </div>
-    <!-- V1.13 (2026-09-17, round 2): the two buttons above read as interchangeable,
-         unordered options, but "Per E-Mail" only sends the brief as plain text -- the
-         PDF has to be attached by hand, and until now that was only said AFTER
-         clicking Mail (in #mailNote below), so a group could reasonably click Mail
-         first thinking it was the complete action (an independent adversarial pass).
-         Stated up front here instead; #mailNote still confirms it after the fact. -->
-    <p class="export-note">Empfehlung: zuerst "Interventionsbrief als PDF" speichern, danach
-      "Per E-Mail" nutzen und das PDF dort selbst anhängen. Der Druckdialog bietet "Als PDF
-      speichern"; Kopf- und Fusszeilen des Browsers bitte ausschalten.</p>
+</div></div>
+<div class="export-more no-print" id="exportMoreWrap">
+    <!-- Loop iteration 5 (2026-09-21): the banner and the mail note sit in flow under
+         the sticky button row, not inside it, so the bar stays one row tall. -->
+    <p class="hint" id="hint-routine" hidden></p>
+    <!-- Shown after "Per E-Mail" (an .eml file with the PDF attached, see emlBytes()):
+         what to do with the file, and the fallback if the mail client only shows it.
+         Hidden again on the next change to the brief (renderBrief()). -->
+    <p class="export-note" id="mailNote" hidden>Die E-Mail-Datei aus dem Download-Ordner in Outlook öffnen: Empfänger, Text und PDF sind drin, nur noch senden. Öffnet sie sich nicht als Entwurf: das PDF aus demselben Ordner an eine Mail an edimant@sas.upenn.edu anhängen.</p>
     <!-- V1.13 (2026-09-17, Eugen): "remove clutter, move things that aren't directly
          relevant to this exercise (like the JSON stuff) out of sight". The JSON export
          is a technical, facilitator/tool-sync feature (reopening a case later, here or
@@ -1853,53 +1886,13 @@
     <details class="startfall-more" id="exportMore">
       <summary>Weitere Optionen</summary>
       <div class="startfall-more__body">
-        <p class="field__help">Für die technische Weiterverarbeitung: öffnet denselben Fall
-          später wieder, hier im Tool oder im Streamlit-Begleittool.</p>
+        <p class="field__help">Für die Weiterverarbeitung: den Fall später wieder öffnen, hier oder im Begleittool.</p>
         <button type="button" class="btn" id="btnJson">Interventionsbrief als JSON</button>
       </div>
     </details>
-    <!-- V1.13 (Eugen): one click to mail him the result. A web page cannot attach a
-         file to a mailto: link, that is a browser and mail-client limit and no
-         workaround exists offline, so the button does the two things it can: it saves
-         the PDF first (print dialog) and opens the mail already addressed, with the
-         whole brief in the body as text, so the mail is useful even if nobody attaches
-         anything. The note below says so in one line instead of leaving people
-         wondering where the attachment went. -->
-    <!-- Round-3 adversarial pass (2026-09-17): "Der Brief steht vollstandig im
-         Mailtext" was tested against realistic, non-adversarial German
-         sentences (nothing near any field's own character cap) and the mail
-         body still cut after ~1156 characters -- everything from Feld 2
-         onward (Konzepte, Massnahme, Werkzeug, both Erklärungen, Nächster
-         Schritt, Verantwortlich, Datum, Vorhersage, Signal, Risiko) was
-         replaced by mailtoUrl()'s own "[gekürzt]" tail. The mail body already
-         says so IN the mail; this note said the opposite ON screen, before
-         anyone opens their mail client to find out. Never claims completeness
-         the tool cannot guarantee -- the PDF is the one copy that always has
-         everything, so it is named first, not as an afterthought.
-         Fresh-reader pass (2026-09-18): that fix still framed the cut as
-         something that happens "bei einem längeren Fall" (an unusually long
-         case) -- the round-3 investigation it cites had already shown this is
-         the ORDINARY outcome for a realistic brief, not an edge case, because
-         encodeURIComponent triples the size of umlauts/quotes/newlines well
-         before any field nears its own character cap. Reworded to say plainly
-         that several field-boxes are commonly left out, so nobody reads a
-         terse mail as "the group only filled in two fields" -- and to say the
-         one thing mailtoUrl()'s rewrite now guarantees: what IS shown is
-         always a complete field-box, never a fragment cut off mid-sentence. -->
-    <p class="export-note" id="mailNote" hidden>Ihr Mailprogramm öffnet sich mit vorbereitetem Text.
-      Aus Platzgründen zeigt der Mailtext oft nicht alle sechs Felder auf einmal (das Programm
-      sagt dann "[gekürzt]") -- die gezeigten Felder sind aber immer vollständig, nie mitten im
-      Satz abgeschnitten. Vollständig ist immer nur das PDF: zuerst "Interventionsbrief als PDF"
-      speichern, dann hier im Mailprogramm anhängen.</p>
-  </section>
+</div>
 
-</main>
-
-<section class="brief-sheet" id="briefSheet" aria-label="Interventionsbrief">
-  <div class="brief" id="briefBody"></div>
-</section>
-
-<footer class="app-footer no-print">
+<footer class="app-footer no-print" id="appFooter">
   <div class="app-footer__inner">
     <details>
       <summary>Datenschutzhinweis</summary>
@@ -1919,7 +1912,7 @@
       Fragen: <a href="mailto:edimant@sas.upenn.edu">edimant@sas.upenn.edu</a>
     </p>
     <p class="app-footer__line app-footer__version">
-      Version <span id="appVersion"></span> &middot; <span id="appFooterStand"></span>
+      Version <span id="appVersion"></span>
     </p>
   </div>
 </footer>
@@ -1946,7 +1939,7 @@
      therefore already agree; if it does not, the canonical file is the one to trust. */
   var DATA = {
   "build": {
-    "version": "1.14",
+    "version": "1.15",
     "material_stand": "07.09.2026",
     "session_date": "24. September 2026"
   },
@@ -2446,13 +2439,21 @@
 
   /* Workshop's own row labels; the third is Workshop's own word. */
   var BOX_TITLES = ["Feld 1 · Beobachtung", "Feld 2 · Konzepte und Massnahmen", "Feld 3 · Diagnose", "Feld 4 · Die eine Änderung und Frage fürs Teammeeting", "Feld 5 · Umsetzung", "Feld 6 · Vorhersage, Signal, Risiko"];
-  var LABEL_WIRK = "Wirkmechanismen";
-  /* The glossary section is the ten mechanisms and is headed LABEL_WIRK. The chip row and
-     the Interventionsbrief cover the mechanisms AND the foundation entry, so they use
-     their own label; one heading cannot honestly stand for both sets. */
+  /* The loop, iteration 1 (2026-09-18): "Wirkmechanismen" was the one place the tool
+     still used June's word for what every screen, the brief and the printed
+     worksheet call "Konzepte"; a first-time participant counted four words for
+     three lists. The glossary section now carries the same word as the chip row it
+     explains (the foundation entry keeps its own section, so the two sets are
+     still told apart). */
+  var LABEL_WIRK = "Konzepte";
   var LABEL_WIRK_ROW = "Konzepte";
   var LABEL_MASS = "Massnahmen";
   var LABEL_TOOL = "Toolbox";
+  /* The loop, iteration 2 (2026-09-18): the Werkzeug row's minimum is zero ("Keines
+     oder eines"), so an empty row prints this, not "[noch offen]" (shared with the
+     Streamlit companion's TOOL_NONE). */
+  var TOOL_NONE = "keines";
+  var MASS_NONE = "keine";  /* the Massnahmen row's minimum is zero as well (APEX, 2026-09-21) */
   var LABEL_VERKNUEPFUNG = "Verknüpfung";
   var NO_MASSNAHME_OPTION = "Keine passende Massnahme";
   var NO_MASSNAHME_BRIEF = "Keine passende Massnahme";
@@ -2503,9 +2504,10 @@
   var STATE = freshState();
   var currentStep = 1;
   /* What the Massnahmen row held before "Keine passende Massnahme" cleared it, so
-     unticking that option gives the group back what it had chosen. Not part of the
-     case and never exported. */
+     unticking that option gives the group back what it had chosen, pairings
+     included (LINKS_SHADOW). Not part of the case and never exported. */
   var MASSNAHMEN_SHADOW = [];
+  var LINKS_SHADOW = [];  /* the pairings that went with them (APEX review, 2026-09-21) */
   /* Which control to give focus back to after a chip row is rebuilt. */
   var PENDING_FOCUS = null;
 
@@ -2525,16 +2527,13 @@
      an independent adversarial pass (2026-09-17, round 2) reproduced the
      toast sitting on screen for its full ~3s insisting fields were still
      empty while the same fields, right above it, visibly were not. */
-  var _statusGateHint = null;
-  function announce(msg) { $("liveRegion").textContent = msg; }
-  function showStatus(msg, ms, gateHint) {
+  function announce(msg) { $("liveRegion").textContent = String(msg).replace(/\u00AD/g, ""); }
+  function showStatus(msg, ms) {
     var box = $("visualStatus");
-    box.textContent = msg;
-    box.classList.toggle("action-status--notice", !!gateHint);
+    box.textContent = String(msg).replace(/\u00AD/g, "");
     box.hidden = false;
-    _statusGateHint = gateHint || null;
     if (_statusTimer) { window.clearTimeout(_statusTimer); }
-    _statusTimer = window.setTimeout(function () { box.hidden = true; _statusGateHint = null; }, ms || 3200);
+    _statusTimer = window.setTimeout(function () { box.hidden = true; }, ms || 3200);
     announce(msg);
   }
   /* Used both by navigation (a screen change makes any leftover toast stale,
@@ -2544,9 +2543,7 @@
   function dismissStatus() {
     var box = $("visualStatus");
     box.hidden = true;
-    box.classList.remove("action-status--notice");
     if (_statusTimer) { window.clearTimeout(_statusTimer); _statusTimer = null; }
-    _statusGateHint = null;
   }
 
   /* =================================================================
@@ -2569,9 +2566,18 @@
   /* answer === true means Bestätigen; anything else is a cancel. The callbacks are
      read into locals and the fields cleared BEFORE either runs, so a continuation
      that itself opens a confirm cannot be handed the closing one's callbacks. */
+  /* Everything outside `except` (an id) becomes inert while a dialog is up. */
+  function setPageInert(on, except) {
+    ["skipLink", "progressNavInner", "progressCount", "main-content", "briefSheet", "exportBar", "exportMoreWrap", "appFooter", "timerBar"].forEach(function (id) {
+      var el = $(id);
+      if (!el || id === except) { return; }
+      if (on) { el.setAttribute("inert", ""); } else { el.removeAttribute("inert"); }
+    });
+  }
   function closeConfirm(answer) {
     var box = $("confirmModal");
     if (box.hidden) { return; }
+    setPageInert(false);
     var onOk = _confirmOk;
     var onCancel = _confirmCancel;
     var back = _confirmReturnFocus;
@@ -2627,6 +2633,7 @@
     if (hadOpenGloss) { OPEN_GLOSS = {}; renderChips(); }
     box.hidden = false;
     document.body.style.overflow = "hidden";
+    setPageInert(true);
     /* Focus goes to Abbrechen, the reversible choice: all four questions this
        modal asks are about discarding a group's work, and neither the Apple
        nor the Windows guidance for a destructive confirmation defaults focus
@@ -2651,6 +2658,12 @@
        to, and doubles as the fix for that same drift: Tab/Shift-Tab now pull
        focus back into the box even if something moved it out. */
     document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && $("confirmModal").hidden && $("lookupDetails").open) {
+        ev.preventDefault();
+        $("lookupDetails").open = false;
+        $("lookupSummary").focus();
+        return;
+      }
       if ($("confirmModal").hidden) { return; }
       if (ev.key === "Escape") { ev.preventDefault(); closeConfirm(false); return; }
       /* The box holds exactly two focusable elements, so a trap is just "Tab, in
@@ -2729,6 +2742,10 @@
      of small print further down: Eugen, on the old build, "the button selection
      should be salient such that they are being moved to Feld 1, rather than thinking
      something didn't work when clicking that button". */
+  /* Iteration 3: "Eigener Fall" clears Feld 1, so the button could not read as
+     chosen from the text alone until someone typed; this flag covers the gap
+     (reset by loadCase(), implied by a non-empty own situation after a reload). */
+  var ownChosen = false;
   function markSelectedCase() {
     var all = document.querySelectorAll("#startfallRow button[data-case], #startfallMore button[data-case]");
     Array.prototype.forEach.call(all, function (b) {
@@ -2738,7 +2755,7 @@
     });
     var own = $("btnOwnCase");
     if (own) {
-      var ownOn = STATE.startfall === null && trimmed(STATE.situation) !== "";
+      var ownOn = STATE.startfall === null && (trimmed(STATE.situation) !== "" || ownChosen);
       own.classList.toggle("is-selected", ownOn);
       own.setAttribute("aria-pressed", ownOn ? "true" : "false");
     }
@@ -2755,7 +2772,10 @@
   function renderThemeCoach() {
     var th = currentTheme();
     var text = (th && th.bridge) ? th.bridge : "";
-    ["themeCoach2", "themeCoach3"].forEach(function (id) {
+    /* The loop, iteration 1 (2026-09-18): the bridge sentence used to print on
+       screens 2 AND 3, verbatim; a participant read it twice in two minutes. It
+       belongs where the explanation is formed, screen 2. */
+    ["themeCoach2"].forEach(function (id) {
       var el = $(id);
       if (!el) { return; }
       if (text) {
@@ -2833,6 +2853,7 @@
        is the old one verbatim -- same state, same renders, same order. */
     function apply() {
       STATE.startfall = id;
+      ownChosen = false;
       /* The facilitator cannot press Start on five laptops, so the first case a group
          loads starts their clock. Pressing Start by hand still works exactly as before;
          this only removes the case where the clock never runs at all. */
@@ -2855,7 +2876,7 @@
       renderThemeCoach();
       renderChips();
       renderBrief();
-      showStatus("„" + clickedLabel + "“ geladen. Situation und Verhalten stehen jetzt in Feld 1, als Beispiel zum Überschreiben.");
+      showStatus("„" + clickedLabel + "“ geladen.");
       revealFeld1();
     }
     if (ownWorkAtRisk()) {
@@ -2883,7 +2904,11 @@
     if (!target) { return; }
     var card = target.closest(".step-card");
     if (card && card.scrollIntoView) {
-      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      /* Iteration 3: "start" with a scroll margin (see .step-card) keeps the
+         case-meta line of the Thema card in view above the flashing Feld 1 card,
+         so the click and what it changed stay on one screen; "center" used to
+         scroll the clicked button and that line out of view. */
+      card.scrollIntoView({ behavior: "smooth", block: "start" });
       card.classList.remove("is-flash");
       /* Reading offsetWidth forces the class removal to take effect before it is put
          back, so the animation restarts on a second load instead of doing nothing. */
@@ -2905,8 +2930,13 @@
   }
 
   /* The group may replace the Startfall with a case of its own; every printed surface
-     says so. Two ways out of the binding: this control, and simply rewriting field 1,
-     after which the loaded case is no longer what is on the screen. */
+     says so. One way out of the binding: the "Eigener Fall" control. APEX review
+     (2026-09-21, participant role-play): rewriting Feld 1 used to detach the case
+     too, so the one edit the badge itself asks for ("mit Ihrem eigenen Fall
+     überschreiben") silently threw away the theme, its suggested concepts, the
+     coaching on screens 2 and 3 and the brief's headline. The theme is the survey
+     pattern the group chose; their own wording of a case inside it is still that
+     pattern, so an edit keeps the binding and only the example marking goes. */
   function detachCase(clearText) {
     STATE.startfall = null;
     if (clearText) {
@@ -2921,10 +2951,9 @@
          the dialog's own wording would have believed their concept choices
          were gone and could easily have re-picked them, doubling up, or been
          confused to see old choices still checked against a new situation.
-         maybeDetach()'s quiet auto-detach (clearText=false, someone just
-         edited Feld 1 away from the loaded case) is deliberately NOT touched
-         here: that path keeps the room's existing diagnosis on the person's
-         own wording of the same situation, which is correct as-is. */
+         (An edit to Feld 1 no longer detaches at all since the APEX review of
+         2026-09-21, so clearText=false has no caller left but is kept as the
+         documented shape.) */
       STATE.wirkmechanismen = [];
       STATE.massnahmen = [];
       STATE.toolbox = [];
@@ -2940,17 +2969,6 @@
     renderThemeCoach();
     renderChips();
     renderBrief();
-  }
-
-  function maybeDetach() {
-    if (!STATE.startfall) { return; }
-    var c = caseById(STATE.startfall);
-    if (!c || trimmed(STATE.situation) !== trimmed(c.situation) ||
-        trimmed(STATE.verhalten) !== trimmed(c.verhalten)) {
-      detachCase(false);
-      showStatus("Eigener Fall. Im Kopfsatz heisst die Situation jetzt \u201E" +
-                 OWN_CASE_LABEL + "\u201C.");
-    }
   }
 
   /* V1.13: this was one faint grey run-on line under the buttons, which is where a
@@ -2971,52 +2989,24 @@
      to say plainly that there is deliberately none, the same honest-silence
      principle applied where its absence is visible instead of unremarked. */
   function renderCaseMeta() {
+    /* The loop, iteration 2 (2026-09-18): one line, and only when the loaded case
+       suggests a Werkzeug. The case's title used to head this block while the
+       theme button 60px above already showed it selected; the own-case variant
+       ("Eigener Fall" plus a sentence saying there is no suggestion) said what the
+       selected "Eigener Fall" button and the absence of a line already say. */
     var el = $("caseMeta");
     el.textContent = "";
-    if (!STATE.startfall) {
-      var ownActive = trimmed(STATE.situation) !== "";
-      if (!ownActive) { el.hidden = true; return; }
-      var ownHead = document.createElement("span");
-      ownHead.className = "case-meta__title";
-      ownHead.textContent = "Eigener Fall";
-      el.appendChild(ownHead);
-      var ownLine = document.createElement("span");
-      ownLine.className = "case-meta__line";
-      ownLine.textContent = "Keine vorausgewählte Empfehlung für diese Situation. " +
-        "Wählen Sie unten frei die Konzepte, die Massnahme und das Werkzeug, die passen.";
-      el.appendChild(ownLine);
-      el.hidden = false;
-      return;
-    }
+    el.hidden = true;
+    if (!STATE.startfall) { return; }
     var c = caseById(STATE.startfall);
     /* A file exported before the V1.13 merge can name SF2, which no longer exists.
        Treat it as the group's own case rather than throwing halfway through a render
        and leaving the screen showing one case while STATE holds another. */
-    if (!c) { STATE.startfall = null; el.hidden = true; return; }
-    var head = document.createElement("span");
-    head.className = "case-meta__title";
-    head.textContent = c.titel;
-    el.appendChild(head);
-    var sub = document.createElement("span");
-    sub.className = "case-meta__line";
-    sub.textContent = "Situation und beobachtetes Verhalten stehen in Feld 1. Überschreiben Sie den Text mit Ihrem eigenen Fall, sobald Sie einen haben.";
-    el.appendChild(sub);
-    /* The suggested concepts are not repeated here any more: renderWirkGroups()
-       already puts them first in the chip list itself, under "Aus Ihrem Thema",
-       which is where the decision actually happens. Saying it again in a sentence
-       above the chips was the same fact twice. The toolbox suggestion stays, since
-       nothing else on this screen shows it. */
-    var parts = [];
+    if (!c) { STATE.startfall = null; return; }
     if (c.toolbox_ids.length) {
-      parts.push("Werkzeug, das oft passt: " + c.toolbox_ids.map(toolboxShort).join(", "));
+      el.textContent = "Zu Ihrem Thema passt oft: " + c.toolbox_ids.map(toolboxShort).join(", ") + ".";
+      el.hidden = false;
     }
-    if (parts.length) {
-      var hint = document.createElement("span");
-      hint.className = "case-meta__line";
-      hint.textContent = parts.join(" · ") + ". Vorschlag, keine Diagnose: Sie entscheiden.";
-      el.appendChild(hint);
-    }
-    el.hidden = false;
   }
 
   /* =================================================================
@@ -3222,8 +3212,14 @@
        independent treatment of them: now neither field's box can read as
        done while the other is still empty. */
     var out = [];
-    var c = STATE.startfall ? caseById(STATE.startfall) : null;
-    var fall = c ? c.titel : (trimmed(STATE.situation) ? OWN_CASE_LABEL : "");
+    /* The loop, iteration 1 (2026-09-18): the loaded case used to carry two names on
+       one brief, the theme the group clicked ("Warten auf den besseren Zeitpunkt",
+       in the headline sentence and on the button) and the example's own title ("Der
+       Einstieg wird immer wieder verschoben", here and in the chain). One name now,
+       the theme, everywhere the brief or the recap names the Fall; the example's own
+       title is shown once, on screen 1, above the field it fills. Same in the
+       Streamlit companion's brief_chain(). */
+    var fall = situationLabel();
     out.push({ label: "Fall", value: fall, step: 1 });
     out.push({ label: "Vornamen der Gruppe", value: trimmed(STATE.gruppe), step: 1 });
     out.push({ label: "Beobachtetes Verhalten", value: trimmed(STATE.verhalten), step: 1 });
@@ -3248,7 +3244,7 @@
          to the genuinely-required rows around it. The label saying so plainly
          works regardless of which visual state the row is in, so it stays
          correct whether the row is later restyled or not. */
-      out.push({ label: "Massnahme (optional)", value: mass, step: 3 });
+      out.push({ label: "Massnahme und Werkzeug", value: mass, step: 3 });
       out.push({ label: "Die eine Änderung", value: trimmed(STATE.aenderung), step: 3 });
       out.push({ label: DATA.session.team_question_label, value: trimmed(STATE.teamfrage), step: 3 });
     }
@@ -3341,37 +3337,17 @@
         d.classList.toggle("is-goal", on && r[0] === "ziel");
         d.setAttribute("aria-pressed", (r[1] !== null && n === r[1]) ? "true" : "false");
       });
-      var label = $(r[2]);
-      if (label) { label.textContent = r[1] === null ? "noch offen" : r[1] + " von 10"; }
+      /* The trailing value is the number box itself now (see the markup); nothing
+         to write here, the box shows what the dots show. */
     });
   }
 
   function renderPredict() {
     var v = predictValues();
     paintDots();
-    var box = $("predictChart");
-    if (!box) { return; }
-    if (v.now === null && v.goal === null) { box.hidden = true; return; }
-    box.hidden = false;
-    var set = function (fillId, valId, n) {
-      var fill = $(fillId), val = $(valId);
-      fill.style.width = (n === null ? 0 : n * 10) + "%";
-      val.textContent = n === null ? "\u2013" : n + " von 10";
-    };
-    set("barNow", "barNowValue", v.now);
-    set("barGoal", "barGoalValue", v.goal);
-    $("predictDelta").textContent = predictDeltaText(v.now, v.goal);
-    var big = $("predictBig");
-    if (big) {
-      var d = (v.now === null || v.goal === null) ? null : v.goal - v.now;
-      if (d === null || d === 0) { big.hidden = true; big.textContent = ""; }
-      else {
-        big.hidden = false;
-        big.textContent = (d > 0 ? "+" : "\u2212") + Math.abs(d) + " von 10";
-        big.classList.toggle("is-down", d < 0);
-      }
-    }
-    paintDots();
+    /* The on-screen chart that used to follow the dots is gone (iteration 3, then
+       APEX review 2026-09-21: dead markup): the dots and the number boxes show
+       both values, the brief preview draws the bars (renderBriefPredict()). */
   }
 
   /* The link map. Left column: the concepts chosen in step 1. Right column: the
@@ -3469,7 +3445,9 @@
     pruneLinks();
     if (linkmapArmed !== null && leftIds.indexOf(linkmapArmed) < 0) { linkmapArmed = null; }
 
-    if (!left.length) { box.hidden = true; return; }
+    /* Both sides, not only the left: below the chip rows now, the panel has no
+       job until a Massnahme or Werkzeug exists to pair (the loop, iteration 2). */
+    if (!left.length || !right.length) { box.hidden = true; return; }
     box.hidden = false;
 
     var linkedLeft = {}, linkedRight = {};
@@ -3499,6 +3477,9 @@
           n.setAttribute("aria-pressed", armed ? "true" : "false");
         }
         n.textContent = it.label;
+        if (side === "right") {
+          n.setAttribute("aria-pressed", linkmapArmed !== null && linkExists(linkmapArmed, it.id) ? "true" : "false");
+        }
         n.addEventListener("click", function () {
           LINKMAP_PENDING_FOCUS = { side: side, id: it.id };
           if (side === "left") {
@@ -3508,7 +3489,7 @@
           }
           if (linkmapArmed === null) {
             LINKMAP_PENDING_FOCUS = null;
-            showStatus("Zuerst links das Konzept anklicken, das dazu passt, dann rechts die Massnahme oder das Werkzeug.");
+            showStatus("Zuerst ein Konzept antippen.", 2200);
             return;
           }
           /* H4 (an independent adversarial pass, V1.13 round 4, 2026-09-17): confirming
@@ -3524,8 +3505,10 @@
           toggleLink(linkmapArmed, it.id);
           var armedLabel = left.filter(function (l) { return l.id === justConfirmedId; })
             .map(function (l) { return l.label; })[0] || "";
-          announce((wasLinked ? "Verknüpfung entfernt: " : "Verknüpfung bestätigt: ") +
-                   armedLabel + " → " + it.label + ".");
+          /* The loop, iteration 2: shown, not only announced (a first-time
+             participant confirmed a pairing and saw nothing say so). */
+          showStatus((wasLinked ? "Verknüpfung entfernt: " : "Verknüpfung bestätigt: ") +
+                     armedLabel + " → " + it.label + ".");
           /* Fresh-reader pass (2026-09-18): linkmapArmed used to survive a confirmed
              (or removed) pairing untouched, so the just-used left node kept BOTH
              is-linked and is-armed -- and .is-armed (defined after .is-linked, same
@@ -3547,6 +3530,14 @@
     };
     mk($("linkmapLeft"), left, "left");
     mk($("linkmapRight"), right, "right");
+    /* The hint follows the state: armed, it says what the next tap is (APEX). */
+    var hintEl = $("linkmapHint");
+    if (hintEl) {
+      var armedItem = left.filter(function (l) { return l.id === linkmapArmed; })[0];
+      hintEl.textContent = armedItem
+        ? "Jetzt die Massnahme oder das Werkzeug antippen, zu dem „" + armedItem.label.replace(/\u00AD/g, "") + "“ passt."
+        : "Freiwillig: ein Konzept antippen, dann die passende Massnahme oder das passende Werkzeug.";
+    }
     if (LINKMAP_PENDING_FOCUS) {
       var focusHost = $(LINKMAP_PENDING_FOCUS.side === "left" ? "linkmapLeft" : "linkmapRight");
       var focusTarget = focusHost && focusHost.querySelector('[data-node="' + LINKMAP_PENDING_FOCUS.id + '"]');
@@ -3592,7 +3583,7 @@
        after: the gap was exactly the difference between 150px and colH()'s
        ~24px measurement. */
     svg.style.height = Math.max(24, Math.ceil(Math.max(colH("linkmapLeft"), colH("linkmapRight")))) + "px";
-    if (!right.length) { return; }
+    if (!right.length) { if ($("linkmapLegend")) { $("linkmapLegend").hidden = true; } return; }
     var host = svg.getBoundingClientRect();
     if (!host.width || !host.height) { return; }
     svg.setAttribute("viewBox", "0 0 " + Math.max(1, Math.round(host.width)) + " " +
@@ -3618,10 +3609,17 @@
       line.setAttribute("class", "linkmap__line" + (cls ? " " + cls : ""));
       svg.appendChild(line);
     };
+    var nSuggested = 0, nSolid = 0;
     linkmapPairs(left, right).forEach(function (pr) {
-      if (pr.suggested && !linkExists(pr.from, pr.to)) { draw(pr.from, pr.to, "is-suggested"); }
+      if (pr.suggested && !linkExists(pr.from, pr.to)) { draw(pr.from, pr.to, "is-suggested"); nSuggested += 1; }
     });
-    STATE.links.forEach(function (p) { draw(p.from, p.to, ""); });
+    STATE.links.forEach(function (p) { draw(p.from, p.to, ""); nSolid += 1; });
+    var legend = $("linkmapLegend");
+    if (legend) {
+      $("legendSolid").hidden = nSolid === 0;
+      $("legendSuggested").hidden = nSuggested === 0;
+      legend.hidden = (nSolid + nSuggested) === 0;
+    }
   }
 
   function renderCarry() {
@@ -3632,19 +3630,23 @@
       var body = box.querySelector(".carry__body");
       if (!summary || !body) { return; }
       var items = carryItems(n);
-      summary.textContent = "Bisher entschieden (" + items.length + ")";
+      /* Iteration 3: the count names decided rows only, not rows still open. */
+      var decided = items.filter(function (it) { return trimmed(it.value); }).length;
+      summary.textContent = "Bisher entschieden (" + decided + ")";
       /* Default open/closed is decided once per step, the first time this band
          has anything to show -- not on every render. renderCarry() runs on every
          field edit anywhere in the tool (see its callers), and <details>.open is
          exactly the kind of state a participant can toggle by hand; resetting it
          on every keystroke would silently re-collapse a band someone just opened
          to check something. dataset.carryInit distinguishes "never decided yet"
-         from "a render already set a default, leave it alone now". Collapsed by
-         default past 6 items (Screens 4-5's 9 and 12) is what this whole change
-         is for; Screens 2-3's 4 and 6 items stay open, since a handful of prior
-         answers next to the current field is not what "crowded" meant. */
+         from "a render already set a default, leave it alone now". The loop,
+         iteration 1 (2026-09-18): collapsed by default on EVERY screen, not only
+         past six items. On a 1366x768 laptop, screens 2 and 3 opened with the
+         band expanded and no input in view; a first-time participant saw only
+         what they had already written. One line, "Bisher entschieden (N)", is the
+         whole default; the group opens it when they want to look back. */
       if (!box.dataset.carryInit) {
-        box.open = items.length <= 6;
+        box.open = false;
         box.dataset.carryInit = "1";
       }
       body.textContent = "";
@@ -3759,7 +3761,6 @@
        per-chip title ("Hochstens 0 gleichzeitig...") is both hover-only and
        nonsensical at a cap of zero. The one visible, always-legible sentence
        below states the real reason instead. */
-    $("massnahmenLockHint").hidden = !STATE.keineMassnahme;
     renderChipRow("chips-massnahmen", ROW_MASS, STATE.massnahmen,
       STATE.keineMassnahme ? 0 : MAX_MASS,
       conceptEn, conceptDe, conceptGloss,
@@ -3775,9 +3776,13 @@
         STATE.keineMassnahme = on;
         if (on) {
           MASSNAHMEN_SHADOW = STATE.massnahmen.slice();
+          LINKS_SHADOW = STATE.links.slice();
           STATE.massnahmen = [];
         } else {
           STATE.massnahmen = MASSNAHMEN_SHADOW.slice();
+          STATE.links = STATE.links.concat(LINKS_SHADOW.filter(function (p) {
+            return !linkExists(p.from, p.to); }));
+          LINKS_SHADOW = [];
         }
         PENDING_FOCUS = { container: "chips-keine", id: "keine" };
         renderChips(); renderBrief();
@@ -3834,6 +3839,59 @@
   function renderLookup() {
     var body = $("lookupBody");
     body.textContent = "";
+    /* The side sheet's own close control (the loop, iteration 1): the <summary> that
+       opened it now sits in the nav row behind the sheet's left edge on narrow
+       screens, so the sheet carries a visible way out at its top; Escape does the
+       same (see the document keydown handler below the confirm modal's). */
+    /* The sheet starts below the header rows while they are on screen (so the tabs
+       and the toggle that opened it stay reachable at any width, including a
+       1024px tablet where a 600px sheet would otherwise cover the toggle), and from
+       the top edge once the page has scrolled past them. */
+    var placeSheet = function () {
+      var nav = $("progressNav");
+      var top = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
+      document.documentElement.style.setProperty("--sheet-top", Math.round(top) + "px");
+    };
+    if (!$("lookupDetails").dataset.sheetBound) {
+      $("lookupDetails").addEventListener("toggle", placeSheet);
+      window.addEventListener("resize", placeSheet);
+      window.addEventListener("scroll", placeSheet, { passive: true });
+      document.addEventListener("click", function (e) {
+        var d = $("lookupDetails");
+        /* The scrim is the details element's own ::before, so a click on it
+           targets the <details> itself; anything inside the sheet or the summary
+           is a descendant and leaves the sheet open. */
+        if (d.open && e.target === d) { d.open = false; $("lookupSummary").focus(); }
+      });
+      /* APEX review (2026-09-21): while the sheet is open the page behind the
+         scrim is inert (no Tab into it, no browse-mode reading), focus starts
+         on the sheet's close control and returns to the toggle on close. */
+      $("lookupDetails").addEventListener("toggle", function () {
+        var open = $("lookupDetails").open;
+        setPageInert(open, "lookupPanel");
+        if (open) { dismissStatus(); var c = $("lookupBody").querySelector(".lookup__close"); if (c) { c.focus(); } }
+      });
+      $("lookupDetails").dataset.sheetBound = "1";
+    }
+    placeSheet();
+    /* Iteration 3: a sticky header band (title + close) with the sheet's own
+       background, so scrolled entries never run under the close button. */
+    var head = document.createElement("div");
+    head.className = "lookup__head";
+    var headTitle = document.createElement("span");
+    headTitle.className = "lookup__headtitle";
+    headTitle.textContent = "Konzepte nachschlagen";
+    head.appendChild(headTitle);
+    var closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "lookup__close";
+    closeBtn.textContent = "Schliessen";
+    closeBtn.addEventListener("click", function () {
+      $("lookupDetails").open = false;
+      $("lookupSummary").focus();
+    });
+    head.appendChild(closeBtn);
+    body.appendChild(head);
     lookupSections().forEach(function (section) {
       var group = document.createElement("section");
       group.className = "lookup__group";
@@ -3951,12 +4009,24 @@
          out of room?" -- so it only needs to exist once that is a real
          concern: from 70% of the cap, the same point .is-near-limit's own
          warning colour later escalates from at 10 characters left. */
+      /* The loop, iteration 2 (2026-09-18): at the cap the browser simply stops
+         accepting keystrokes, which a participant typing into the box reads as
+         nothing at all (role-play: a sentence cut mid-word reached the brief). The
+         counter now says "Limit" and the field's own border turns amber. */
+      el.classList.toggle("is-at-limit", len >= max);
+      /* APEX review (2026-09-21, participant role-play): a manager typing with his
+         eyes on the keys never saw the counter; the moment the browser stops
+         accepting keys is announced once per field, as a toast. */
+      if (len >= max && !el.dataset.capToldAt) {
+        el.dataset.capToldAt = "1";
+        if (document.activeElement === el) { showStatus("Zeichenlimit erreicht: bitte kürzen.", 2600); }
+      } else if (len < max) { delete el.dataset.capToldAt; }
       if (len === 0 || len < max * 0.7) {
         counter.textContent = "";
         counter.classList.remove("is-near-limit");
         return;
       }
-      counter.textContent = len + " / " + max;
+      counter.textContent = (len >= max ? "Limit erreicht: " : "") + len + " / " + max;
       counter.classList.toggle("is-near-limit", max - len <= 10);
     });
   }
@@ -4064,9 +4134,7 @@
   function wireFields() {
     FIELD_IDS.forEach(function (id) {
       var el = $(id);
-      /* The group field is a <select> since the headcount was fixed. A select fires
-         "input" in current browsers and "change" everywhere, so both are bound; the
-         handler is idempotent, so a browser that fires both costs one extra render. */
+      /* Every field is a text input or textarea; "input" fires on each keystroke. */
       var handler = function () {
         var key = el.getAttribute("data-key");
         if (key === "heute" || key === "ziel") {
@@ -4095,13 +4163,18 @@
              Startfall button ever clicked, gets nothing back at all otherwise
              until the next unrelated render happens to call it. Same fix, same
              place, for the same reason. */
-          markExampleFields(false); maybeDetach(); markSelectedCase(); renderCaseMeta();
+          /* Loop iteration 5 (2026-09-21): the marking goes per field, so the box the
+             group has not touched keeps its "example" cue; the badge stays until
+             both are the group's own. */
+          el.classList.remove("is-example");
+          if (!document.querySelector("#f_situation.is-example, #f_verhalten.is-example")) { markExampleFields(false); }
+          markSelectedCase(); renderCaseMeta();
         }
         if (key === "erklaerung" || key === "gegenprobe") { renderGegenprobeSimilarHint(); }
+        if ($("mailNote")) { $("mailNote").hidden = true; }  /* the mail sent is no longer this brief */
         renderBrief();
       };
       el.addEventListener("input", handler);
-      if (el.tagName === "SELECT") { el.addEventListener("change", handler); }
     });
     wireGruppeTruncationTracking();
   }
@@ -4133,11 +4206,14 @@
   function firstSentence(s, maxLen) {
     s = trimmed(s);
     if (!s) { return ""; }
-    var m = s.match(/^[\s\S]*?[.!?](\s|$)/);
+    /* A sentence ends on . ! ? after at least three letters, followed by a space
+       and a capital or an opening quote (or the end): "z. B." and "ca. 2" are
+       not sentence ends (APEX review, 2026-09-21; mirrored in radar_data.py). */
+    var m = s.match(/^[\s\S]*?[A-Za-zÄÖÜäöü]{3}[.!?]+(?=\s+[A-ZÄÖÜ„"]|\s*$)/);
     var out = m ? m[0] : s;
     out = out.replace(/\s+$/, "").replace(/[.!?]+$/, "");
     if (maxLen && out.length > maxLen) {
-      out = out.slice(0, maxLen).replace(/\s+\S*$/, "") + " ...";
+      out = out.slice(0, maxLen).replace(/\s+\S*$/, "") + " \u2026";
     }
     return out;
   }
@@ -4204,7 +4280,7 @@
      early sentence break printed as "...beispielsatz . Änderung:" -- the visual
      truncation marker silently erased, on the client-facing brief header. */
   function closeClause(s, isLast) {
-    if (/\.\.\.$/.test(s)) { return isLast ? s : s + " "; }
+    if (/(\.\.\.|\u2026)$/.test(s)) { return isLast ? s : s + " "; }
     return s.replace(/[.!?]+$/, "") + (isLast ? "." : ". ");
   }
 
@@ -4279,16 +4355,7 @@
   /* The reasoning as a path: every link is something the group selected or wrote, and
      a link they have not reached yet is drawn as still open rather than left out. */
   function renderBriefChain(root) {
-    var c = STATE.startfall ? caseById(STATE.startfall) : null;
-    var links = [
-      { k: "Fall", v: c ? c.titel : (trimmed(STATE.situation) ? OWN_CASE_LABEL : "") },
-      { k: "Konzepte", v: STATE.wirkmechanismen.map(conceptDe).join(" + ") },
-      { k: "Diagnose", v: trimmed(workingHypothesis()) },
-      { k: "Massnahme", v: STATE.keineMassnahme ? NO_MASSNAHME_OPTION
-          : STATE.massnahmen.map(conceptDe).join(" + ") },
-      { k: "Werkzeug", v: STATE.toolbox.map(toolboxShort).join(" + ") },
-      { k: "Die eine Änderung", v: trimmed(STATE.aenderung) }
-    ].filter(function (l) { return l.k !== "Werkzeug" || l.v; });
+    var links = briefChainLinks();  /* one list for the screen and the PDF */
     var wrap = document.createElement("div");
     wrap.className = "chain";
     wrap.id = "briefChain";
@@ -4342,7 +4409,7 @@
       var track = document.createElement("span");
       track.className = "bar__track";
       var fill = document.createElement("span");
-      fill.className = "bar__fill bar__fill--" + row[2];
+      fill.className = row[2] === "now" ? "bar__fill bar__fill--now" : "bar__fill bar__fill--goal";
       fill.style.width = (row[1] === null ? 0 : row[1] * 10) + "%";
       track.appendChild(fill);
       bar.appendChild(track);
@@ -4431,8 +4498,8 @@
     briefRow(b2, LABEL_WIRK_ROW, STATE.wirkmechanismen.map(conceptLabel).join("\n"));
     briefRow(b2, LABEL_MASS, STATE.keineMassnahme
       ? NO_MASSNAHME_BRIEF
-      : STATE.massnahmen.map(conceptLabel).join("\n"));
-    briefRow(b2, LABEL_TOOL, STATE.toolbox.map(toolboxTitle).join("\n"));
+      : (STATE.massnahmen.map(conceptLabel).join("\n") || MASS_NONE));
+    briefRow(b2, LABEL_TOOL, STATE.toolbox.map(toolboxTitle).join("\n") || TOOL_NONE);
     /* Independent adversarial re-score, round 4 (2026-09-17): the link map's own
        confirmed pairings (STATE.links -- "Ihre Diagnose und Ihre Wahl", the specific
        concept a group clicked to explain a specific Massnahme or Werkzeug) were
@@ -4491,6 +4558,7 @@
     root.appendChild(attr);
 
     renderProgressCount();
+    renderNav();  /* the tabs' availability follows the concept count (APEX) */
   }
 
   /* =================================================================
@@ -4593,18 +4661,10 @@
      because the mail has to be readable on its own when nobody attaches the PDF. */
   var MAIL_TO = "edimant@sas.upenn.edu";
 
-  /* Split into header/boxes/footer (2026-09-18 fresh-reader pass) so mailtoUrl()'s
-     truncation can operate on whole boxes rather than raw characters -- see the
-     long comment on that split's own motivation at mailtoUrl() below. Nothing
-     about the CONTENT changed, only that it is now assembled from three pieces
-     instead of built inline in one function; briefPlainText() below still joins
-     them exactly as before for any caller that wants the complete text. */
   function briefPlainTextHeader() {
     var L = [];
-    var c = STATE.startfall ? caseById(STATE.startfall) : null;
     L.push("Interventionsbrief, RADAR");
     L.push("Bearbeitet von: " + truncationSafe(STATE.gruppe, "f_gruppe"));
-    L.push("Fall: " + (c ? c.titel : OWN_CASE_LABEL));
     L.push("");
     L.push(reportbackSentence());
     L.push("");
@@ -4620,26 +4680,9 @@
     return L;
   }
 
-  /* Ordered so that if the ~2000-character mailto: limit forces a cut (see
-     MAIL_URL_MAX below), the cut falls on the least essential trailing content,
-     never on the decided change itself. "Die eine Änderung" is what a manager
-     forwards this email to show, so it is written FIRST, ahead of its own
-     "Feld 4" position in the printed, numbered brief. */
-  function briefPlainTextBoxes() {
-    return [
-      [BOX_TITLES[3], [["Die eine Änderung", STATE.aenderung], ["Frage fürs Teammeeting", STATE.teamfrage]]],
-      [BOX_TITLES[0], [["Situation", STATE.situation], ["Beobachtetes Verhalten", STATE.verhalten]]],
-      [BOX_TITLES[1], [["Konzepte", STATE.wirkmechanismen.map(conceptLabel).join(", ")],
-                       ["Massnahmen", STATE.keineMassnahme ? NO_MASSNAHME_OPTION
-                          : STATE.massnahmen.map(conceptLabel).join(", ")],
-                       ["Toolbox", STATE.toolbox.map(toolboxTitle).join(", ")]]],
-      [BOX_TITLES[2], [["Erklärung A", STATE.erklaerung], ["Erklärung B", STATE.gegenprobe]]],
-      [BOX_TITLES[4], [["Nächster Schritt", STATE.schritt], ["Verantwortlich", STATE.verantwortlich],
-                       ["Datum", STATE.datum]]],
-      [BOX_TITLES[5], [["Vorhersage in einem Satz", STATE.erwartung], ["Signal", STATE.signal],
-                       ["Risiko oder Nebenwirkung", STATE.risiko]]]
-    ];
-  }
+  /* The mail body's boxes: the sheet's own order and values, one source with the
+     PDF (briefPdfBoxes(), below the mail code). */
+  function briefPlainTextBoxes() { return briefPdfBoxes(); }
 
   function briefBoxLines(box) {
     var L = [box[0]];
@@ -4658,73 +4701,493 @@
     var L = briefPlainTextHeader();
     briefPlainTextBoxes().forEach(function (box) { L = L.concat(briefBoxLines(box)); });
     L.push(briefPlainTextFooter());
-    return L.join("\n");
+    return L.join("\n").replace(/\u00AD/g, "");  /* no soft hyphens in a mail body */
   }
 
-  /* Windows and Outlook cut a mailto: body at roughly two thousand characters, and a
-     full brief runs to four and a half thousand. Rather than let a mail client
-     truncate mid-sentence or refuse to open at all, the body is cut here, at a line
-     break, and says plainly that the PDF carries the rest. */
-  /* Outlook's ShellExecute (the mechanism Windows uses to hand a mailto: URL to the
-     default client) refuses a URL past roughly 2048 characters, and German text with
-     umlauts encodes to about 1.45x its raw length, so a cap measured on the raw body
-     is not a cap on what actually goes out the door. This shrinks the ENCODED url
-     until it fits, at a line break where possible, rather than guessing a raw length. */
-  var MAIL_URL_MAX = 1900;
-  var MAIL_TAIL = "\n\n[gekürzt] Der vollständige Brief steht im PDF. Bitte hängen Sie es an diese Mail an.";
+  /* =================================================================
+     The brief as a PDF, written here without a library (iteration 4 of the loop,
+     2026-09-21, Eugen: "Per E-Mail should also append the final PDF that the team
+     worked on, not just the text"). One generator serves both buttons: the PDF
+     button downloads the file, the mail button wraps the same bytes into an
+     e-mail file (.eml) with the PDF attached, so the mail carries the brief the
+     group actually made, and the two can never differ. The print stylesheet
+     stays for Ctrl+P. Fonts are the PDF standard Helvetica, Helvetica-Bold and
+     Symbol (the arrow), with WinAnsi encoding, which covers every character the
+     brief can contain (umlauts, „“, …, ·); soft hyphens in the labels are
+     stripped, not printed. Widths (Adobe AFM, codes 32 to 255) drive the word
+     wrap, so a long field lands on the page the way it reads on screen.
+     ================================================================= */
+  var PDF_W_R = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,0,278,0,222,556,333,1000,556,556,333,1000,667,333,1000,0,611,0,0,222,222,333,333,350,556,1000,333,1000,500,333,944,0,500,667,0,333,556,556,556,556,260,556,333,737,370,556,584,0,737,333,400,584,0,0,333,556,537,278,333,0,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500];
+  var PDF_W_B = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,0,278,0,278,556,500,1000,556,556,333,1000,667,333,1000,0,611,0,0,278,278,500,500,350,556,1000,333,1000,556,333,944,0,500,667,0,333,556,556,556,556,280,556,333,737,370,556,584,0,737,333,400,584,0,0,333,611,556,278,333,0,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,584,611,611,611,611,611,556,611,556];
+  /* WinAnsi code points 0x80 to 0x9F that differ from Latin-1. */
+  var PDF_CP1252 = { "\u20AC": 128, "\u201A": 130, "\u0192": 131, "\u201E": 132, "\u2026": 133, "\u2020": 134,
+    "\u2021": 135, "\u02C6": 136, "\u2030": 137, "\u0160": 138, "\u2039": 139, "\u0152": 140, "\u017D": 142,
+    "\u2018": 145, "\u2019": 146, "\u201C": 147, "\u201D": 148, "\u2022": 149, "\u2013": 150, "\u2014": 151,
+    "\u02DC": 152, "\u2122": 153, "\u0161": 154, "\u203A": 155, "\u0153": 156, "\u017E": 158, "\u0178": 159 };
+  var PDF_ARROW = "\u2192";
+  var PDF_ARROW_W = 987;  /* Symbol "arrowright", code 0xAE */
 
-  /* Fresh-reader pass (2026-09-18): the previous cut was a raw character-count
-     binary search over the WHOLE joined text, with no notion of where one box
-     ended and the next began -- live-fired against a realistic, non-adversarial
-     brief, it landed mid-box often enough to be the normal case, not an edge
-     case: "Feld 1 · Beobachtung" printed as a heading with ZERO rows beneath
-     it, immediately followed by "[gekürzt]", reading as "this group left
-     Feld 1 blank" rather than "the mail ran out of room". Rewritten to add
-     WHOLE boxes, in the existing priority order, stopping at the last box that
-     still fits -- the cut can now only ever fall between two complete boxes,
-     never inside one, so every field-box the mail shows is either entirely
-     present or entirely absent, never a misleading fragment. */
-  function mailtoUrl() {
-    var c = STATE.startfall ? caseById(STATE.startfall) : null;
-    var subject = "RADAR Interventionsbrief · " + (c ? c.titel : OWN_CASE_LABEL) +
-                  " · " + truncationSafe(STATE.gruppe, "f_gruppe");
-    var head = "mailto:" + MAIL_TO + "?subject=" + encodeURIComponent(subject) + "&body=";
-    var full = briefPlainText();
-    var body = full;
-    if ((head + encodeURIComponent(body)).length > MAIL_URL_MAX) {
-      var headerLines = briefPlainTextHeader();
-      var kept = headerLines.slice();
-      var fits = function (lines) {
-        return (head + encodeURIComponent(lines.join("\n") + MAIL_TAIL)).length <= MAIL_URL_MAX;
-      };
-      if (fits(kept)) {
-        briefPlainTextBoxes().forEach(function (box) {
-          var candidate = kept.concat(briefBoxLines(box));
-          if (fits(candidate)) { kept = candidate; }
-        });
-        body = kept.join("\n") + MAIL_TAIL;
-      } else {
-        /* Header alone (name/case/report-back sentence, all already capped
-           fields) does not fit with the tail -- realistically unreachable, but
-           falls back to the old raw-character cut rather than sending nothing,
-           so this can never throw or produce an empty mailto: body. */
-        var lo = 0, hi = full.length, fit = 0;
-        while (lo <= hi) {
-          var mid = (lo + hi) >> 1;
-          var candidateStr = full.slice(0, mid) + MAIL_TAIL;
-          if ((head + encodeURIComponent(candidateStr)).length <= MAIL_URL_MAX) {
-            fit = mid; lo = mid + 1;
-          } else { hi = mid - 1; }
-        }
-        var cut = full.slice(0, fit);
-        var nl = cut.lastIndexOf("\n");
-        if (nl > 200) { cut = cut.slice(0, nl); }
-        body = cut + MAIL_TAIL;
+  /* Letters outside WinAnsi fall back to their base letter (Ş to S, ğ to g, Ł to
+     L), so a Turkish or Polish name prints as a name; only a script with no Latin
+     base (Greek, Cyrillic) becomes "?", one per character (APEX review). */
+  var PDF_STROKED = { "\u0141": 76, "\u0142": 108, "\u0110": 68, "\u0111": 100, "\u00D8": 216, "\u00F8": 248 };
+  function pdfByte(ch) {
+    var cp = ch.codePointAt(0);
+    if (cp === 0xAD) { return -1; }            /* soft hyphen: never printed */
+    if (cp < 128) { return cp; }
+    if (PDF_CP1252[ch] !== undefined) { return PDF_CP1252[ch]; }
+    if (cp >= 0xA0 && cp <= 0xFF) { return cp; }
+    if (cp === 0x2212) { return 45; }            /* minus sign */
+    if (PDF_STROKED[ch] !== undefined) { return PDF_STROKED[ch]; }
+    var base = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (base && base !== ch && base.codePointAt(0) < 0x100) { return pdfByte(base.charAt(0)); }
+    return 63;                                    /* "?" for anything else */
+  }
+  /* A string becomes runs of (font, bytes): text runs in the requested face, each
+     arrow in Symbol. Width is in thousandths of an em. */
+  function pdfRuns(s, bold) {
+    var runs = [], cur = null;
+    var table = bold ? PDF_W_B : PDF_W_R;
+    var chars = Array.from(s);  /* by code point: an emoji is one "?", not two */
+    for (var i = 0; i < chars.length; i += 1) {
+      var ch = chars[i];
+      if (ch === PDF_ARROW) {
+        runs.push({ f: "S", b: [0xAE], w: PDF_ARROW_W });
+        cur = null;
+        continue;
       }
+      var code = pdfByte(ch);
+      if (code < 0) { continue; }
+      if (!cur) { cur = { f: bold ? "B" : "R", b: [], w: 0 }; runs.push(cur); }
+      cur.b.push(code);
+      cur.w += table[code - 32] || 556;
     }
-    return head + encodeURIComponent(body);
+    return runs;
   }
-  window.radarMailtoUrl = mailtoUrl;
+  function pdfWidth(s, size, bold) {
+    var runs = pdfRuns(s, bold), w = 0;
+    runs.forEach(function (r) { w += r.w; });
+    return w / 1000 * size;
+  }
+  /* Greedy word wrap on the measured width; a single word wider than the line is
+     broken by character so nothing can run off the page. */
+  function pdfWrap(s, size, bold, maxW) {
+    var lines = [], words = String(s).split(/\s+/).filter(function (w) { return w.length; });
+    if (!words.length) { return [""]; }
+    var line = "";
+    var push = function (w) {
+      if (pdfWidth(w, size, bold) <= maxW) { return [w]; }
+      var parts = [], cur = "";
+      Array.from(w).forEach(function (ch) {
+        if (pdfWidth(cur + ch, size, bold) > maxW && cur) { parts.push(cur); cur = ""; }
+        cur += ch;
+      });
+      if (cur) { parts.push(cur); }
+      return parts;
+    };
+    words.forEach(function (word) {
+      push(word).forEach(function (w) {
+        var trial = line ? line + " " + w : w;
+        if (pdfWidth(trial, size, bold) <= maxW) { line = trial; }
+        else { if (line) { lines.push(line); } line = w; }
+      });
+    });
+    if (line) { lines.push(line); }
+    return lines;
+  }
+
+  /* One document: pages of content-stream operators, A4 portrait, points. */
+  function PdfDoc() {
+    this.pages = [];
+    this.W = 595.28; this.H = 841.89;
+    this.newPage();
+  }
+  PdfDoc.prototype.newPage = function () { this.ops = []; this.pages.push(this.ops); };
+  PdfDoc.prototype.n = function (v) { return (Math.round(v * 100) / 100).toString(); };
+  PdfDoc.prototype.rgb = function (hex) {
+    var r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+    return this.n(r) + " " + this.n(g) + " " + this.n(b);
+  };
+  /* y is measured from the TOP of the page, like the screen; converted here. */
+  PdfDoc.prototype.text = function (x, yTop, s, size, opts) {
+    opts = opts || {};
+    var runs = pdfRuns(s, !!opts.bold);
+    if (!runs.length) { return; }
+    var y = this.H - yTop;
+    var parts = ["BT", this.rgb(opts.color || "#111111") + " rg"];
+    if (opts.spacing) { parts.push(this.n(opts.spacing) + " Tc"); }
+    parts.push(this.n(x) + " " + this.n(y) + " Td");
+    var self = this;
+    runs.forEach(function (r) {
+      var esc = "";
+      r.b.forEach(function (c) {
+        if (c === 40 || c === 41 || c === 92) { esc += "\\" + String.fromCharCode(c); }
+        else if (c < 32 || c > 126) { esc += "\\" + ("00" + c.toString(8)).slice(-3); }
+        else { esc += String.fromCharCode(c); }
+      });
+      parts.push("/F" + r.f + " " + self.n(size) + " Tf (" + esc + ") Tj");
+    });
+    if (opts.spacing) { parts.push("0 Tc"); }
+    parts.push("ET");
+    this.ops.push(parts.join(" "));
+  };
+  PdfDoc.prototype.rect = function (x, yTop, w, h, opts) {
+    opts = opts || {};
+    var y = this.H - yTop - h, cmd = [];
+    if (opts.fill) { cmd.push(this.rgb(opts.fill) + " rg"); }
+    if (opts.stroke) { cmd.push(this.rgb(opts.stroke) + " RG " + this.n(opts.width || 0.5) + " w"); }
+    cmd.push(this.n(x) + " " + this.n(y) + " " + this.n(w) + " " + this.n(h) + " re");
+    cmd.push(opts.fill && opts.stroke ? "B" : (opts.fill ? "f" : "S"));
+    this.ops.push(cmd.join(" "));
+  };
+  PdfDoc.prototype.line = function (x1, y1, x2, y2, color, width) {
+    this.ops.push(this.rgb(color) + " RG " + this.n(width || 0.5) + " w " +
+      this.n(x1) + " " + this.n(this.H - y1) + " m " + this.n(x2) + " " + this.n(this.H - y2) + " l S");
+  };
+  PdfDoc.prototype.bytes = function () {
+    /* Objects: 1 catalog, 2 pages, 3 Helvetica, 4 Helvetica-Bold, 5 Symbol, then
+       per page: page object and its content stream. Latin-1 text only, so the
+       byte length of a string is its length. */
+    var objs = [];
+    var add = function (s) { objs.push(s); return objs.length; };
+    add("<< /Type /Catalog /Pages 2 0 R /Lang (de-CH) >>");
+    add("");  /* pages, filled below */
+    add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+    add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+    add("<< /Type /Font /Subtype /Type1 /BaseFont /Symbol >>");
+    var kids = [], self = this;
+    this.pages.forEach(function (ops) {
+      var stream = ops.join("\n");
+      var cId = add("<< /Length " + stream.length + " >>\nstream\n" + stream + "\nendstream");
+      var pId = add("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + self.n(self.W) + " " + self.n(self.H) + "] " +
+        "/Resources << /Font << /FR 3 0 R /FB 4 0 R /FS 5 0 R >> >> /Contents " + cId + " 0 R >>");
+      kids.push(pId + " 0 R");
+    });
+    objs[1] = "<< /Type /Pages /Kids [" + kids.join(" ") + "] /Count " + kids.length + " >>";
+    var infoId = add("<< /Producer (RADAR " + DATA.build.version + ") /Title (Interventionsbrief) >>");
+    var out = "%PDF-1.4\n%\u00E2\u00E3\u00CF\u00D3\n", offsets = [];
+    objs.forEach(function (body, i) {
+      offsets.push(out.length);
+      out += (i + 1) + " 0 obj\n" + body + "\nendobj\n";
+    });
+    var xref = out.length;
+    out += "xref\n0 " + (objs.length + 1) + "\n0000000000 65535 f \n";
+    offsets.forEach(function (o) { out += ("0000000000" + o).slice(-10) + " 00000 n \n"; });
+    out += "trailer\n<< /Size " + (objs.length + 1) + " /Root 1 0 R /Info " + infoId + " 0 R >>\nstartxref\n" + xref + "\n%%EOF\n";
+    var arr = new Uint8Array(out.length);
+    for (var i = 0; i < out.length; i += 1) { arr[i] = out.charCodeAt(i) & 0xFF; }
+    return arr;
+  };
+
+  /* The brief, laid out in the order the screen and the print sheet use: title and
+     group, the one-sentence summary, the diagnosis chain, the prediction, the six
+     boxes, the footer. Colours are the print stylesheet's (the same gold and greys
+     that clear WCAG on white). */
+  var PDF_INK = "#111111", PDF_MUTED = "#555555", PDF_FAINT = "#767676", PDF_GOLD = "#8a5c00",
+      PDF_RULE = "#bbbbbb", PDF_NOW = "#6f6f6f";
+  /* Three spacing tiers, like the print stylesheet's: the brief is laid out at the
+     roomiest, and tightened only if it would not fit one A4 page (at every
+     field's cap and the maximum chip selection it still fits at the last tier;
+     stress.py's at-cap check measures this, pdf_export_test.py the representative case). */
+  var PDF_TIERS = [
+    { M: 48, lead: 11.5, val: 9,   boxPad: 10, boxGap: 8, rowGap: 4, leadS: 10,  measure: 430 },
+    { M: 42, lead: 10.5, val: 8.6, boxPad: 8,  boxGap: 6, rowGap: 3, leadS: 9.5, measure: 430 },
+    { M: 34, lead: 9.4,  val: 8,   boxPad: 5,  boxGap: 3, rowGap: 2, leadS: 8.8, measure: 9999 },
+    { M: 28, lead: 8.8,  val: 7.6, boxPad: 4,  boxGap: 3, rowGap: 1.5, leadS: 8.4, measure: 9999 }
+  ];
+  function briefPdfBytes() {
+    var doc;
+    for (var i = 0; i < PDF_TIERS.length; i += 1) {
+      doc = briefPdfDoc(PDF_TIERS[i]);
+      if (doc.pages.length === 1) { break; }
+    }
+    return doc.bytes();
+  }
+  function briefPdfDoc(T) {
+    var doc = new PdfDoc();
+    var M = T.M, W = doc.W - 2 * M, y = M, bottom = doc.H - M;
+    var need = function (h) { if (y + h > bottom) { doc.newPage(); y = M; } };
+    var para = function (s, size, opts, x, maxW, lead) {
+      var lines = pdfWrap(s, size, !!(opts && opts.bold), maxW || W);
+      lines.forEach(function (ln) {
+        need(lead);
+        doc.text(x || M, y + size, ln, size, opts);
+        y += lead;
+      });
+      return lines.length;
+    };
+    var eyebrow = function (s) { need(14); doc.text(M, y + 7, s.toUpperCase(), 6.8, { color: PDF_GOLD, spacing: 0.6 }); y += 12; };
+
+    /* Title row */
+    doc.text(M, y + 14, "Interventionsbrief", 15, { bold: true, color: PDF_INK });
+    y += 22;
+    if (trimmed(STATE.gruppe)) {
+      para(GROUP_NAMES_LABEL + ": " + truncationSafe(STATE.gruppe, "f_gruppe"), 8.5, { color: PDF_MUTED }, M, W, 12);
+      y += 2;
+    }
+    y += 6;
+
+    /* One sentence */
+    eyebrow("Der Brief in einem Satz");
+    var leadTop = y;
+    para(reportbackSentence(), T.leadS, { color: PDF_INK }, M + 10, W - 10, T.leadS + 4);
+    doc.rect(M, leadTop, 2, y - leadTop - 3, { fill: PDF_GOLD });
+    y += T.boxGap + 6;
+
+    /* Chain */
+    var chain = briefChainLinks();
+    var cx = M, rowH = 0, keyS = 6, valS = 8, pad = 4, gap = 14;
+    var chainTop = y;
+    need(40);
+    chain.forEach(function (l, i) {
+      var val = l.v || EMPTY;
+      var maxBox = 230;  /* a long Diagnose or Änderung wraps to two or three lines, not five */
+      var lines = pdfWrap(val, valS, false, maxBox - 2 * pad);
+      var wTxt = Math.max(pdfWidth(l.k.toUpperCase(), keyS, false) + 0.5 * l.k.length + 1, Math.max.apply(null, lines.map(function (t) { return pdfWidth(t, valS); })));
+      var bw = Math.min(maxBox, wTxt + 2 * pad), bh = pad + keyS + 2 + lines.length * (valS + 2) + pad - 1;
+      var arrowW = i ? gap : 0;
+      if (cx + arrowW + bw > M + W) { cx = M; y += rowH + 6; rowH = 0; need(bh + 6); }
+      if (i) {
+        var ay = y + pad + keyS + 2 + valS / 2 + 1;  /* on the first text line, the same height across a row */
+        doc.line(cx + 2, ay, cx + gap - 4, ay, PDF_FAINT, 0.7);
+        doc.line(cx + gap - 7, ay - 2.5, cx + gap - 4, ay, PDF_FAINT, 0.7);
+        doc.line(cx + gap - 7, ay + 2.5, cx + gap - 4, ay, PDF_FAINT, 0.7);
+        cx += gap;
+      }
+      doc.rect(cx, y, bw, bh, { stroke: l.v ? PDF_GOLD : PDF_RULE, width: 0.6 });
+      doc.text(cx + pad, y + pad + keyS - 1, l.k.toUpperCase(), keyS, { color: PDF_GOLD, spacing: 0.5 });
+      lines.forEach(function (t, j) {
+        doc.text(cx + pad, y + pad + keyS + 2 + (j + 1) * (valS + 2) - 3, t, valS, { color: l.v ? PDF_INK : PDF_FAINT });
+      });
+      cx += bw; rowH = Math.max(rowH, bh);
+    });
+    y += rowH + T.boxGap + 4;
+
+    /* Prediction */
+    var v = predictValues();
+    if (v.now !== null || v.goal !== null) {
+      need(56);
+      eyebrow("Vorhersage der Gruppe: von 10 vergleichbaren Kundinnen und Kunden");
+      [["Heute", v.now, PDF_NOW], ["Nach der Änderung", v.goal, PDF_GOLD]].forEach(function (row) {
+        var lx = M, tx = M + 90, tw = 240, th = 8;
+        doc.text(lx, y + 7.5, row[0], 8, { color: PDF_INK });
+        doc.rect(tx, y, tw, th, { stroke: PDF_FAINT, width: 0.5 });
+        if (row[1] !== null && row[1] > 0) { doc.rect(tx, y, tw * row[1] / 10, th, { fill: row[2] }); }
+        doc.text(tx + tw + 8, y + 7.5, row[1] === null ? "\u2013" : row[1] + " von 10", 8, { color: PDF_INK });
+        y += 14;
+      });
+      var d = predictDeltaText(v.now, v.goal);
+      if (d) { y += 2; para(d, 8, { color: PDF_MUTED }, M, W, 11); }
+      y += T.boxGap;
+    }
+
+    /* Six boxes */
+    var boxes = briefPdfBoxes();
+    boxes.forEach(function (box) {
+      var rows = box[1], labS = 6.8, valS2 = T.val, inner = Math.min(W - 2 * 10, T.measure), P = T.boxPad;
+      var h = P + 13;  /* padding + title */
+      var wrapped = rows.map(function (r) {
+        var val = trimmed(r[1]) || EMPTY;
+        /* A pairing row holds one pairing per line ("A → B"); the arrow is drawn,
+           not set in the Symbol font (APEX review, 2026-09-21). */
+        var lines = [];
+        val.split("\n").forEach(function (part) { lines = lines.concat(pdfWrap(part, valS2, false, inner)); });
+        h += T.rowGap + labS + 2 + lines.length * T.lead;
+        return { label: r[0], lines: lines, empty: !trimmed(r[1]) };
+      });
+      h += P - 2;
+      need(h);
+      var top = y;
+      doc.rect(M, top, W, h, { stroke: PDF_RULE, width: 0.6 });
+      doc.rect(M, top, 2, h, { fill: PDF_GOLD });
+      y += P;
+      doc.text(M + 10, y + 8, box[0], 9, { bold: true, color: PDF_GOLD });
+      y += 13;
+      wrapped.forEach(function (r) {
+        y += T.rowGap;
+        doc.text(M + 10, y + 6, r.label, labS, { color: PDF_FAINT });
+        y += labS + 2;
+        r.lines.forEach(function (t) {
+          var arrowAt = t.indexOf(" " + PDF_ARROW + " ");
+          if (arrowAt < 0) {
+            doc.text(M + 10, y + valS2, t, valS2, { color: r.empty ? PDF_FAINT : PDF_INK });
+          } else {
+            var a = t.slice(0, arrowAt), b = t.slice(arrowAt + 3);
+            doc.text(M + 10, y + valS2, a, valS2, { color: PDF_INK });
+            var ax = M + 10 + pdfWidth(a, valS2) + 4, ay2 = y + valS2 - 3;
+            doc.line(ax, ay2, ax + 9, ay2, PDF_FAINT, 0.7);
+            doc.line(ax + 6, ay2 - 2.5, ax + 9, ay2, PDF_FAINT, 0.7);
+            doc.line(ax + 6, ay2 + 2.5, ax + 9, ay2, PDF_FAINT, 0.7);
+            doc.text(ax + 13, y + valS2, b, valS2, { color: PDF_INK });
+          }
+          y += T.lead;
+        });
+      });
+      y = top + h + T.boxGap;
+    });
+
+    /* Footer: two small lines, allowed to sit in the bottom margin like a page
+       footer, so they never push the last box onto a page of their own. */
+    var attribution = "RADAR " + DATA.build.version + ", erstellt von Prof. Eugen Dimant, University of Pennsylvania. Fragen: edimant@sas.upenn.edu";
+    var stand = FOOTER_STAND_PREFIX + DATA.build.material_stand;
+    if (T.measure > 1000) {
+      /* the tight tiers: one footer line, allowed down to 12pt from the paper edge */
+      bottom = doc.H - 12;
+      need(12);
+      y += 6 - T.boxGap;
+      doc.text(M, y + 7, stand + " · " + attribution, 7, { color: PDF_FAINT });
+    } else {
+      bottom = doc.H - 22;
+      need(22);
+      y += 8 - T.boxGap;
+      doc.text(M, y + 7, stand, 7.5, { color: PDF_FAINT });
+      y += 11;
+      para(attribution, 7.5, { color: PDF_FAINT }, M, W, 10);
+    }
+    return doc;
+  }
+  /* The same six boxes, in the sheet's own order (Feld 1 to 6), with the
+     confirmed pairings under Feld 2 exactly as renderBrief() prints them. */
+  function briefPdfBoxes() {
+    pruneLinks();
+    var b2 = [[LABEL_WIRK_ROW, STATE.wirkmechanismen.map(conceptLabel).join(", ")],
+              [LABEL_MASS, STATE.keineMassnahme ? NO_MASSNAHME_BRIEF : (STATE.massnahmen.map(conceptLabel).join(", ") || MASS_NONE)],
+              [LABEL_TOOL, STATE.toolbox.map(toolboxTitle).join(", ") || TOOL_NONE]];
+    if (STATE.links.length) {
+      b2.push([LABEL_VERKNUEPFUNG, STATE.links.map(function (p) {
+        return conceptLabel(p.from) + " " + PDF_ARROW + " " + linkNodeLabel(p.to);
+      }).join("\n")]);
+    }
+    return [
+      [BOX_TITLES[0], [["Situation", truncationSafe(STATE.situation, "f_situation")],
+                       ["Beobachtetes Verhalten", truncationSafe(STATE.verhalten, "f_verhalten")]]],
+      [BOX_TITLES[1], b2],
+      [BOX_TITLES[2], [["Erklärung A", truncationSafe(STATE.erklaerung, "f_erklaerung")],
+                       ["Erklärung B", truncationSafe(STATE.gegenprobe, "f_gegenprobe")]]],
+      [BOX_TITLES[3], [["Die eine Änderung", truncationSafe(STATE.aenderung, "f_aenderung")],
+                       [DATA.session.team_question_label, truncationSafe(STATE.teamfrage, "f_teamfrage")]]],
+      [BOX_TITLES[4], [["Nächster Schritt", truncationSafe(STATE.schritt, "f_schritt")],
+                       ["Verantwortlich", truncationSafe(STATE.verantwortlich, "f_verantwortlich")],
+                       ["Datum", truncationSafe(STATE.datum, "f_datum")]]],
+      [BOX_TITLES[5], [["Vorhersage in einem Satz", truncationSafe(STATE.erwartung, "f_erwartung")],
+                       ["Signal", truncationSafe(STATE.signal, "f_signal")],
+                       ["Risiko oder Nebenwirkung", truncationSafe(STATE.risiko, "f_risiko")]]]
+    ];
+  }
+  /* The chain's links, the one list renderBriefChain() (screen, print) and the
+     PDF both draw; a value cut at its field's cap carries the ellipsis here too
+     (APEX review, 2026-09-21: the chain used to print the sheared fragment). */
+  function briefChainLinks() {
+    return [
+      { k: "Fall", v: situationLabel() },
+      { k: "Konzepte", v: STATE.wirkmechanismen.map(conceptDe).join(" + ") },
+      { k: "Diagnose", v: truncationSafe(workingHypothesis(), workingHypothesisFieldId()) },
+      { k: "Massnahme", v: STATE.keineMassnahme ? NO_MASSNAHME_OPTION
+          : STATE.massnahmen.map(conceptDe).join(" + ") },
+      { k: "Werkzeug", v: STATE.toolbox.map(toolboxShort).join(" + ") },
+      { k: "Die eine Änderung", v: truncationSafe(STATE.aenderung, "f_aenderung") }
+    ].filter(function (l) { return l.k !== "Werkzeug" || l.v; });
+  }
+  window.radarBriefPdfBytes = briefPdfBytes;
+
+  function downloadBytes(bytes, mime, filename) {
+    var blob = new Blob([bytes], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    window.radarLastDownload = filename;  /* read by the browser suites */
+  }
+  function b64(bytes) {
+    var s = "";
+    for (var i = 0; i < bytes.length; i += 1) { s += String.fromCharCode(bytes[i]); }
+    return window.btoa(s);
+  }
+  function b64utf8(text) {
+    var enc = window.encodeURIComponent(text).replace(/%([0-9A-F]{2})/g, function (m, h) { return String.fromCharCode(parseInt(h, 16)); });
+    return window.btoa(enc);
+  }
+  function b64lines(s) { return s.replace(/(.{76})/g, "$1\r\n"); }
+
+  /* The mail as an e-mail file (RFC 5322 with a MIME attachment). A web page
+     cannot hand a mail client an attachment through mailto:; an .eml file can:
+     opened in Outlook it is a ready draft (X-Unsent) addressed to Eugen, with the
+     brief as text in the body and the same PDF attached. The body is the whole
+     brief, no longer cut at the ~2000 characters a mailto: URL allows. */
+  function mailMessage() {
+    return {
+      to: MAIL_TO,
+      subject: "RADAR Interventionsbrief · " + (situationLabel() || OWN_CASE_LABEL) +
+               " · " + truncationSafe(STATE.gruppe, "f_gruppe"),
+      body: briefPlainText(),
+      pdfName: exportFilename("pdf"),
+      emlName: exportFilename("eml")
+    };
+  }
+  window.radarMailMessage = mailMessage;
+  /* RFC 2047 encoded-words of at most 66 characters each (so "Subject: " plus the
+     first one stays under 78), folded onto continuation lines; the subject can
+     carry any character this way. */
+  function encodedWords(text) {
+    var out = [], chunk = "";
+    Array.from(text).forEach(function (ch) {
+      if (("=?UTF-8?B?" + b64utf8(chunk + ch) + "?=").length > 66) { out.push(chunk); chunk = ""; }
+      chunk += ch;
+    });
+    if (chunk) { out.push(chunk); }
+    return out.map(function (c) { return "=?UTF-8?B?" + b64utf8(c) + "?="; }).join("\r\n ");
+  }
+  /* The attachment name may carry non-ASCII: Content-Disposition gets the RFC
+     2231 form alone (a client that reads both is allowed to prefer the plain
+     one, which would lose the letters), Content-Type's informational name gets
+     an ASCII fold. */
+  function asciiName(name) {
+    return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, "_").replace(/["\\]/g, "_");
+  }
+  function filenameParam(name) {
+    var utf = window.encodeURIComponent(name).replace(/[!'()*]/g, function (c) {
+      return "%" + c.charCodeAt(0).toString(16).toUpperCase(); });
+    return "filename*=UTF-8''" + utf;
+  }
+  function emlBytes(pdf) {
+    var m = mailMessage();
+    var boundary = "=_RADAR_" + DATA.build.version.replace(/\W/g, "_") + "_brief";
+    var lines = [
+      "X-Unsent: 1",
+      "Date: " + new Date().toUTCString().replace(/GMT$/, "+0000"),
+      "To: " + m.to,
+      "Subject: " + encodedWords(m.subject),
+      "MIME-Version: 1.0",
+      "Content-Type: multipart/mixed; boundary=\"" + boundary + "\"",
+      "",
+      "--" + boundary,
+      "Content-Type: text/plain; charset=UTF-8",
+      "Content-Transfer-Encoding: base64",
+      "",
+      b64lines(b64utf8(m.body.replace(/\r?\n/g, "\r\n"))),
+      "",
+      "--" + boundary,
+      "Content-Type: application/pdf;\r\n name=\"" + asciiName(m.pdfName) + "\"",
+      "Content-Disposition: attachment;\r\n " + filenameParam(m.pdfName),
+      "Content-Transfer-Encoding: base64",
+      "",
+      b64lines(b64(pdf)),
+      "",
+      "--" + boundary + "--",
+      ""
+    ];
+    /* Every header is ASCII by construction (encoded-words, RFC 2231, base64), so
+       the byte loop below is exact, never a mask. */
+    var s = lines.join("\r\n");
+    var arr = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i += 1) { arr[i] = s.charCodeAt(i) & 0x7F; }
+    return arr;
+  }
+  window.radarEmlBytes = function () { return emlBytes(briefPdfBytes()); };
 
   function exportFilename(ext) {
     // Unicode-property escape (\p{L}\p{N}, "u" flag), not JS's plain \w: \w in a
@@ -4899,25 +5362,10 @@
     s.gruppe = clampText(p.gruppe, "f_gruppe");
     s.situation = clampText(f1.kundensituation, "f_situation");
     s.verhalten = clampText(f1.beobachtetes_verhalten, "f_verhalten");
-    /* V1.13 round 4 (2026-09-17), an independent adversarial pass: a typed edit to
-       Situation/Verhalten that no longer matches the loaded Startfall's own text
-       already detaches (maybeDetach(), called on every input event), so the printed
-       brief's headline (which quotes the Startfall's own survey-pattern label) never
-       disagrees with Box 1 (which prints whatever Situation/Verhalten actually say).
-       Importing a JSON payload set both s.startfall AND s.situation/s.verhalten
-       directly, with no equivalent check, so a hand-edited file naming a Startfall
-       id alongside unrelated situation text produced exactly that disagreement: the
-       headline quoting SF1's own pattern ("Warten auf den besseren Zeitpunkt") while
-       Box 1 printed a completely different, imported situation -- a self-
-       contradictory client-facing document. Mirrors maybeDetach()'s own comparison
-       rather than introducing a second one. */
-    if (s.startfall) {
-      var importedCase = caseById(s.startfall);
-      if (!importedCase || trimmed(s.situation) !== trimmed(importedCase.situation) ||
-          trimmed(s.verhalten) !== trimmed(importedCase.verhalten)) {
-        s.startfall = null;
-      }
-    }
+    /* APEX review (2026-09-21): an imported Startfall id stays bound whatever the
+       situation text says (a typed edit no longer detaches either, see
+       detachCase()); the id names the theme the group chose, the text is their
+       case inside it. An unknown id is dropped by caseById()'s callers. */
     /* clampText() above stops a hand-edited JSON text field from reaching the screen
        longer than typing could have produced, specifically to protect the one-page
        print guarantee -- but chip SELECTIONS were exempt from any equivalent cap
@@ -5030,7 +5478,19 @@
       num.textContent = n;
       b.appendChild(num);
       b.appendChild(document.createTextNode(name));
-      b.addEventListener("click", function () { goToStep(n); });
+      /* Screens 2 to 5 need a concept (goToStep()'s one gate); until there is one
+         the tabs say so instead of looking clickable and doing nothing (APEX). */
+      if (n > 1 && STATE.wirkmechanismen.length < MIN_WIRK) {
+        b.classList.add("is-unavailable");
+        b.setAttribute("aria-disabled", "true");
+      }
+      b.addEventListener("click", function () {
+        goToStep(n);
+        /* A refused tab click (screen 1, no concept): the banner under the Weiter
+           button is brought into view, else the click shows nothing (loop iteration 5). */
+        var h = $("hint-wirkmechanismen");
+        if (currentStep === 1 && n > 1 && h && !h.hidden) { h.scrollIntoView({ block: "center", behavior: "smooth" }); }
+      });
       inner.appendChild(b);
     });
   }
@@ -5101,6 +5561,16 @@
      it stays up -- one template, so the two can never drift apart the way
      the banner and the toast once had (see the note on showStatus() further
      down). */
+  /* aria-invalid on every field the banner names, cleared as they fill (APEX). */
+  function markGatedFields(missing) {
+    var open = {};
+    missing.forEach(function (label) { open[label] = true; });
+    REQUIRED_STEP_4.concat(REQUIRED_STEP_5).forEach(function (f) {
+      var el = $("f_" + f.key);
+      if (!el) { return; }
+      if (open[f.label]) { el.setAttribute("aria-invalid", "true"); } else { el.removeAttribute("aria-invalid"); }
+    });
+  }
   function gateBannerText(missing) {
     return "Noch offen: " + missing.join(", ") + ". Bitte ausfüllen, dann geht es weiter.";
   }
@@ -5110,6 +5580,8 @@
     if (!missing.length) { el.hidden = true; return true; }
     el.textContent = gateBannerText(missing);
     el.hidden = false;
+    markGatedFields(missing);
+    if ($("mailNote")) { $("mailNote").hidden = true; }
     /* An adversarial pass (2026-09-17) noted the toast used to repeat the
        inline banner's own sentence word for word -- visually two identical
        notices firing at once. The toast is fixed to the viewport bottom
@@ -5118,10 +5590,14 @@
        doubles as the screen-reader announcement, so it still has to name the
        missing fields; it is now worded as a distinct, shorter pointer to the
        banner rather than a duplicate of it. The third argument marks this as
-       a gate rejection rather than a confirmation, both for the amber
-       styling (see .action-status--notice) and so renderGateHints() below
-       can dismiss it the instant the missing fields are actually filled. */
-    showStatus("Bitte zuerst ausfüllen: " + missing.join(", ") + ".", null, hintId);
+       a gate rejection rather than a confirmation. (That toast and its
+       amber style are gone since the loop.) */
+    /* The loop, iteration 1 (2026-09-18): the toast is gone. The banner sits directly
+       beside the button that was clicked (that is where the group is looking), so a
+       second, floating copy of the same list at the viewport bottom was the same
+       fact twice on one screen; the brief's own "Noch offen" line already made it a
+       third. Assistive tech still hears it, through the sr-only live region. */
+    announce(gateBannerText(missing));
     return false;
   }
 
@@ -5138,39 +5614,12 @@
      as quiet as before -- this is a truth-repair, not a new nag. Called from
      renderBrief(), the one function every field edit already triggers. */
   function renderGateHints() {
-    var aktionMissing = missingOf(REQUIRED_STEP_4);
-    var aktion = $("hint-aktion");
-    if (aktion && !aktion.hidden) {
-      /* A banner that stays up because SOME of its fields are still missing
-         must keep naming the CURRENT missing set, not the one that was true
-         the moment it first appeared -- missingForExport() below can now
-         list up to nine fields at once (Situation through Risiko), so a
-         group that fills three of them and keeps working would otherwise
-         watch the banner keep insisting all nine were still empty until
-         they clicked the gated button a second time (an independent
-         adversarial pass, 2026-09-17, round 2, caught this exact gap while
-         testing the broadened export gate below). */
-      if (aktionMissing.length === 0) { aktion.hidden = true; }
-      else { aktion.textContent = gateBannerText(aktionMissing); }
-    }
     var routine = $("hint-routine");
     var routineMissing = missingForExport();
     if (routine && !routine.hidden) {
       if (routineMissing.length === 0) { routine.hidden = true; }
       else { routine.textContent = gateBannerText(routineMissing); }
-    }
-    /* The toast has the identical staleness problem the two lines above
-       already fix for the persistent banners -- see showStatus()'s
-       gateHint parameter. Same truth-repair, same "only ever hides,
-       never shows" rule: browsing the screen without having tried the
-       gated button stays exactly as quiet as before. */
-    if (_statusGateHint === "hint-aktion" && aktionMissing.length === 0) {
-      dismissStatus();
-    } else if (_statusGateHint === "hint-routine" && routineMissing.length === 0) {
-      dismissStatus();
-    } else if (_statusGateHint === "hint-wirkmechanismen" &&
-               STATE.wirkmechanismen.length >= MIN_WIRK) {
-      dismissStatus();
+      markGatedFields(routineMissing);
     }
   }
 
@@ -5205,7 +5654,8 @@
     var open = missingForExport().length;
     var openText = open === 0 ? "Alle Felder ausgefüllt"
       : open + (open === 1 ? " Feld noch offen" : " Felder noch offen");
-    el.textContent = openText + ".";
+    /* Assigned only when it differs: a live region re-announces every write (APEX). */
+    if (el.textContent !== openText + ".") { el.textContent = openText + "."; }
   }
 
   function openBriefFields() {
@@ -5230,32 +5680,17 @@
   function goToStep(n) {
     if (n < 1 || n > STEP_NAMES.length) { return; }
     if (n > 1 && STATE.wirkmechanismen.length < MIN_WIRK) {
+      /* The loop, iteration 2 (2026-09-18): banner only, like every other gate
+         since iteration 1; it now sits under the refused button. */
       $("hint-wirkmechanismen").hidden = false;
-      showStatus("Bitte wählen Sie mindestens ein Konzept, dann geht es weiter.",
-                 null, "hint-wirkmechanismen");
+      announce($("hint-wirkmechanismen").textContent);
       return;
     }
-    /* This gate has to fire for every path into screen 5, not only the "Weiter" click
-       out of screen 4: the progress-nav buttons (data-navstep) call goToStep(n)
-       directly and can jump from screen 1, 2 or 3 straight to screen 5, and a gate
-       keyed to currentStep === 4 only stopped the "Weiter" path, letting a nav click
-       reach the brief -- and therefore the print/export buttons, which only re-check
-       REQUIRED_STEP_5 -- with Nächster Schritt, Verantwortlich and Datum still empty. */
-    if (n > 4 && !showGate("hint-aktion", missingOf(REQUIRED_STEP_4))) {
-      /* showGate() just made "#hint-aktion" visible, but that banner lives
-         inside <section id="step-4">, which is display:none whenever some
-         OTHER step is the active one -- exactly the case a nav-bar jump from
-         screen 1/2/3 hits. Without this, the only thing a participant ever
-         saw was the ~3s toast; the persistent explanation of what to fill in
-         was on screen but invisible for as long as they stayed put (an
-         independent adversarial pass, 2026-09-17, round 2). Screen 4 is
-         always reachable at this point (the only earlier gate, wirkmechanismen,
-         has already passed for any n > 1), so landing them there is not a
-         second rejection, it is the tool taking them to the one screen where
-         its own explanation is actually visible. */
-      if (currentStep !== 4) { goToStep(4); }
-      return;
-    }
+    /* APEX review (2026-09-21): the screen-4 gate (Feld 5 before screen 5) is gone.
+       It duplicated the export gate, which names every open field anyway, and a
+       tab click on "5" from screen 1 to 3 landed on screen 4 with a banner. The
+       one gate that stays is screen 1's: the concepts feed screens 3 and the
+       brief, so nothing past screen 1 is usable without one. */
     currentStep = n;
     /* An armed left-hand concept (linkmapArmed) is a transient "waiting for its
        partner" cue, scoped to being on screen 3 with the panel in front of you,
@@ -5299,20 +5734,6 @@
      Timer: the lab clock and its checkpoints, both out of the data.
      ================================================================= */
   var TOTAL_SECONDS = DATA.session.total_minutes * 60;
-  /* The tool keeps no server-side copy of a case (see the privacy note in the
-     footer): a closed tab or a crashed laptop loses everything except via
-     "Interventionsbrief als JSON", which lived only inside a closed
-     "Weitere Optionen" disclosure a group had no reason to open mid-session.
-     Named once, at the first checkpoint (see the announced-checkpoint toast
-     below), the same way this same toast already tells the room what phase
-     to be in -- not a new, separate nag, just the existing message doing one
-     more job (an independent adversarial pass, 2026-09-17, round 2). Derived
-     from DATA.session.radar_checkpoints rather than a literal "5", so a
-     future change to the schedule's first checkpoint keeps this in step
-     automatically. */
-  var FIRST_CHECKPOINT = DATA.session.radar_checkpoints.reduce(function (a, b) {
-    return Math.min(a, b);
-  });
   var remaining = TOTAL_SECONDS;
   var ticking = null;
   /* deadline (a real Date.now() timestamp, set the instant the clock starts or
@@ -5389,11 +5810,10 @@
       el.classList.toggle("is-passed", mins >= cp);
       if (mins >= cp && !announced[cp]) {
         announced[cp] = true;
-        var cpMsg = "Minute " + cp + ": " + phaseName() + ".";
-        if (cp === FIRST_CHECKPOINT) {
-          cpMsg += " Tipp: Zwischenstand jederzeit über „Weitere Optionen“ als JSON sichern.";
-        }
-        showStatus(cpMsg);
+        /* The loop, iteration 2 (2026-09-18): the first checkpoint used to append
+           a JSON-export tip; JSON is a facilitator feature behind "Weitere
+           Optionen", not something a group needs told at minute 5. */
+        showStatus("Minute " + cp + ": " + phaseName() + ".");
       }
     });
   }
@@ -5440,7 +5860,6 @@
      ================================================================= */
   function init() {
     $("appVersion").textContent = DATA.build.version;
-    $("appFooterStand").textContent = FOOTER_STAND_PREFIX + DATA.build.material_stand;
     /* The session date used to be a second literal in the footer's static markup,
        independent of DATA.build.session_date (which nothing read). Two copies of the
        same date is exactly the kind of literal that drifts if only one of them is
@@ -5449,18 +5868,9 @@
     $("appSessionDate").textContent = DATA.build.session_date;
     $("signalHelp").textContent = DATA.session.signal_help;
     $("lbl_teamfrage").textContent = DATA.session.team_question_label;
-    /* Round-4 fresh-reader pass (2026-09-17): each screen's "Schritt N von 5"
-       eyebrow was five separate hand-typed strings in the static markup, while
-       the live progress line elsewhere already computed the same fact from
-       STEP_NAMES.length -- two counts of the same thing that agree today only
-       because nobody has added or removed a step since. Derived from the same
-       source here too, once, since it never changes after load: the five
-       .step-eyebrow elements are in DOM order 1-5 (verified by the five
-       .step-N sections' own fixed order in the markup), so their position in
-       the NodeList is the step number. */
-    Array.prototype.forEach.call(document.querySelectorAll(".step-eyebrow"), function (el, i) {
-      el.textContent = "Schritt " + (i + 1) + " von " + STEP_NAMES.length;
-    });
+    /* The loop, iteration 1 (2026-09-18): the eyebrows are gone. The lit step tab
+       directly above (aria-current="step") is the one statement of which step this
+       is; the eyebrow said it again in capitals 60px below the tab. */
 
     renderStartfallButtons();
     renderThemeCoach();
@@ -5532,6 +5942,8 @@
          only. Declining leaves Feld 1 and the chips exactly as they were. */
       function toOwnCase() {
         detachCase(true);
+        ownChosen = true;
+        markSelectedCase();
         /* loadCase() has started the clock on a group's first Startfall since
            V1.12; Eigener Fall is the co-equal alternative on the same screen
            and never got the same line, so a group that starts from its own
@@ -5558,26 +5970,29 @@
       }
       toOwnCase();
     });
+    /* Iteration 4 (2026-09-21): the PDF is generated here (briefPdfBytes()) and
+       downloaded, no print dialog, no header/footer settings to get right; Ctrl+P
+       still prints the sheet through the print stylesheet. */
     $("btnPrint").addEventListener("click", function () {
       if (!showGate("hint-routine", missingForExport())) { return; }
       renderBrief();
-      showStatus("Druckdialog wird geöffnet. Dort können Sie auch als PDF speichern.", 1800);
-      window.setTimeout(function () { window.print(); }, 80);
+      var name = exportFilename("pdf");
+      downloadBytes(briefPdfBytes(), "application/pdf", name);
+      showStatus("PDF erstellt: " + name + " (Download-Ordner).", 4000);
     });
     $("btnJson").addEventListener("click", exportJson);
+    /* Iteration 4 (2026-09-21, Eugen: the mail "should also append the final PDF
+       that the team worked on, not just the text"): a mailto: link cannot carry
+       an attachment, so the button now downloads an e-mail file (.eml) with the
+       recipient, the brief as text and the same PDF attached; opened in Outlook
+       it is a ready draft. See emlBytes(). */
     $("btnMail").addEventListener("click", function () {
       if (!showGate("hint-routine", missingForExport())) { return; }
       renderBrief();
+      var pdf = briefPdfBytes();
+      downloadBytes(emlBytes(pdf), "message/rfc822", exportFilename("eml"));
       $("mailNote").hidden = false;
-      /* A plain location.href here fires the beforeunload guard, and a group that
-         clicks "Verlassen" loses the whole case. An anchor click opens the mail client
-         without a navigation the guard can see. */
-      var a = document.createElement("a");
-      a.href = mailtoUrl();
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      showStatus("Mailprogramm wird geöffnet. Das PDF hängen Sie dort selbst an.", 4000);
+      showStatus("E-Mail-Datei erstellt (Download-Ordner).", 4000);
     });
     /* V1.12: the visible German-labelled trigger for the now visually-hidden
        #fileImport (see the markup comment above it). A plain .click() forward,
@@ -5592,6 +6007,7 @@
         b.addEventListener("click", function () {
           var months = Number(b.getAttribute("data-datum-months"));
           var d = new Date();
+          d.setDate(1);  /* the 31st plus one month is not the month after next */
           d.setMonth(d.getMonth() + months);
           var el = $("f_datum");
           el.value = "bis " + GERMAN_MONTHS[d.getMonth()] + " " + d.getFullYear();
@@ -5638,7 +6054,7 @@
             $("fileImportName").textContent = file.name;
             showStatus("Fall aus JSON geladen.");
           } catch (e) {
-            $("fileImportName").textContent = "Keine Datei ausgewählt";
+            $("fileImportName").textContent = "";
             showStatus("Diese Datei ist kein RADAR-Fall.");
           }
         };
@@ -5649,7 +6065,7 @@
         showConfirmModal(
           "Fall aus JSON öffnen? Die aktuelle, ungespeicherte Eingabe wird dabei ersetzt.",
           openJson,
-          function () { input.value = ""; $("fileImportName").textContent = "Keine Datei ausgewählt"; },
+          function () { input.value = ""; $("fileImportName").textContent = ""; },
           "Ersetzen");
         return;
       }
