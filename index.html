@@ -6,7 +6,7 @@
 <title>RADAR | Breakout Sessions</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="generator" content="hand-authored; build_radar.py is retired as generator, see file banner">
-<meta name="radar-version" content="1.16">
+<meta name="radar-version" content="1.17">
 <!-- Favicon as an inline data URI: no external file, no request, works from a stick. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%231a1b1e'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23e8b23a' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='16' fill='none' stroke='%23e8b23a' stroke-width='5'/%3E%3Cline x1='50' y1='50' x2='74' y2='28' stroke='%23e8b23a' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
 <!--
@@ -116,6 +116,9 @@
      JS string constant below, and in the Streamlit companion's matching
      constants -- the two tools' own parity checks compare these verbatim. */
   p, li{ text-wrap: pretty; }
+  /* V1.17: the export bar is sticky at the bottom on screen 5; a focused field is
+     scrolled clear of it (the phone keyboard leaves little room). */
+  html:has(body.show-brief){ scroll-padding-bottom: 130px; }
   h1, h2, h3, p, ul, fieldset{ margin: 0; padding: 0; }
   ul{ list-style: none; }
   fieldset{ border: none; }
@@ -1133,7 +1136,7 @@
      viewport with no word to break on. overflow-wrap:anywhere allows a break inside
      an unbroken run only when there is nowhere else to break, so an ordinary
      sentence still wraps at its own spaces exactly as before. */
-  .brief__value{ white-space: pre-wrap; overflow-wrap: anywhere; }
+  .brief__value{ white-space: pre-wrap; overflow-wrap: anywhere; text-wrap: pretty; }
   .brief__value.is-empty{ color: var(--color-text-faint); }
   .brief__footer{
     margin-top: var(--space-4); padding-top: var(--space-2);
@@ -1500,15 +1503,16 @@
   <!-- ============================ Screen 1 ============================ -->
   <section class="step is-active" id="step-1" data-step="1" aria-labelledby="step-1-title">
     <div class="step-intro">
-      <p class="step-help" id="onboardingIntro">Das ist das RADAR-Tool. Der Name kommt von den fünf Schritten, durch die Sie gleich gehen: Reibung erkennen, Auslöser analysieren, Design anpassen, Aktion einleiten, Routine verankern.</p>
-      <p class="step-help" id="onboardingHelp">So läuft die Übung: In Schritt 1 wählen Sie für Ihren Fall ein bis zwei Konzepte aus der Verhaltenswissenschaft. In Schritt 2 prüfen Sie zwei mögliche Erklärungen für das beobachtete Verhalten. In Schritt 3 wählen Sie eine Massnahme (das Konzept, an dem Sie ansetzen) und ein Werkzeug aus der Toolbox, mit dem Sie diese Massnahme im Gespräch umsetzen. In Schritt 4 legen Sie fest, wer was bis wann macht. In Schritt 5 halten Sie fest, was Sie erwarten, woran Sie es erkennen und welches Risiko oder welche Nebenwirkung möglich ist.</p>
-      <p class="step-help">Wählen Sie ein Thema, es lädt einen Beispielfall, oder tragen Sie einen eigenen Fall ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
+      <p class="step-help" id="onboardingIntro">Das ist das RADAR-Tool. RADAR steht für fünf Schritte: Reibung erkennen, Auslöser analysieren, Design anpassen, Aktion einleiten, Routine verankern. Arbeiten Sie zu dritt oder zu viert an einem Gerät, eine Person tippt.</p>
+      <p class="step-help" id="onboardingHelp">So läuft die Übung: In Schritt 1 beschreiben Sie, wo es hängen bleibt, und wählen ein bis zwei Konzepte aus der Verhaltenswissenschaft. In Schritt 2 stellen Sie zwei Erklärungen nebeneinander und suchen die Beobachtung, die sie trennt. In Schritt 3 wählen Sie eine Massnahme (das Konzept, an dem Sie ansetzen) und ein Werkzeug aus der Toolbox, mit dem Sie diese Massnahme im Gespräch umsetzen. In Schritt 4 legen Sie den nächsten Schritt fest, mit Datum und Namen. In Schritt 5 halten Sie fest, was Sie erwarten, woran Sie es erkennen und welches Risiko oder welche Nebenwirkung möglich ist.</p>
+      <p class="step-help">Wählen Sie ein Thema (RADAR lädt dann einen Beispielfall) oder tragen Sie einen eigenen Fall ein. Beschreiben Sie Situation und beobachtetes Verhalten, noch keine Erklärung.</p>
     </div>
     <h2 class="step-title" id="step-1-title" tabindex="-1">Reibung erkennen</h2>
+    <p class="step-help" id="step1Lead">Konkretes Verhalten. Wo bleibt es hängen?</p>
 
     <div class="step-card">
       <h3 class="box-label">Thema wählen</h3>
-      <div class="startfall-row" id="startfallRow" role="group" aria-label="Thema und Startfall"></div>
+      <div class="startfall-row" id="startfallRow" role="group" aria-label="Thema und Beispielfall"></div>
       <p class="startfall-own">
         <button type="button" class="btn" id="btnOwnCase">Eigener Fall</button>
         <span class="field__help">Ohne Thema und Beispiel. Im Brief steht dann „ein eigener Fall“.</span>
@@ -1546,7 +1550,7 @@
     </div>
 
     <div class="step-card">
-      <h3 class="box-label">Feld 1 · Beobachtung <span class="example-badge" id="feld1Example" hidden>Beispieltext, mit Ihrem Fall ersetzen</span></h3>
+      <h3 class="box-label">Feld 1 · Beobachtung <span class="example-badge" id="feld1Example" hidden>Beispieltext, durch Ihren Fall ersetzen</span></h3>
       <div class="field">
         <div class="field__labelrow">
           <label class="field__label" for="f_gruppe">Wer arbeitet an diesem Fall?</label>
@@ -1568,7 +1572,7 @@
           <label class="field__label" for="f_verhalten">Beobachtetes Verhalten</label>
           <span class="field__counter" id="counter-f_verhalten" aria-hidden="true"></span>
         </div>
-        <p class="field__help">Was passiert nach dem Gespräch tatsächlich? Nur beobachten, noch nicht erklären.</p>
+        <p class="field__help">Was passiert nach dem Gespräch? Nur beobachten, noch nicht erklären.</p>
         <textarea class="field__area" id="f_verhalten" data-key="verhalten" rows="2" maxlength="160"></textarea>
       </div>
 
@@ -1600,7 +1604,7 @@
   <!-- ============================ Screen 2 ============================ -->
   <section class="step" id="step-2" data-step="2" aria-labelledby="step-2-title">
     <h2 class="step-title" id="step-2-title" tabindex="-1">Auslöser analysieren</h2>
-    <p class="step-help">Zwei plausible Erklärungen für das beobachtete Verhalten.</p>
+    <p class="step-help" id="step2Lead">Zwei Erklärungen. Welche Beobachtung trennt sie?</p>
     <div class="theme-coach" id="themeCoach2" hidden></div>
     <details class="carry" id="carry-2" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
@@ -1628,7 +1632,7 @@
            which until now had nowhere to be recorded. Freiwillig, nie ein Gate. -->
       <div class="field" id="hypotheseField" hidden>
         <p class="field__label" id="hypotheseLabel">Arbeitshypothese</p>
-        <p class="field__help">Welche Beobachtung würde die beiden trennen, und welche ist danach wahrscheinlicher? Freiwillig.</p>
+        <p class="field__help">Welche Erklärung vermuten Sie? Danach richtet sich Schritt 3.</p>
         <div class="segmented" role="group" aria-labelledby="hypotheseLabel">
           <button type="button" class="segmented__btn" data-hyp="A" aria-pressed="false">Erklärung A</button>
           <button type="button" class="segmented__btn" data-hyp="B" aria-pressed="false">Erklärung B</button>
@@ -1645,7 +1649,7 @@
   <!-- ============================ Screen 3 ============================ -->
   <section class="step" id="step-3" data-step="3" aria-labelledby="step-3-title">
     <h2 class="step-title" id="step-3-title" tabindex="-1">Design anpassen</h2>
-    <p class="step-help">Eine Änderung, die zur vermuteten Erklärung passt.</p>
+    <p class="step-help" id="step3Lead">Eine Änderung, die zur vermuteten Erklärung passt.</p>
     <details class="carry" id="carry-3" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
@@ -1663,7 +1667,7 @@
            input uses: a bold question as the label, the rule as the help line. -->
       <div class="chiprow">
         <p class="chiprow__question">Was ändern Sie?</p>
-        <p class="field__help">Die Massnahme: das Konzept aus der Verhaltenswissenschaft. Keine bis zwei.</p>
+        <p class="field__help">Die Massnahme: das Konzept aus der Verhaltenswissenschaft. Höchstens zwei, freiwillig.</p>
         <div class="chiplist" id="chips-massnahmen" role="group" aria-label="Massnahmen"></div>
         <div class="chip-single" id="chips-keine"></div>
         <!-- Round-3 adversarial pass (2026-09-17): with "Keine passende Massnahme"
@@ -1675,7 +1679,7 @@
 
       <div class="chiprow">
         <p class="chiprow__question">Womit tun Sie es im Gespräch?</p>
-        <p class="field__help">Das Werkzeug: Ihr eigenes aus der Toolbox. Keines oder eines. <span id="caseMeta" hidden></span></p>
+        <p class="field__help">Das Werkzeug: aus Ihrer Toolbox vom Juni. Höchstens eines, freiwillig. <span id="caseMeta" hidden></span></p>
         <div class="chiplist" id="chips-toolbox" role="group" aria-label="Toolbox"></div>
       </div>
       <!-- The loop, iteration 2 (2026-09-18): the panel now FOLLOWS the two chip rows
@@ -1728,7 +1732,7 @@
              the tool: the test to apply (can you say why in one sentence), and
              the fallback if the answer is no (go back and look again, do not
              force a line). -->
-        <p class="linkmap__hint">So kommen Sie zum Ergebnis: Fragen Sie sich, warum genau diese Massnahme oder dieses Werkzeug zur Erklärung passt, die Sie oben gewählt haben, nicht nur, welches Ihnen zuerst einfällt. Wenn Sie das in einem Satz begründen können, ist die Wahl getroffen. Wenn nicht, schauen Sie noch einmal auf die Konzepte in Schritt 1: manchmal passt ein anderes besser.</p>
+        <p class="linkmap__hint">Begründen Sie jede Verknüpfung in einem Satz. Warum passt diese Massnahme oder dieses Werkzeug zum Konzept und zu Ihrer Erklärung aus Schritt 2? Gelingt das nicht, schauen Sie noch einmal auf die Konzepte in Schritt 1.</p>
         <div class="linkmap__body">
           <div class="linkmap__col" id="linkmapLeft"></div>
           <svg class="linkmap__svg" id="linkmapSvg" aria-hidden="true"></svg>
@@ -1738,7 +1742,7 @@
              (renderLinkmap() toggles them): a first-time participant read the dotted
              key as an instruction for a state that never appeared. -->
         <p class="linkmap__legend" id="linkmapLegend" hidden><span id="legendSolid" hidden><span class="linkmap__key linkmap__key--solid"></span>von Ihnen verknüpft</span>
-          <span id="legendSuggested" hidden><span class="linkmap__key linkmap__key--dotted"></span>im Material so angelegt, noch nicht bestätigt</span></p>
+          <span id="legendSuggested" hidden><span class="linkmap__key linkmap__key--dotted"></span>Vorschlag aus dem Beispielfall, noch nicht bestätigt</span></p>
       </div>
 
     </div>
@@ -1772,7 +1776,7 @@
   <!-- ============================ Screen 4 ============================ -->
   <section class="step" id="step-4" data-step="4" aria-labelledby="step-4-title">
     <h2 class="step-title" id="step-4-title" tabindex="-1">Aktion einleiten</h2>
-    <p class="step-help">Wer macht was bis wann?</p>
+    <p class="step-help" id="step4Lead">Schritt, Datum, Name.</p>
     <details class="carry" id="carry-4" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
@@ -1808,9 +1812,9 @@
              format. The three buttons write a concrete horizon into the field and can
              be overwritten immediately; they set no state of their own. -->
         <div class="quickpick" id="datumQuickpick" role="group" aria-label="Zeithorizont vorschlagen">
+          <button type="button" class="btn btn--quick" data-datum-days="7">In einer Woche</button>
+          <button type="button" class="btn btn--quick" data-datum-days="14">In zwei Wochen</button>
           <button type="button" class="btn btn--quick" data-datum-months="1">Im nächsten Monat</button>
-          <button type="button" class="btn btn--quick" data-datum-months="6">In 6 Monaten</button>
-          <button type="button" class="btn btn--quick" data-datum-months="12">In 12 Monaten</button>
         </div>
         <input class="field__input" id="f_datum" data-key="datum" type="text" maxlength="60">
       </div>
@@ -1825,7 +1829,7 @@
   <!-- ============================ Screen 5 ============================ -->
   <section class="step" id="step-5" data-step="5" aria-labelledby="step-5-title">
     <h2 class="step-title" id="step-5-title" tabindex="-1">Routine verankern</h2>
-    <p class="step-help" id="routineHelp">Halten Sie Vorhersage, Signal und Risiko oder Nebenwirkung fest. Eine Überprüfungsroutine brauchen Sie nicht.</p>
+    <p class="step-help" id="routineHelp">Erwartung, Signal und Risiko festhalten. Danach auswerten und bei Bedarf einen neuen Durchgang starten.</p>
     <details class="carry" id="carry-5" hidden><summary class="carry__summary"></summary><div class="carry__body"></div></details>
 
     <div class="step-card">
@@ -1836,7 +1840,7 @@
            later, which is the whole point of writing one down. The two numbers below
            are the group's own estimate, they draw themselves as a comparison, and they
            travel into the Interventionsbrief. -->
-      <p class="field__help">Bei wie vielen von 10 vergleichbaren Kundinnen und Kunden passiert das heute?
+      <p class="field__help">Bei wie vielen von 10 vergleichbaren Kundinnen und Kunden zeigt sich das gewünschte Verhalten heute?
         Und bei wie vielen nach Ihrer Änderung?</p>
       <div class="predict" id="predict">
         <!-- V1.13: the estimate is made by clicking a row of ten, not by typing into a
@@ -1945,7 +1949,7 @@
          (see MAIL_NOTE_TEXT/MAIL_FILE_NOTE_TEXT below); the markup carries only
          the #btnMail wording as its default so the page still reads sensibly
          before any script runs. -->
-    <p class="export-note" id="mailNote" hidden>Das PDF liegt jetzt im Download-Ordner. Im geöffneten E-Mail-Fenster einmal anhängen, dann senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die E-Mail-Datei mit PDF herunterladen.</p>
+    <p class="export-note" id="mailNote" hidden>Das PDF liegt jetzt im Download-Ordner (auf dem iPhone in der App „Dateien“). Im geöffneten E-Mail-Fenster anhängen und senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die E-Mail-Datei mit PDF herunterladen.</p>
     <!-- V1.13 (2026-09-17, Eugen): "remove clutter, move things that aren't directly
          relevant to this exercise (like the JSON stuff) out of sight". The JSON export
          is a technical, facilitator/tool-sync feature (reopening a case later, here or
@@ -1967,7 +1971,7 @@
              rather than attach the PDF by hand. Same emlBytes() this button always
              produced; only its position and framing changed, now that it is the
              second option rather than the only one. -->
-        <p class="field__help">Falls sich keine E-Mail öffnet, oder Outlook den Entwurf lieber fertig haben soll: E-Mail-Datei mit Text und PDF-Anhang.</p>
+        <p class="field__help">Falls sich keine E-Mail öffnet oder Sie in Outlook einen fertigen Entwurf möchten: E-Mail-Datei mit Text und PDF-Anhang.</p>
         <button type="button" class="btn" id="btnMailFile">E-Mail-Datei mit PDF</button>
         <p class="field__help">Für die Weiterverarbeitung: den Fall später wieder öffnen, hier oder im Begleittool.</p>
         <button type="button" class="btn" id="btnJson">Interventionsbrief als JSON</button>
@@ -1980,17 +1984,18 @@
     <details open>
       <summary>Datenschutzhinweis</summary>
       <div class="privacy-body">
-        <p>Diese Datei läuft vollständig im Browser: keine Netzwerkaufrufe, keine
-        Analysewerkzeuge, kein Server, keine Übertragung von Eingaben an irgendjemanden.</p>
-        <p>Eingaben leben nur im Arbeitsspeicher dieses Tabs. Auf dem Gerät wird nichts
-        gespeichert. Beim Schliessen oder Neuladen des Tabs sind die Eingaben weg. Wer den Fall
-        behalten will, exportiert ihn als JSON und legt die Datei selbst ab.</p>
+        <p>Das Tool läuft nach dem Laden ganz in Ihrem Browser. Es sendet keine Eingaben an
+        einen Server und nutzt keine Analysewerkzeuge.</p>
+        <p>Eingaben bleiben nur in diesem Tab. Auf dem Gerät wird nichts gespeichert. Wer den
+        Tab schliesst oder neu lädt, verliert sie. Wer den Fall behalten will, lädt ihn über
+        „Interventionsbrief als JSON“ herunter.</p>
         <p>Bitte keine Kundennamen, Kontonummern oder sonstigen vertraulichen Kundendaten
         eingeben; das Werkzeug fragt an keiner Stelle danach.</p>
       </div>
     </details>
     <p class="app-footer__line">
-      Erstellt von Prof. Eugen Dimant, University of Pennsylvania, für den Behavioral Science
+      Erstellt von Prof. Eugen Dimant, University of Pennsylvania und University of Cambridge,
+      für den Behavioral Science
       Deep Dive mit den Regionalleitungen Personal Banking, <span id="appSessionDate"></span>.
       Fragen: <a href="mailto:edimant@sas.upenn.edu">edimant@sas.upenn.edu</a>
       · Version <span id="appVersion" class="app-footer__version"></span>
@@ -2020,15 +2025,15 @@
      therefore already agree; if it does not, the canonical file is the one to trust. */
   var DATA = {
   "build": {
-    "version": "1.16",
+    "version": "1.17",
     "material_stand": "07.09.2026",
     "session_date": "24. September 2026"
   },
   "concepts": [
     {
       "id": "value_based_framing",
-      "banking_example": "„Sie verlieren jedes Jahr Kaufkraft“ landet anders als „Sie gewinnen jedes Jahr Rendite“, obwohl beide dasselbe Depot beschreiben.",
-      "action": "Vor dem Gespräch festlegen, aus welcher Perspektive Sie die Empfehlung erzählen, statt es dem Zufall zu überlassen.",
+      "banking_example": "„Sie verlieren jedes Jahr Kaufkraft“ wirkt anders als „Sie gewinnen jedes Jahr Rendite“, obwohl beide dasselbe Depot beschreiben.",
+      "action": "Vor dem Gespräch festlegen, aus welcher Perspektive Sie die Empfehlung darstellen, statt es dem Zufall zu überlassen.",
       "label_en": "Value-based Framing",
       "german_gloss": "Dieselbe Information wirkt anders, je nachdem, ob sie als Gewinn oder als Verlust dargestellt wird.",
       "row": "mechanism",
@@ -2039,7 +2044,7 @@
     {
       "id": "social_proof",
       "banking_example": "Der Kunde fragt, was andere in seiner Lage machen, bevor er sich auf eine Empfehlung einlässt.",
-      "action": "Eine echte, zutreffende Vergleichsgruppe benennen statt einer allgemeinen Aussage über „viele Kunden“.",
+      "action": "Keine Entscheidungen anderer Kundinnen oder Kunden nennen; fragen, an wem sich die Kundin orientiert, und klären, ob diese Person Information liefert oder mitentscheiden will.",
       "label_en": "Social proof",
       "german_gloss": "Menschen orientieren sich daran, was andere in einer ähnlichen Situation tun oder entscheiden.",
       "row": "mechanism",
@@ -2117,16 +2122,16 @@
       "id": "personalization",
       "banking_example": "Die Standardunterlage wird überflogen, die Seite mit den eigenen Zahlen wird gelesen.",
       "action": "Einen konkreten Bezug zur Lage dieses Kunden herstellen, bevor Sie das allgemeine Argument bringen.",
-      "label_en": "Personalization",
+      "label_en": "Relational Framing",
       "german_gloss": "Eine Botschaft wirkt stärker, wenn sie sichtbar auf die Situation der einzelnen Person zugeschnitten ist.",
       "row": "mechanism",
       "order": 9,
       "verified": true,
-      "german_short": "Personalisierung"
+      "german_short": "Via Personalisierung"
     },
     {
       "id": "recognition",
-      "banking_example": "Wer seit Jahren diszipliniert spart, hört das nie und rechnet auch nicht damit.",
+      "banking_example": "Wer seit Jahren diszipliniert spart, bekommt dafür selten Anerkennung und erwartet auch keine.",
       "action": "Benennen, was der Kunde bereits gut macht, bevor Sie eine Veränderung vorschlagen.",
       "label_en": "Recognition",
       "german_gloss": "Menschen reagieren positiv, wenn ihr Verhalten oder ihre Leistung sichtbar wahrgenommen wird.",
@@ -2149,7 +2154,7 @@
     {
       "id": "social_norm_messaging",
       "banking_example": "Der Hinweis, dass die meisten in vergleichbarer Lage bereits umgestellt haben, spricht einen anderen Grund an als ein weiteres Sachargument.",
-      "action": "Nur eine Norm nennen, die tatsächlich zutrifft, sonst kippt die Wirkung.",
+      "action": "Nur eine Norm nennen, die zutrifft. Wer schon besser liegt als die genannte Mehrheit, kann sich ihr nach unten angleichen; in grossen Feldstudien blieb dieser Effekt allerdings aus.",
       "label_en": "Social norm messaging",
       "german_gloss": "Zu zeigen, was die Mehrheit tut oder für richtig hält, verändert das eigene Verhalten.",
       "row": "intervention",
@@ -2225,7 +2230,7 @@
     },
     {
       "id": "system_1_system_2",
-      "banking_example": "Die schnelle Reaktion im Termin ist selten dieselbe wie das Ergebnis einer Nacht darüber schlafen.",
+      "banking_example": "Die schnelle Reaktion im Termin ist selten dieselbe wie die Entscheidung nach einer Nacht Bedenkzeit.",
       "action": "Bewusst entscheiden, welchen Modus Ihr Gespräch gerade braucht.",
       "label_en": "System 1 / System 2",
       "german_gloss": "Der Mensch entscheidet meist schnell und intuitiv, kann aber gezielt langsam und bewusst nachdenken.",
@@ -2255,12 +2260,13 @@
     },
     {
       "id": "tb_relational_framing",
-      "was": "Die Empfehlung im partnerschaftlichen Rahmen adressieren statt als Verkauf.",
+      "was": "Kundinnen und Kunden als Partner ansprechen, nicht als Käufer.",
       "leitfrage": "Sprechen Sie von „wir“ und vom gemeinsamen Ziel, oder von Produkt und Abschluss?",
-      "title": "Relational Framing: Adressiere im partnerschaftlichen Rahmen",
+      "title": "Relational Framing: Sprich KundInnen partnerschaftlich an",
       "german_short": "Relational Framing",
       "linked_concept_ids": [
-        "recognition"
+        "recognition",
+        "personalization"
       ],
       "verified": true,
       "print_questions": [
@@ -2286,7 +2292,7 @@
       "id": "tb_peak_end",
       "was": "Bewusste Höhepunkte setzen und den Schluss gestalten.",
       "leitfrage": "Was ist der stärkste Moment des Termins, und wie endet er?",
-      "title": "Peak End Rule: Setze bewusste Peaks und sorge für ein gutes Ende",
+      "title": "Peak End Rule: Setze bewusst Peaks und schaue für ein gutes Ende",
       "german_short": "Peak End Rule",
       "linked_concept_ids": [
         "peak_end_rule"
@@ -2301,8 +2307,8 @@
       "id": "tb_halo_anchoring",
       "was": "Anker bewusst setzen, weil die erste Zahl den ganzen weiteren Rahmen prägt.",
       "leitfrage": "Welche Zahl nennen Sie zuerst, und ist das die, an der gemessen werden soll?",
-      "title": "Halo-Effekt und Anchoring: Nutze bewusste Anker in der Beratung",
-      "german_short": "Halo-Effekt und Anchoring",
+      "title": "Halo-Effekt & Anchoring: Nutze bewusste Anker in der Beratung",
+      "german_short": "Halo-Effekt & Anchoring",
       "linked_concept_ids": [],
       "verified": true,
       "print_questions": [
@@ -2353,11 +2359,12 @@
       "kanal": "Filiale",
       "titel": "Zu Hause kippt die Entscheidung",
       "situation": "Ein Kunde ist im Gespräch von der Empfehlung überzeugt und will nur noch über den Betrag nachdenken. Draussen spricht er mit seiner Partnerin oder einem Freund; Tage später sagt er ab.",
-      "verhalten": "Ja im Gespräch, Nein nach einem Gespräch ausserhalb der Bank; die Entscheidungseinheit war nicht im Raum.",
+      "verhalten": "Ja im Gespräch, Nein nach einem Gespräch ausserhalb der Bank; die Person, die mitentscheidet, war nicht dabei.",
       "pattern_label": "Jemand anderes hat das letzte Wort",
       "pattern_label_short": "Jemand anderes hat das letzte Wort",
       "concept_ids": [
-        "social_proof"
+        "social_proof",
+        "personalization"
       ],
       "toolbox_ids": [
         "tb_relational_framing"
@@ -2391,7 +2398,7 @@
       "label_short": "Warten",
       "count": 4,
       "startfall_ids": ["SF1"],
-      "bridge": "Kunden vergleichen mit Kursen. Setzen Sie daneben einen Massstab, an dem die Entscheidung wirklich hängt.",
+      "bridge": "Welcher frühere oder erwartete Wert ist gerade der Massstab: Einstiegskurs, erlebtes Hoch, Wunschziel oder Zinskorridor?",
       "wildcard": false
     },
     {
@@ -2400,7 +2407,7 @@
       "label_short": "Sagt ja, tut es dann nicht",
       "count": 4,
       "startfall_ids": ["SF3"],
-      "bridge": "Trennen Sie zwei Fälle nach einem Ja: die Entscheidung ist offen, oder der Auslöser fehlt.",
+      "bridge": "Ein Ja ist noch keine Diagnose. Lücke 1: Die Wahl ist noch offen. Lücke 2: Der Auslöser fehlt.",
       "wildcard": false
     },
     {
@@ -2409,7 +2416,7 @@
       "label_short": "Jemand anderes hat das letzte Wort",
       "count": 3,
       "startfall_ids": ["SF4"],
-      "bridge": "Trennen Sie zwei Wege, auf denen eine nahestehende Person mitentscheidet: sie liefert Information, oder ihre Beteiligung selbst zählt.",
+      "bridge": "Verändert die Person die Einschätzung der Anlage, oder verändert ihre Beteiligung den Wert der Entscheidung selbst?",
       "wildcard": false
     },
     {
@@ -2535,6 +2542,9 @@
      Streamlit companion's TOOL_NONE). */
   var TOOL_NONE = "keines";
   var MASS_NONE = "keine";  /* the Massnahmen row's minimum is zero as well (APEX, 2026-09-21) */
+  var HYPOTHESIS_OPEN_CHAIN = "A oder B, noch offen";  /* V1.17: see hypothesisOpen() */
+  /* V1.17: the two affiliations of slide 1, in the words the footer uses. */
+  var AUTHOR_AFFIL = "University of Pennsylvania und University of Cambridge";
   var LABEL_VERKNUEPFUNG = "Verknüpfung";
   var NO_MASSNAHME_OPTION = "Keine passende Massnahme";
   var NO_MASSNAHME_BRIEF = "Keine passende Massnahme";
@@ -2596,6 +2606,8 @@
   function txt(s) { return (s === null || s === undefined) ? "" : String(s); }
   function trimmed(s) { return txt(s).trim(); }
 
+  var GERMAN_WEEKDAYS = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag",
+                         "Freitag", "Samstag"];
   var GERMAN_MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni",
                        "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
@@ -3371,10 +3383,10 @@
   function predictDeltaText(now, goal) {
     if (now === null || goal === null) { return ""; }
     var d = goal - now;
-    if (d === 0) { return "Ihre Änderung soll nichts verschieben. Ist das die Absicht?"; }
+    if (d === 0) { return "Heute und nach der Änderung gleich viele. Erwarten Sie keine Wirkung?"; }
     var richtung = d > 0 ? "mehr" : "weniger";
-    return "Ihre Änderung soll " + Math.abs(d) + " von 10 " + richtung +
-           " bewirken, also von " + now + " auf " + goal + ".";
+    return "Erwartet: von " + now + " auf " + goal + " von 10, also " + Math.abs(d) +
+           " " + richtung + ".";
   }
 
   /* Ten buttons per row. Clicking the sixth means six, clicking the sixth again means
@@ -3825,7 +3837,7 @@
        the header to speak for itself. */
     var capThema = document.createElement("p");
     capThema.className = "chipgroup__caption";
-    capThema.textContent = "Zu Ihrem Fall vorbereitet. Sie sind nicht daran gebunden.";
+    capThema.textContent = "Um diese Konzepte ist der Beispielfall gebaut. Sie können auch andere wählen.";
     box.insertBefore(capThema, kids[0]);
     if (kids.length > nFirst) {
       var h2 = document.createElement("p");
@@ -3853,7 +3865,9 @@
     choice_architecture: "gleiche Idee, Werkzeug unten",
     tb_choice_architecture: "gleiche Idee, Massnahme oben",
     peak_end_rule: "gleiche Idee, Werkzeug in Schritt 3",
-    tb_peak_end: "gleiche Idee, Konzept in Schritt 1"
+    tb_peak_end: "gleiche Idee, Konzept in Schritt 1",
+    personalization: "gleiche Idee, Werkzeug in Schritt 3",
+    tb_relational_framing: "gleiche Idee, Konzept in Schritt 1"
   };
 
   function renderChips() {
@@ -4281,6 +4295,64 @@
       el.addEventListener("input", handler);
     });
     wireGruppeTruncationTracking();
+    wireFieldTruncationTracking();
+    wirePredictionDigits();
+    Array.prototype.forEach.call(document.querySelectorAll("textarea"), function (ta) {
+      ta.addEventListener("input", function () { autoGrow(ta); });
+    });
+  }
+  /* V1.17 (loop, iteration 1): a two-row box hid most of a 160-character answer on a
+     phone. Each text box grows with its content (never below the rows it was given). */
+  function autoGrow(ta) {
+    if (!ta || !ta.offsetParent) { return; }
+    ta.style.height = "auto";
+    ta.style.height = (ta.scrollHeight + 2) + "px";
+  }
+  function autoGrowAll() {
+    Array.prototype.forEach.call(document.querySelectorAll("textarea"), autoGrow);
+  }
+  /* V1.17 (loop, iteration 1): truncationSafe() treated every value sitting exactly at
+     its cap as cut off, so a complete entry typed to exactly 50 characters lost its last
+     word in the brief ("Lea …"). The same precise signal f_gruppe already had is now
+     kept for every capped field: true only when an edit actually overflowed the cap. */
+  var gFieldTruncated = {};
+  function wireFieldTruncationTracking() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("input[maxlength], textarea[maxlength]"), function (el) {
+        if (!el.id) { return; }
+        el.addEventListener("beforeinput", function (e) {
+          var data = e.data;
+          if (data == null && e.dataTransfer) {
+            try { data = e.dataTransfer.getData("text/plain"); } catch (err) { data = null; }
+          }
+          if (data == null) { gFieldTruncated[el.id] = false; return; }
+          var s = el.selectionStart, en = el.selectionEnd;
+          if (s == null || en == null) { s = 0; en = el.value.length; }
+          var was = gFieldTruncated[el.id] === true;
+          gFieldTruncated[el.id] = (el.value.length - (en - s) + data.length) > el.maxLength;
+          /* A refused keystroke fires no input event, so the brief is redrawn here. */
+          if (gFieldTruncated[el.id] && !was) { window.setTimeout(renderBrief, 0); }
+        });
+      });
+  }
+  /* V1.17 (loop, iteration 2): the estimate is a whole number of ten. A typed decimal
+     separator used to vanish in a number field ("3,5" read as 35, clamped to 10); now the
+     separator and any digit typed after it are ignored, so "3,5" stays 3. */
+  function wirePredictionDigits() {
+    ["f_heute", "f_ziel"].forEach(function (id) {
+      var el = $(id);
+      if (!el) { return; }
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "," || e.key === "." || e.key === "e" || e.key === "E") {
+          e.preventDefault(); el.setAttribute("data-frac", "1"); return;
+        }
+        if (/^[0-9]$/.test(e.key) && el.getAttribute("data-frac") === "1") { e.preventDefault(); return; }
+        if (e.key === "Backspace" || e.key === "Delete" || e.ctrlKey || e.metaKey) {
+          el.removeAttribute("data-frac");
+        }
+      });
+      el.addEventListener("blur", function () { el.removeAttribute("data-frac"); });
+    });
   }
   function writeFields() {
     FIELD_IDS.forEach(function (id) {
@@ -4296,6 +4368,8 @@
        starts typing in this tab. */
     var gEl0 = $("f_gruppe");
     if (gEl0) { gGruppeTruncated = gEl0.value.length >= gEl0.maxLength; }
+    gFieldTruncated = {};
+    autoGrowAll();
   }
 
   /* =================================================================
@@ -4351,7 +4425,8 @@
     if (!v || !fieldId) { return v; }
     var el = $(fieldId);
     var cap = el ? el.maxLength : -1;
-    if (cap >= 0 && raw.length >= cap && !/[.!?…]\s*$/.test(v)) {
+    if (cap >= 0 && raw.length >= cap && !/[.!?…]\s*$/.test(v) &&
+        (gFieldTruncated[fieldId] !== false || /\s$/.test(raw))) {
       var cut = v.replace(/\s+\S*$/, "");
       return (cut || v) + " …";
     }
@@ -4403,10 +4478,21 @@
     if (STATE.hypothese === "B" && trimmed(STATE.gegenprobe)) { return "f_gegenprobe"; }
     return "f_erklaerung";
   }
+  /* V1.17 (2026-09-22, council): with both explanations typed and no working
+     hypothesis chosen, the brief used to present Erklärung A as the group's
+     hypothesis although nobody had chosen it. Slide 26 prints an open diagnosis as
+     "Wahl offen oder Auslöser fehlt", so an open choice now names both; the toggle
+     stays voluntary and nothing is gated on it. */
+  function hypothesisOpen() {
+    return STATE.hypothese === "" && !!trimmed(STATE.erklaerung) && !!trimmed(STATE.gegenprobe);
+  }
   function reportbackSentence() {
     var xRaw = situationLabel();
     var x = xRaw ? quoteName(xRaw) : EMPTY;
-    var z = firstSentence(truncationSafe(workingHypothesis(), workingHypothesisFieldId()), 150) || EMPTY;
+    var z = hypothesisOpen()
+      ? closeClause(firstSentence(truncationSafe(STATE.erklaerung, "f_erklaerung"), 72), false) +
+        "Oder: " + firstSentence(truncationSafe(STATE.gegenprobe, "f_gegenprobe"), 72)
+      : (firstSentence(truncationSafe(workingHypothesis(), workingHypothesisFieldId()), 150) || EMPTY);
     var a = firstSentence(truncationSafe(STATE.aenderung, "f_aenderung"), 130) || EMPTY;
     var d = firstSentence(truncationSafe(STATE.signal, "f_signal"), 120) || EMPTY;
     return "Problem: " + x + ". " +
@@ -4582,7 +4668,7 @@
     openLine.id = "briefOpen";
     openLine.textContent = open.length
       ? "Noch offen: " + open.join(", ") + "."
-      : "Alle Felder ausgefüllt.";
+      : "Alles ausgefüllt.";
     root.appendChild(openLine);
 
     /* V1.13 (Eugen: the brief "can't just be a collection of open text boxes"). Two
@@ -4657,7 +4743,7 @@
     var attr = document.createElement("p");
     attr.className = "print-attribution";
     attr.textContent = "RADAR " + DATA.build.version +
-      ", erstellt von Prof. Eugen Dimant, University of Pennsylvania. " +
+      ", erstellt von Prof. Eugen Dimant, " + AUTHOR_AFFIL + ". " +
       "Fragen: edimant@sas.upenn.edu";
     root.appendChild(attr);
 
@@ -4774,7 +4860,7 @@
     L.push("");
     var v = predictValues();
     if (v.now !== null || v.goal !== null) {
-      L.push("Vorhersage der Gruppe, von 10 vergleichbaren Kunden:");
+      L.push("Vorhersage der Gruppe, von 10 vergleichbaren Kundinnen und Kunden:");
       L.push("  heute: " + (v.now === null ? "offen" : v.now + " von 10"));
       L.push("  nach der Änderung: " + (v.goal === null ? "offen" : v.goal + " von 10"));
       var d = predictDeltaText(v.now, v.goal);
@@ -4876,7 +4962,8 @@
   /* Greedy word wrap on the measured width; a single word wider than the line is
      broken by character so nothing can run off the page. */
   function pdfWrap(s, size, bold, maxW) {
-    var lines = [], words = String(s).split(/\s+/).filter(function (w) { return w.length; });
+    var lines = [], words = String(s).replace(/[\u200B\uFEFF]/g, "").replace(/\u202F/g, "\u00A0")
+      .replace(/[\u1680\u2000-\u200A\u2028\u2029\u205F\u3000]/g, " ").split(/[ \t\n\r\f\v]+/).filter(function (w) { return w.length; });
     if (!words.length) { return [""]; }
     var line = "";
     var push = function (w) {
@@ -4897,7 +4984,19 @@
       });
     });
     if (line) { lines.push(line); }
-    return lines;
+    /* V1.17: no single word alone on the last line of a wrapped paragraph. The last
+       word of the previous line moves down when both then still fit. */
+    if (lines.length > 1 && lines[lines.length - 1].indexOf(" ") < 0) {
+      var prev = lines[lines.length - 2], cutAt = prev.lastIndexOf(" ");
+      if (cutAt > 0) {
+        var moved = prev.slice(cutAt + 1) + " " + lines[lines.length - 1];
+        if (pdfWidth(moved, size, bold) <= maxW) {
+          lines[lines.length - 2] = prev.slice(0, cutAt);
+          lines[lines.length - 1] = moved;
+        }
+      }
+    }
+    return lines.map(function (l) { return l.replace(/\u00A0/g, " "); });
   }
 
   /* One document: pages of content-stream operators, A4 portrait, points. */
@@ -5132,14 +5231,23 @@
 
     /* Footer: two small lines, allowed to sit in the bottom margin like a page
        footer, so they never push the last box onto a page of their own. */
-    var attribution = "RADAR " + DATA.build.version + ", erstellt von Prof. Eugen Dimant, University of Pennsylvania. Fragen: edimant@sas.upenn.edu";
+    var attribution = "RADAR " + DATA.build.version + ", erstellt von Prof. Eugen Dimant, " +
+      AUTHOR_AFFIL + ". Fragen: edimant@sas.upenn.edu";
     var stand = FOOTER_STAND_PREFIX + DATA.build.material_stand;
     if (T.measure > 1000) {
       /* the tight tiers: one footer line, allowed down to 12pt from the paper edge */
       bottom = doc.H - 12;
       need(12);
       y += 6 - T.boxGap;
-      doc.text(M, y + 7, stand + " · " + attribution, 7, { color: PDF_FAINT });
+      /* V1.17: with both affiliations the sentence form no longer fits the measure
+         at 7pt, so this one line switches to a list form that keeps every item:
+         stamp, version, author, both universities, address. */
+      var one = stand + " · " + attribution;
+      if (pdfWidth(one, 7) > W) {
+        one = stand + " · RADAR " + DATA.build.version + " · Prof. Eugen Dimant, " +
+          AUTHOR_AFFIL + " · edimant@sas.upenn.edu";
+      }
+      doc.text(M, y + 7, one, 7, { color: PDF_FAINT });
     } else {
       bottom = doc.H - 22;
       need(22);
@@ -5185,9 +5293,12 @@
     return [
       { k: "Fall", v: situationLabel() },
       { k: "Konzepte", v: STATE.wirkmechanismen.map(conceptDe).join(" + ") },
-      { k: "Diagnose", v: truncationSafe(workingHypothesis(), workingHypothesisFieldId()) },
+      { k: "Diagnose", v: hypothesisOpen() ? HYPOTHESIS_OPEN_CHAIN
+          : truncationSafe(workingHypothesis(), workingHypothesisFieldId()) },
+      /* V1.17: an empty Massnahmen row is a valid answer (its minimum is zero), so
+         the chain says "keine" like the brief rows below it, not "offen". */
       { k: "Massnahme", v: STATE.keineMassnahme ? NO_MASSNAHME_OPTION
-          : STATE.massnahmen.map(conceptDe).join(" + ") },
+          : (STATE.massnahmen.map(conceptDe).join(" + ") || MASS_NONE) },
       { k: "Werkzeug", v: STATE.toolbox.map(toolboxShort).join(" + ") },
       { k: "Die eine Änderung", v: truncationSafe(STATE.aenderung, "f_aenderung") }
     ].filter(function (l) { return l.k !== "Werkzeug" || l.v; });
@@ -5247,8 +5358,8 @@
      silently handing a client a truncated brief. */
   function mailtoHref(m) {
     var full = m.body + "\n\n(Vollständiger Text auch im angehängten PDF: " + m.pdfName + ")";
-    var short = "Der vollständige Interventionsbrief ist als PDF angehängt (" + m.pdfName +
-      "), eben in den Download-Ordner geladen. Bitte hier anhängen, dann senden.";
+    var short = "Bitte hängen Sie den Interventionsbrief als PDF an (" + m.pdfName +
+      ", soeben im Download-Ordner gespeichert) und senden Sie die E-Mail.";
     var body = window.encodeURIComponent(full).length <= 1800 ? full : short;
     return "mailto:" + m.to + "?subject=" + window.encodeURIComponent(m.subject) +
       "&body=" + window.encodeURIComponent(body);
@@ -5264,7 +5375,12 @@
      the brief the group just finished writing. An <a> click with no .download
      attribute never does that for mailto:, in this browser or the ones this
      tool has been tested in. */
+  /* V1.17 (loop, iteration 1): desktop Chrome and Edge fire beforeunload on a mailto:
+     click, so the leave-page warning appeared at the last step and a group that chose
+     "Cancel" never got its mail window. The guard is paused for the click itself. */
+  var gMailtoAt = 0;
   function openMailto(href) {
+    gMailtoAt = Date.now();
     var a = document.createElement("a");
     a.href = href;
     a.style.display = "none";
@@ -5279,12 +5395,12 @@
      set as textContent right before the note is shown; MAIL_NOTE_TEXT also
      matches the markup's own static #mailNote content, so the page reads
      correctly even before either button has been clicked. */
-  var MAIL_NOTE_TEXT = "Das PDF liegt jetzt im Download-Ordner. Im geöffneten E-Mail-Fenster " +
-    "einmal anhängen, dann senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die " +
+  var MAIL_NOTE_TEXT = "Das PDF liegt jetzt im Download-Ordner (auf dem iPhone in der App „Dateien“). Im geöffneten E-Mail-Fenster " +
+    "anhängen und senden. Öffnet sich keine E-Mail: unten bei „Weitere Optionen“ die " +
     "E-Mail-Datei mit PDF herunterladen.";
   var MAIL_FILE_NOTE_TEXT = "Die E-Mail-Datei aus dem Download-Ordner in Outlook öffnen: " +
-    "Empfänger, Text und PDF sind drin, nur noch senden. Öffnet sie sich nicht als Entwurf: das " +
-    "PDF aus demselben Ordner an eine Mail an edimant@sas.upenn.edu anhängen.";
+    "Empfänger, Text und PDF sind enthalten, nur noch senden. Öffnet sie sich nicht als Entwurf: das " +
+    "PDF aus demselben Ordner an eine E-Mail an edimant@sas.upenn.edu anhängen.";
   /* RFC 2047 encoded-words of at most 66 characters each (so "Subject: " plus the
      first one stays under 78), folded onto continuation lines; the subject can
      carry any character this way. */
@@ -5418,8 +5534,8 @@
     document.body.removeChild(a);
     window.setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
     showStatus(missing.length
-      ? "JSON-Datei erstellt (noch nicht vollständig -- zum Weiterarbeiten später wieder öffnen). Sie liegt im Download-Ordner dieses Browsers."
-      : "JSON-Datei erstellt. Sie liegt im Download-Ordner dieses Browsers.");
+      ? "JSON-Datei im Download-Ordner gespeichert. Der Fall ist noch nicht vollständig; öffnen Sie die Datei später hier, um weiterzuarbeiten."
+      : "JSON-Datei im Download-Ordner gespeichert.");
   }
 
   /* True only for a real object ({...}), never a string, array, number or null.
@@ -5754,6 +5870,9 @@
        fact twice on one screen; the brief's own "Noch offen" line already made it a
        third. Assistive tech still hears it, through the sr-only live region. */
     announce(gateBannerText(missing));
+    /* V1.17: the export bar is sticky at the bottom of the screen, so the banner is
+       usually not beside the button that was pressed. It is brought into view. */
+    try { el.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { el.scrollIntoView(); }
     return false;
   }
 
@@ -5808,8 +5927,10 @@
     var el = $("progressCount");
     if (!el) { return; }
     var open = missingForExport().length;
-    var openText = open === 0 ? "Alle Felder ausgefüllt"
-      : open + (open === 1 ? " Feld noch offen" : " Felder noch offen");
+    /* V1.17: "Felder" named the six numbered boxes everywhere except here, where
+       it counted inputs (14 of them); the counter now says what it counts. */
+    var openText = open === 0 ? "Alles ausgefüllt"
+      : open + (open === 1 ? " Eingabe noch offen" : " Eingaben noch offen");
     /* Assigned only when it differs: a live region re-announces every write (APEX). */
     if (el.textContent !== openText + ".") { el.textContent = openText + "."; }
   }
@@ -5881,6 +6002,7 @@
        it is rebuilt here, once the panel is actually on screen, rather than trusting
        whatever the last renderBrief() call happened to measure. */
     if (n === 3) { renderLinkmap(); }
+    autoGrowAll();
     var title = $("step-" + n + "-title");
     if (title) { title.focus(); }
     window.scrollTo(0, 0);
@@ -6177,15 +6299,24 @@
     /* Date quick-picks: they write a readable horizon into the free-text field and
        nothing else, so the field stays the single source of the date. */
     Array.prototype.forEach.call(
-      document.querySelectorAll("#datumQuickpick button[data-datum-months]"),
+      document.querySelectorAll("#datumQuickpick button[data-datum-months], #datumQuickpick button[data-datum-days]"),
       function (b) {
         b.addEventListener("click", function () {
-          var months = Number(b.getAttribute("data-datum-months"));
-          var d = new Date();
-          d.setDate(1);  /* the 31st plus one month is not the month after next */
-          d.setMonth(d.getMonth() + months);
           var el = $("f_datum");
-          el.value = "bis " + GERMAN_MONTHS[d.getMonth()] + " " + d.getFullYear();
+          var d = new Date();
+          /* V1.17: "Der kleinste konkrete Schritt" and slide 26's example date sit
+             one to two weeks out, not six or twelve months; the week buttons write
+             an exact day, the month button keeps its month-only form. */
+          if (b.hasAttribute("data-datum-days")) {
+            d.setDate(d.getDate() + Number(b.getAttribute("data-datum-days")));
+            el.value = "bis " + GERMAN_WEEKDAYS[d.getDay()] + ", " + d.getDate() + ". " +
+              GERMAN_MONTHS[d.getMonth()] + " " + d.getFullYear();
+          } else {
+            var months = Number(b.getAttribute("data-datum-months"));
+            d.setDate(1);  /* the 31st plus one month is not the month after next */
+            d.setMonth(d.getMonth() + months);
+            el.value = "bis " + GERMAN_MONTHS[d.getMonth()] + " " + d.getFullYear();
+          }
           STATE.datum = el.value;
           renderBrief();
           announce("Datum gesetzt: " + el.value);
@@ -6252,6 +6383,7 @@
        Nothing is written anywhere: this only asks the question. */
     window.addEventListener("beforeunload", function (ev) {
       if (!caseHasContent()) { return undefined; }
+      if (Date.now() - gMailtoAt < 2000) { return undefined; }
       ev.preventDefault();
       ev.returnValue = "";
       return "";
@@ -6265,7 +6397,7 @@
     var linkmapResizeTimer = null;
     window.addEventListener("resize", function () {
       window.clearTimeout(linkmapResizeTimer);
-      linkmapResizeTimer = window.setTimeout(renderLinkmap, 120);
+      linkmapResizeTimer = window.setTimeout(function () { renderLinkmap(); autoGrowAll(); }, 120);
     });
 
     /* Round 4 (2026-09-17), Evaluator C's Dimension 6: a print-time safety net for
