@@ -690,7 +690,7 @@
     flex-wrap: nowrap;
   }
   .chip input{ margin: 0; margin-top: 0.2em; accent-color: var(--color-accent); flex: 0 0 auto; }
-  /* The wrapper that carries every text span (main name, .chip__de, .chip__dual).
+  /* The wrapper that carries every text span (main name, .chip__de).
      flex:1 1 auto + min-width:0 let it claim the row's full remaining width and
      shrink below its own content's natural width, which is what lets the
      browser wrap its text at word/hyphen boundaries instead of overflowing or
@@ -707,7 +707,7 @@
      Raising the opacity enough to fix that (needs >=0.95) would have made
      "blocked" barely visible at all, so opacity is dropped in favour of an
      explicit, contrast-checked color per element below: .chip__main is
-     recolored (still >=4.5:1), while .chip__de and .chip__dual keep their
+     recolored (still >=4.5:1), while .chip__de keeps its
      ordinary, already-passing color unchanged -- nothing left in this rule
      needs to dim text it does not directly touch. */
   .chip.is-blocked{ cursor: not-allowed; }
@@ -729,7 +729,7 @@
      dot; the chip did not, so the same pair read as one run-on label on screen
      and as a pair on paper. One separator, both places. */
   /* Leading nbsp keeps the separator off the preceding word now that main/
-     .chip__de/.chip__dual are plain inline text inside one wrapper rather
+     .chip__de are plain inline text inside one wrapper rather
      than flex siblings with a gap between them (see .chip__text above). */
   .chip__de::before{ content: "\00a0\00b7\00a0"; }
   .chip__de{ color: var(--color-text-faint); }
@@ -748,16 +748,6 @@
     flex: 0 0 100%; margin: 0 0 var(--space-2);
     font-size: 0.78rem; color: var(--color-text-faint);
   }
-  .chip__dual{
-    font-size: 0.72rem; color: var(--color-text-faint); font-style: italic;
-    /* Now a child of .chip__text rather than a third flex sibling of .chip
-       itself (see that rule's comment), so this is inline content that wraps
-       wherever it naturally falls within the wrapper -- display: block would
-       force it onto its own line unconditionally, which is not needed now
-       that the wrapper is what supplies the width to wrap into. */
-    display: inline;
-  }
-  .chip__dual::before{ content: "\00a0\00b7\00a0"; }
   .chip-single{ margin-top: var(--space-3); }
   .chip-single .chip-line{ border-style: dashed; }
 
@@ -1629,7 +1619,12 @@
       </div>
       <!-- V1.13 round 3: appears once both explanations are typed. Answers the
            question the step itself asks ("welche Beobachtung würde sie trennen?"),
-           which until now had nowhere to be recorded. Freiwillig, nie ein Gate. -->
+           which until now had nowhere to be recorded. V1.13 through V1.17: freiwillig,
+           nie ein Gate. Eugen (2026-09-23, screenshot of both buttons circled): "the
+           selection of one of these buttons should be forced. One should not be able
+           to proceed without selecting one of them." Gated in goToStep() below, same
+           idiom as screen 1's Konzept gate (#hint-hypothese, shown/hidden the same way
+           as #hint-wirkmechanismen). -->
       <div class="field" id="hypotheseField" hidden>
         <p class="field__label" id="hypotheseLabel">Arbeitshypothese</p>
         <p class="field__help">Welche Erklärung vermuten Sie? Danach richtet sich Schritt 3.</p>
@@ -1644,6 +1639,11 @@
       <button type="button" class="btn" data-goto="1">Zurück</button>
       <button type="button" class="btn btn--primary" data-goto="3">Weiter: Design anpassen</button>
     </div>
+    <!-- Same placement idiom as #hint-wirkmechanismen: under the refused button,
+         where the cursor already is. Text is set in JS (goToStep()) because it
+         has two distinct states (explanations not yet typed vs. typed but no
+         hypothesis chosen), unlike hint-wirkmechanismen's one fixed sentence. -->
+    <p class="hint" id="hint-hypothese" hidden></p>
   </section>
 
   <!-- ============================ Screen 3 ============================ -->
@@ -3171,12 +3171,6 @@
         sec.textContent = secondFn(item.id);
         text.appendChild(sec);
       }
-      if (BOTH_ROWS_NOTE[item.id]) {
-        var dual = document.createElement("span");
-        dual.className = "chip__dual";
-        dual.textContent = BOTH_ROWS_NOTE[item.id];
-        text.appendChild(dual);
-      }
       label.appendChild(text);
       line.appendChild(label);
 
@@ -3683,7 +3677,7 @@
                      Math.max(1, Math.round(host.height)));
     /* Scoped to its own column, not to #linkmap as a whole: a Massnahme and a
        Wirkmechanismus can share the same concept id (both rows are drawn from the
-       same concept list, see the BOTH_ROWS_NOTE chips), and an unscoped lookup
+       same concept list), and an unscoped lookup
        would resolve to whichever column happens to come first in the DOM. */
     var at = function (id, side) {
       var el = document.querySelector("#linkmap" + (side === "left" ? "Left" : "Right") +
@@ -3849,26 +3843,15 @@
   }
 
   /* The two rows legitimately share a few names (Choice Architecture, Peak End Rule,
-     and the concepts that also exist as a named tool). Rather than rename anything,
-     each side says what the other one is, on the tile.
-     Eugen (2026-09-21, screenshot): "auch an anderen Stellen sehe ich solche
-     Verweise und verstehe nicht wofuer das gut sein soll ausser vllt zu
-     verwirren?" The bare cross-reference ("auch als Werkzeug unten") only makes
-     sense to someone who already knows this tool intentionally reuses a name
-     across two rows; read cold, it looks like an unexplained duplicate. "gleiche
-     Idee" is the missing word: it says up front that the second appearance is
-     the SAME thing in its other role, not a different item that happens to share
-     a name, which is the one fact the annotation exists to convey. Kept short on
-     purpose (a V1.12 round-3 fix had to rebuild .chip__text's own layout after a
-     longer version of this exact string orphaned mid-word at 320px). */
-  var BOTH_ROWS_NOTE = {
-    choice_architecture: "gleiche Idee, Werkzeug unten",
-    tb_choice_architecture: "gleiche Idee, Massnahme oben",
-    peak_end_rule: "gleiche Idee, Werkzeug in Schritt 3",
-    tb_peak_end: "gleiche Idee, Konzept in Schritt 1",
-    personalization: "gleiche Idee, Werkzeug in Schritt 3",
-    tb_relational_framing: "gleiche Idee, Konzept in Schritt 1"
-  };
+     and the concepts that also exist as a named tool). V1.12 through V1.17 answered
+     that with a per-chip cross-reference annotation (BOTH_ROWS_NOTE, ".chip__dual",
+     "gleiche Idee, Werkzeug in Schritt 3" and its siblings). Removed entirely
+     (Eugen, 2026-09-23, screenshot of the Weitere-Konzepte row with the annotation
+     circled): a preview of where else a concept resurfaces is exactly the kind of
+     thing a group should discover by working through the tool, not read off the
+     button before they have even chosen it -- previewing it risks confusing more
+     than it clarifies. No replacement: a shared name with no annotation is fine: it
+     reads as two related but independent choices, same as any other chip. */
 
   function renderChips() {
     renderWirkGroups();
@@ -4178,6 +4161,17 @@
     if (!wrap) { return; }
     var ready = trimmed(STATE.erklaerung) !== "" && trimmed(STATE.gegenprobe) !== "";
     wrap.hidden = !ready;
+    /* Mirrors the hint-wirkmechanismen auto-hide a few lines up in
+       renderWirkGroups(): once hypothesisChoiceRequired() is satisfied (by
+       either path -- typing the second explanation, or picking A/B), the
+       screen-2 gate banner in goToStep() no longer applies, so it is hidden
+       here on every render rather than waiting for another blocked "Weiter"
+       click to notice. Checked on every render, same as that one, so it
+       covers a JSON import (applyPayload() -> renderChips() -> here) too,
+       not only a hand click on the toggle. */
+    if ($("hint-hypothese") && !hypothesisChoiceRequired()) {
+      $("hint-hypothese").hidden = true;
+    }
     if (!ready) { return; }
     ["A", "B"].forEach(function (v) {
       var btn = wrap.querySelector('[data-hyp="' + v + '"]');
@@ -4481,10 +4475,25 @@
   /* V1.17 (2026-09-22, council): with both explanations typed and no working
      hypothesis chosen, the brief used to present Erklärung A as the group's
      hypothesis although nobody had chosen it. Slide 26 prints an open diagnosis as
-     "Wahl offen oder Auslöser fehlt", so an open choice now names both; the toggle
-     stays voluntary and nothing is gated on it. */
+     "Wahl offen oder Auslöser fehlt", so an open choice now names both. Superseded
+     the same round (2026-09-23, see goToStep()'s gate below): the toggle is no
+     longer reachable in an open state through ordinary use, since screen 2 now
+     refuses to release the group without a choice. This function, and the open
+     rendering it feeds (HYPOTHESIS_OPEN_CHAIN, the brief, the JSON export), stay
+     exactly as they were: a case re-opened from an older JSON export (from before
+     this round, or hand-edited) can still legitimately carry an unset hypothesis,
+     and it must still render honestly rather than silently claiming Erklärung A. */
   function hypothesisOpen() {
     return STATE.hypothese === "" && !!trimmed(STATE.erklaerung) && !!trimmed(STATE.gegenprobe);
+  }
+  /* goToStep()'s own gate for screen 2 (2026-09-23, see the HTML comment on
+     #hypotheseField): the group may not proceed past screen 2 without both
+     explanations AND a chosen working hypothesis. Kept as its own named
+     function, not inlined into goToStep(), so renderHypotheseToggle() (which
+     needs the identical condition to know when to hide the now-satisfied hint)
+     can never drift out of step with what actually gates navigation. */
+  function hypothesisChoiceRequired() {
+    return !(trimmed(STATE.erklaerung) && trimmed(STATE.gegenprobe) && STATE.hypothese);
   }
   function reportbackSentence() {
     var xRaw = situationLabel();
@@ -5750,18 +5759,32 @@
       num.textContent = n;
       b.appendChild(num);
       b.appendChild(document.createTextNode(name));
-      /* Screens 2 to 5 need a concept (goToStep()'s one gate); until there is one
-         the tabs say so instead of looking clickable and doing nothing (APEX). */
+      /* Screens 2 to 5 need a concept, and screens 3 to 5 also need a chosen
+         working hypothesis (goToStep()'s two gates); until either is true the
+         tabs say so instead of looking clickable and doing nothing (APEX). */
       if (n > 1 && STATE.wirkmechanismen.length < MIN_WIRK) {
+        b.classList.add("is-unavailable");
+        b.setAttribute("aria-disabled", "true");
+      }
+      if (n > 2 && hypothesisChoiceRequired()) {
         b.classList.add("is-unavailable");
         b.setAttribute("aria-disabled", "true");
       }
       b.addEventListener("click", function () {
         goToStep(n);
-        /* A refused tab click (screen 1, no concept): the banner under the Weiter
-           button is brought into view, else the click shows nothing (loop iteration 5). */
-        var h = $("hint-wirkmechanismen");
-        if (currentStep === 1 && n > 1 && h && !h.hidden) { h.scrollIntoView({ block: "center", behavior: "smooth" }); }
+        /* A refused tab click: whichever banner goToStep() just showed is brought
+           into view, else the click shows nothing (loop iteration 5). Screen 1's
+           concept gate and screen 2's hypothesis gate are mutually exclusive per
+           click (goToStep() returns at the first one it hits), so checking both
+           hint elements' hidden state, rather than currentStep, picks the right
+           one without needing to know which gate actually fired. */
+        var wirkHint = $("hint-wirkmechanismen");
+        var hypHint = $("hint-hypothese");
+        if (currentStep === 1 && n > 1 && wirkHint && !wirkHint.hidden) {
+          wirkHint.scrollIntoView({ block: "center", behavior: "smooth" });
+        } else if (currentStep === 2 && n > 2 && hypHint && !hypHint.hidden) {
+          hypHint.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
       });
       inner.appendChild(b);
     });
@@ -5963,11 +5986,31 @@
       announce($("hint-wirkmechanismen").textContent);
       return;
     }
+    /* Screen 2's gate (Eugen, 2026-09-23: "the selection of one of these buttons
+       should be forced. One should not be able to proceed without selecting one
+       of them"). Checked for any n > 2, not only n === 3, the same way screen 1's
+       gate above checks any n > 1: a nav-tab click can jump straight from screen 1
+       to screen 4 or 5, and both explanations plus a chosen hypothesis feed
+       screen 3's own design step, so nothing past screen 2 is usable without them
+       either. Two distinct messages, because #hypotheseField itself is hidden
+       until both explanations are typed (see renderHypotheseToggle()): telling a
+       group to "choose Erklärung A or B" while the buttons are not even on screen
+       would be a dead end. */
+    if (n > 2 && hypothesisChoiceRequired()) {
+      var hintEl = $("hint-hypothese");
+      hintEl.textContent = (trimmed(STATE.erklaerung) && trimmed(STATE.gegenprobe))
+        ? "Noch offen: Arbeitshypothese wählen (Erklärung A oder B). Bitte wählen, dann geht es weiter."
+        : "Noch offen: Erklärung A und Erklärung B ausfüllen, dann eine Arbeitshypothese wählen.";
+      hintEl.hidden = false;
+      announce(hintEl.textContent);
+      return;
+    }
     /* APEX review (2026-09-21): the screen-4 gate (Feld 5 before screen 5) is gone.
        It duplicated the export gate, which names every open field anyway, and a
-       tab click on "5" from screen 1 to 3 landed on screen 4 with a banner. The
-       one gate that stays is screen 1's: the concepts feed screens 3 and the
-       brief, so nothing past screen 1 is usable without one. */
+       tab click on "5" from screen 1 to 3 landed on screen 4 with a banner. Two
+       gates stay: screen 1's above (the concepts feed screens 3 and the brief) and
+       screen 2's above (added 2026-09-23; the working hypothesis feeds screen 3's
+       own design step and, since that round, is mandatory rather than voluntary). */
     currentStep = n;
     /* An armed left-hand concept (linkmapArmed) is a transient "waiting for its
        partner" cue, scoped to being on screen 3 with the panel in front of you,
